@@ -1,12 +1,7 @@
-import {createClient} from "@/utils/supabase/client";
-
-
-
+import {fetchTournaments} from "@/utils/data";
 
 export default async function Home() {
-    const supabase = createClient()
-
-    const {data: tournaments} = await supabase.from('tournaments').select()
+    const tournaments = await fetchTournaments();
 
     const tournamentElements = tournaments != null ? tournaments.map((tournament) => {
         return <li key={tournament.id}>
