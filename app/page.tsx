@@ -1,6 +1,4 @@
-import {fetchTournaments} from "@/utils/data";
-
-import {AddButton} from "@/ui/test";
+import {fetchTournaments} from "@/server/queries/queries";
 
 export default async function Home() {
     const tournaments = await fetchTournaments();
@@ -19,7 +17,6 @@ export default async function Home() {
             <ul>
                 {tournamentElements}
             </ul>
-            <AddButton />
         </div>
       </main>
     </div>
