@@ -7,7 +7,7 @@ export default async function Home() {
 
         return <li key={tournament.id}>
             <h2>{tournament.name}</h2>
-            <p>{new Date(tournament.start_time).toLocaleString()}</p>
+            <p>{tournament.start_time}</p>
         </li>
     }) : <></>
 
