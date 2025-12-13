@@ -4,9 +4,10 @@ export default async function Home() {
     const tournaments = await fetchTournaments();
 
     const tournamentElements = tournaments != null ? tournaments.map((tournament) => {
+
         return <li key={tournament.id}>
             <h2>{tournament.name}</h2>
-            <p>{tournament.description}</p>
+            <p>{new Date(tournament.start_time).toLocaleString()}</p>
         </li>
     }) : <></>
 
