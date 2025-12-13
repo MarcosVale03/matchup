@@ -3,7 +3,17 @@
 import {createClient} from "@/server/db/server";
 import { cookies } from 'next/headers'
 
-export async function fetchTournaments(searchQuery: string = "", startAfter: Date = new Date(0)) {
+import {Database} from "@/server/db/db.types";
+
+type QueryResponse<T> = {
+    status: "success" | "error",
+    data?: T,
+    message?: string
+}
+
+type Tournament = Database["public"]["Tables"]["tournaments"]["Row"];
+
+export async function fetchTournaments(searchQuery: string = "", startAfter: Date = new Date(0)): Promise<QueryResponse<Tournament[]>> {
     /**
      * @param {string}  searchQuery     Query placed within the search bar. Used to perform a websearch of the table.
      *                                  Default = ""
@@ -13,7 +23,7 @@ export async function fetchTournaments(searchQuery: string = "", startAfter: Dat
     const cookieStore = await cookies()
     const supabase = await createClient(cookieStore)
 
-    const {data: tournaments} = searchQuery ?
+    const {data, error} = searchQuery ?
         await supabase.from('tournaments').select().gt('start_time', startAfter.toISOString()).textSearch(
         'tournaments', searchQuery, {
             type: "websearch",
@@ -21,5 +31,15 @@ export async function fetchTournaments(searchQuery: string = "", startAfter: Dat
         }) :
         await supabase.from('tournaments').select().gt('start_time', startAfter.toISOString())
 
-    return tournaments
+    if (error) {
+        return {
+            status: "error",
+            message: error.message
+        }
+    }
+
+    return {
+        status: "success",
+        data: data
+    }
 }
