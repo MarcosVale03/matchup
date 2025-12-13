@@ -2,12 +2,13 @@
 
 import { createServerClient } from "@supabase/ssr";
 import {ReadonlyRequestCookies} from "next/dist/server/web/spec-extension/adapters/request-cookies";
+import {Database} from "@/server/db/db.types";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SECRET_KEY;
 
 export const createClient = async (cookieStore: ReadonlyRequestCookies) => {
-    return createServerClient(
+    return createServerClient<Database>(
         supabaseUrl!,
         supabaseKey!,
         {
