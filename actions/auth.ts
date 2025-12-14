@@ -22,6 +22,3 @@ export async function signUp(username: string, email: string, password: string) 
     }
 }
 
-export async function logIn(email: string, password: string) {
-
-}
