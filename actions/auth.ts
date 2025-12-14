@@ -3,11 +3,11 @@
 import { createClient} from "@/server/db/server"
 import {cookies} from 'next/headers'
 
-export async function signUp(email: string, password: string) {
+export async function signUp(username: string, email: string, password: string) {
     const cookieStore = await cookies()
     const supabase = await createClient(cookieStore)
 
-    const {error} = await supabase.auth.signUp({email, password,}) 
+    const {error} = await supabase.auth.signUp({email, password, options: {data: {username,}}}) 
 
     if (error) {
         return {
@@ -20,4 +20,8 @@ export async function signUp(email: string, password: string) {
         success: true,
         message: "Check your email for confirmation link",
     }
+}
+
+export async function logIn(email: string, password: string) {
+
 }
