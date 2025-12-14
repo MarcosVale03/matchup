@@ -19,6 +19,8 @@ export default function AuthFields({
     onPasswordChange, 
     onUsernameChange
 }: AuthFieldsProps) {
+    const inputClass = "border border-gray-300 rounded-lg p-2 mb-4 w-full text-black";
+
     return (
         <div className="flex flex-col">
             <p className="text-left text-gray-500 font-sans">
@@ -30,7 +32,7 @@ export default function AuthFields({
                 value={email}
                 onChange={(e) => onEmailChange(e.target.value)}
                 placeholder="Enter your email"
-                className="border border-gray-300 rounded-lg p-2 mb-4 w-full text-black"
+                className={inputClass}
             />
             {authType === 'Signup' && (
                 <>
@@ -43,7 +45,7 @@ export default function AuthFields({
                     value={username}
                     onChange={(e) => onUsernameChange?.(e.target.value)}
                     placeholder="Enter a username"
-                    className="border border-gray-300 rounded-lg p-2 mb-4 w-full text-black"
+                    className={inputClass}
                     />
                 </>
             )}
@@ -56,7 +58,7 @@ export default function AuthFields({
                 value={password}
                 onChange={(e) => onPasswordChange(e.target.value)}
                 placeholder={authType === "Signup" ? "At least 8 characters" : "Password"}
-                className="border border-gray-300 rounded-lg p-2 mb-4 w-full text-black"
+                className={inputClass}
             />
 
             <button 
