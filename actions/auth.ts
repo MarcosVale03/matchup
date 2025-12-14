@@ -22,3 +22,22 @@ export async function signUp(username: string, email: string, password: string) 
     }
 }
 
+export async function signInWithEmail(email: string, password: string) {
+    const cookieStore = await cookies()
+    const supabase = await createClient(cookieStore)
+
+    const { data, error } = await supabase.auth.signInWithPassword({email: email, password: password,})
+
+     if (error) {
+        return {
+            success: false,
+            error: error.message,
+        }
+    }
+
+    return {
+        success: true,
+        message: "Successfully logged in!",
+    }
+
+}
