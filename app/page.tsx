@@ -1,3 +1,4 @@
+'use client'
 import {fetchTournaments} from "@/server/queries/queries";
 
 export default async function Home() {
