@@ -1,9 +1,9 @@
-import {fetchTournaments} from "@/server/queries/queries";
+import {fetchTournaments} from "@/server/queries/tournaments.queries";
 
 export default async function Home() {
     const response = await fetchTournaments();
 
-    if (response.status !== "success") {
+    if (!response.success) {
         return (
             <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
                 <main
@@ -21,7 +21,7 @@ export default async function Home() {
 
         return <li key={tournament.id}>
             <h2>{tournament.name}</h2>
-            <p>{tournament.start_time}</p>
+            <p>{tournament.start_time.toLocaleString()}</p>
         </li>
     }) : <></>
 

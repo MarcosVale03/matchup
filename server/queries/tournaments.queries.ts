@@ -2,18 +2,23 @@
 
 import {createClient} from "@/server/db/server";
 import { cookies } from 'next/headers'
+import * as z from "zod"
 
-import {Database} from "@/server/db/db.types";
+import {QueryResponse} from "@/lib/types/types";
+import {isoToDateObj} from "@/lib/types/zod.types";
 
-type QueryResponse<T> = {
-    status: "success" | "error",
-    data?: T,
-    message?: string
-}
+const FetchTournamentSchema = z.array(z.object({
+    id: z.number(),
+    name: z.string().min(3).max(80),
+    slug: z.string().min(3).max(80),
+    start_time: isoToDateObj,
+    end_time: isoToDateObj,
+    home_page: z.string()
+}))
 
-type Tournament = Database["public"]["Tables"]["tournaments"]["Row"];
+type Tournaments = z.infer<typeof FetchTournamentSchema>
 
-export async function fetchTournaments(searchQuery: string = "", startAfter: Date = new Date(0)): Promise<QueryResponse<Tournament[]>> {
+export async function fetchTournaments(searchQuery: string = "", startAfter: Date = new Date(0)): Promise<QueryResponse<Tournaments>> {
     /**
      * @param {string}  searchQuery     Query placed within the search bar. Used to perform a websearch of the table.
      *                                  Default = ""
@@ -33,13 +38,21 @@ export async function fetchTournaments(searchQuery: string = "", startAfter: Dat
 
     if (error) {
         return {
-            status: "error",
+            success: false,
             message: error.message
         }
     }
 
+    const result = FetchTournamentSchema.safeParse(data)
+    if (!result.success) {
+        return {
+            success: false,
+            message: z.prettifyError(result.error)
+        }
+    }
+
     return {
-        status: "success",
-        data: data
+        success: true,
+        data: result.data
     }
 }
