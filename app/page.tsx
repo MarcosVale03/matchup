@@ -1,39 +1,20 @@
-import {fetchTournaments} from "@/server/queries/tournaments.queries";
+import Link from 'next/link';
+import NavigationBar from '../ui/navigation-bar'
 
-export default async function Home() {
-    const response = await fetchTournaments();
-
-    if (!response.success) {
-        return (
-            <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-                <main
-                    className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-                    <div>
-                        <p>{response.message}</p>
-                    </div>
-                </main>
-            </div>
-        )
-    }
-
-    const tournaments = response.data
-    const tournamentElements = tournaments != null ? tournaments.map((tournament) => {
-
-        return <li key={tournament.id}>
-            <h2>{tournament.name}</h2>
-            <p>{tournament.start_time.toLocaleString()}</p>
-        </li>
-    }) : <></>
-
-    return (
-        <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-        <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <div>
-            <ul>
-                {tournamentElements}
-            </ul>
-        </div>
-      </main>
-    </div>
+export default function Home() {
+  return (
+    // placeholder code for the home page, will probably just be the search page for now
+    <main className="bg-white">
+      <NavigationBar />
+      <div className="flex flex-col justify-center items-center h-screen">
+        <h1 className="text-black">Matchup</h1>
+        <Link href="/login" className="text-blue-600 hover:underline">
+          Go to Login
+        </Link>
+        <Link href="/signup" className="text-blue-600 hover:underline">
+          Go to Signup
+        </Link>
+      </div>
+    </main>
   );
 }
