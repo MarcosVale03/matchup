@@ -7,18 +7,18 @@ import * as z from "zod"
 import {QueryResponse} from "@/lib/types/types";
 import {isoToDateObj} from "@/lib/types/zod.types";
 
-const FetchTournamentSchema = z.array(z.object({
+const TournamentsFetchSchema = z.array(z.object({
     id: z.number(),
     name: z.string().min(3).max(80),
-    slug: z.string().min(3).max(80),
+    slug: z.string().min(3).max(80).nullable(),
     start_time: isoToDateObj,
     end_time: isoToDateObj,
     home_page: z.string()
 }))
 
-type Tournaments = z.infer<typeof FetchTournamentSchema>
+type TournamentsFetch = z.infer<typeof TournamentsFetchSchema>
 
-export async function fetchTournaments(searchQuery: string = "", startAfter: Date = new Date(0)): Promise<QueryResponse<Tournaments>> {
+export async function fetchTournaments(searchQuery: string = "", startAfter: Date = new Date(0)): Promise<QueryResponse<TournamentsFetch>> {
     /**
      * @param {string}  searchQuery     Query placed within the search bar. Used to perform a websearch of the table.
      *                                  Default = ""
@@ -43,7 +43,7 @@ export async function fetchTournaments(searchQuery: string = "", startAfter: Dat
         }
     }
 
-    const result = FetchTournamentSchema.safeParse(data)
+    const result = TournamentsFetchSchema.safeParse(data)
     if (!result.success) {
         return {
             success: false,
