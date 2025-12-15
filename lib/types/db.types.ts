@@ -117,18 +117,18 @@ export type Database = {
         }
         Relationships: []
       }
-      discord_contact: {
+      discord_contacts: {
         Row: {
           contact_id: number
-          invite_link: string
+          invite_code: string
         }
         Insert: {
           contact_id: number
-          invite_link: string
+          invite_code: string
         }
         Update: {
           contact_id?: number
-          invite_link?: string
+          invite_code?: string
         }
         Relationships: [
           {
@@ -305,21 +305,21 @@ export type Database = {
           id: number
           latitude: number
           longitude: number
-          mapsplaceid: string
+          maps_place_id: string
         }
         Insert: {
           address: string
           id?: number
           latitude: number
           longitude: number
-          mapsplaceid: string
+          maps_place_id: string
         }
         Update: {
           address?: string
           id?: number
           latitude?: number
           longitude?: number
-          mapsplaceid?: string
+          maps_place_id?: string
         }
         Relationships: []
       }
@@ -485,49 +485,6 @@ export type Database = {
           },
           {
             foreignKeyName: "offline_tournaments_tournaments_fk_01"
-            columns: ["tournament_id"]
-            isOneToOne: true
-            referencedRelation: "tournaments"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      online_events: {
-        Row: {
-          event_name: string
-          tournament_id: number
-        }
-        Insert: {
-          event_name: string
-          tournament_id: number
-        }
-        Update: {
-          event_name?: string
-          tournament_id?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "online_events_events_fk_01"
-            columns: ["tournament_id", "event_name"]
-            isOneToOne: true
-            referencedRelation: "events"
-            referencedColumns: ["tournament_id", "name"]
-          },
-        ]
-      }
-      online_tournaments: {
-        Row: {
-          tournament_id: number
-        }
-        Insert: {
-          tournament_id: number
-        }
-        Update: {
-          tournament_id?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "online_tournaments_tournaments_fk_01"
             columns: ["tournament_id"]
             isOneToOne: true
             referencedRelation: "tournaments"
