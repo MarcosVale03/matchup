@@ -238,36 +238,33 @@ export type Database = {
       }
       events: {
         Row: {
-          description: string
           end_time: string
           gaming_platform_name: string
           max_team_size: number | null
           name: string
-          price: unknown
+          price: number
           start_time: string
           teams_allowed: boolean
           tournament_id: number
           video_game_name: string
         }
         Insert: {
-          description: string
           end_time: string
           gaming_platform_name: string
           max_team_size?: number | null
           name: string
-          price: unknown
+          price: number
           start_time: string
           teams_allowed: boolean
           tournament_id: number
           video_game_name: string
         }
         Update: {
-          description?: string
           end_time?: string
           gaming_platform_name?: string
           max_team_size?: number | null
           name?: string
-          price?: unknown
+          price?: number
           start_time?: string
           teams_allowed?: boolean
           tournament_id?: number
@@ -305,20 +302,23 @@ export type Database = {
       locations: {
         Row: {
           address: string
-          coordinates: unknown
           id: number
+          latitude: number
+          longitude: number
           mapsplaceid: string
         }
         Insert: {
           address: string
-          coordinates: unknown
           id?: number
+          latitude: number
+          longitude: number
           mapsplaceid: string
         }
         Update: {
           address?: string
-          coordinates?: unknown
           id?: number
+          latitude?: number
+          longitude?: number
           mapsplaceid?: string
         }
         Relationships: []
@@ -682,15 +682,15 @@ export type Database = {
           home_page: string
           id: number
           name: string
-          slug: string
+          slug: string | null
           start_time: string
         }
         Insert: {
           end_time: string
-          home_page: string
+          home_page?: string
           id?: number
           name: string
-          slug: string
+          slug?: string | null
           start_time: string
         }
         Update: {
@@ -698,7 +698,7 @@ export type Database = {
           home_page?: string
           id?: number
           name?: string
-          slug?: string
+          slug?: string | null
           start_time?: string
         }
         Relationships: []
