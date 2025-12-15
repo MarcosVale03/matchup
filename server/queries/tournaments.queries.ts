@@ -5,14 +5,14 @@ import { cookies } from 'next/headers'
 import * as z from "zod"
 
 import {QueryResponse} from "@/lib/types/types";
-import {isoToDateObj} from "@/lib/types/zod.types";
+import {ISOToDateObj} from "@/lib/types/zod.types";
 
 const TournamentsFetchSchema = z.array(z.object({
     id: z.number(),
     name: z.string().min(3).max(80),
-    slug: z.string().min(3).max(80).nullable(),
-    start_time: isoToDateObj,
-    end_time: isoToDateObj,
+    slug: z.nullable(z.string().min(3).max(80)),
+    start_time: ISOToDateObj,
+    end_time: ISOToDateObj,
     home_page: z.string()
 }))
 
