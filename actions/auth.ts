@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient} from "@/server/db/server"
+import {createClient} from "@/server/db/server"
 import {cookies} from 'next/headers'
 
 export async function signUp(username: string, email: string, password: string) {
