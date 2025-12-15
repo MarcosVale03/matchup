@@ -117,18 +117,18 @@ export type Database = {
         }
         Relationships: []
       }
-      discord_contact: {
+      discord_contacts: {
         Row: {
           contact_id: number
-          invite_link: string
+          invite_code: string
         }
         Insert: {
           contact_id: number
-          invite_link: string
+          invite_code: string
         }
         Update: {
           contact_id?: number
-          invite_link?: string
+          invite_code?: string
         }
         Relationships: [
           {
