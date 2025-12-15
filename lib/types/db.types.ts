@@ -724,7 +724,22 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      insert_tournament: {
+        Args: {
+          is_online: boolean
+          t_address?: string
+          t_discord?: string
+          t_email?: string
+          t_end_time: string
+          t_latitude?: number
+          t_longitude?: number
+          t_name: string
+          t_place_id?: string
+          t_slug?: string
+          t_start_time: string
+        }
+        Returns: number
+      }
     }
     Enums: {
       [_ in never]: never
