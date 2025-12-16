@@ -4,7 +4,11 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { insertTournament, TournamentInsertErrors } from '@/server/mutations/tournaments.mutations';
 
-const dateToInputString = (date: Date) => date.toISOString().substring(0, 16);
+const dateToInputString = (date: Date) => {
+    const offset = date.getTimezoneOffset() * 60000;
+    const outDate = new Date(date.getTime() - offset);
+    return outDate.toISOString().substring(0, 16);
+};
 
 const getDefaultFutureDate = (hours: number = 2) => {
     const d = new Date();
@@ -155,7 +159,10 @@ export default function TournamentInsertForm() {
                             name="startTime"
                             id="startTime"
                             value={dateToInputString(formData.startTime)}
-                            onChange={(e) => setFormData({ ...formData, startTime: new Date(e.target.value) })}
+                            onChange={(e) => {
+                                if (!e.target.validity.valid) return;
+                                setFormData({...formData, startTime: new Date(e.target.value)});
+                            }}
                             required
                             className="mt-1 block w-full rounded-md border-gray-500 shadow-sm p-2 focus:border-[#BD2D2D] focus:ring-[#BD2D2D] text-gray-500"
                         />
