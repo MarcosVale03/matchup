@@ -83,7 +83,7 @@ export async function insertTournament(name: string, start_time: Date, end_time:
         const err = z.flattenError(result.error)
         return {
             success: false,
-            formErrors: err.formErrors.concat(["Please fix above errors and try again"]),
+            formErrors: err.formErrors.concat(["Please fix below errors and try again"]),
             fieldErrors: err.fieldErrors
         }
     }
@@ -177,7 +177,7 @@ export async function updateTournament(id: number, name: string, start_time: Dat
         const err = z.flattenError(result.error)
         return {
             success: false,
-            formErrors: err.formErrors.concat(["Please fix above errors and try again"]),
+            formErrors: err.formErrors.concat(["Please fix below errors and try again"]),
             fieldErrors: err.fieldErrors
         }
     }

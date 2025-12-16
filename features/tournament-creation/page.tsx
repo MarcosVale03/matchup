@@ -82,7 +82,7 @@ export default function TournamentInsertForm() {
                 formData.isOnline,
                 { email: formData.email.trim() || undefined, discord: formData.discord.trim() || undefined },
                 slugArg,
-                locationArg as any // Cast as 'any' temporarily until location type is finalized
+                locationArg
             );
 
             if (response.success) {
@@ -93,9 +93,9 @@ export default function TournamentInsertForm() {
                 setFieldErrors(response.fieldErrors || {});
                 setFormError(response.formErrors?.join(' ') || 'Validation failed. Check the fields above.');
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Insertion Error:", error);
-            setFormError(error.message || 'An unexpected error occurred on the server.');
+            setFormError('An unexpected error occurred on the server.');
         } finally {
             setIsSubmitting(false);
         }
@@ -159,7 +159,6 @@ export default function TournamentInsertForm() {
                             required
                             className="mt-1 block w-full rounded-md border-gray-500 shadow-sm p-2 focus:border-[#BD2D2D] focus:ring-[#BD2D2D] text-gray-500"
                         />
-                        {fieldErrors.times && <p className="text-sm text-red-500 mt-1">{fieldErrors.times[0]}</p>}
                     </div>
 
                     {/* End Time */}
@@ -175,6 +174,7 @@ export default function TournamentInsertForm() {
                             className="mt-1 block w-full rounded-md border-gray-500 shadow-sm p-2 focus:border-[#BD2D2D] focus:ring-[#BD2D2D] text-gray-500"
                         />
                     </div>
+                    {fieldErrors.times && <p className="text-sm text-red-500 mt-1">{fieldErrors.times[0]}</p>}
                 </fieldset>
 
                 {/* Type and Location */}
@@ -231,7 +231,6 @@ export default function TournamentInsertForm() {
                             placeholder='Enter your email'
                             className="mt-1 block w-full rounded-md border-gray-500 shadow-sm p-2 focus:border-[#BD2D2D] focus:ring-[#BD2D2D] text-black"
                         />
-                        {fieldErrors.contact && <p className="text-sm text-red-500 mt-1">{fieldErrors.contact[0]}</p>}
                     </div>
 
                     {/* Discord */}
@@ -247,6 +246,7 @@ export default function TournamentInsertForm() {
                             className="mt-1 block w-full rounded-md border-gray-500 shadow-sm p-2 focus:border-[#BD2D2D] focus:ring-[#BD2D2D] text-black"
                         />
                     </div>
+                    {fieldErrors.contact && <p className="text-sm text-red-500 mt-1">{fieldErrors.contact[0]}</p>}
                 </fieldset>
 
                 {/* Submit Button */}
