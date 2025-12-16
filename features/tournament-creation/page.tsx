@@ -3,12 +3,9 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { insertTournament, TournamentInsertErrors } from '@/server/mutations/tournaments.mutations';
+import {dateToInputString} from "@/lib/utils";
 
-const dateToInputString = (date: Date) => {
-    const offset = date.getTimezoneOffset() * 60000;
-    const outDate = new Date(date.getTime() - offset);
-    return outDate.toISOString().substring(0, 16);
-};
+
 
 const getDefaultFutureDate = (hours: number = 2) => {
     const d = new Date();

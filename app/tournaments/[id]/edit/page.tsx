@@ -23,13 +23,16 @@ export default async function EditTournamentPage({ params }: { params: { id: str
         <main className="py-12 bg-white min-h-screen">
             <TournamentEditForm initialData={{
                 name: tournament.name,
-                start_time: tournament.start_time,
-                end_time: tournament.end_time, 
+                start_time: new Date(tournament.start_time),
+                end_time: new Date(tournament.end_time),
                 slug: tournament.slug,         
                 id: tournament.id,             
                 
                 is_online: false, 
-                contact: null, 
+                contact: {
+                    email: tournament.email_contact,
+                    discord: tournament.discord_invite
+                },
                 location: null,
             }} />
         </main>

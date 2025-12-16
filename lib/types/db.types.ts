@@ -344,7 +344,7 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "matches_match_slots"
+            foreignKeyName: "matches_match_slots_fk_01"
             columns: [
               "advance_match_identifier",
               "tournament_id",
@@ -440,21 +440,21 @@ export type Database = {
           event_name: string
           identifier: string
           tournament_id: number
-          wave_identifier: string
+          wave_identifier: string | null
         }
         Insert: {
           bracket_phase_name: string
           event_name: string
           identifier: string
           tournament_id: number
-          wave_identifier: string
+          wave_identifier?: string | null
         }
         Update: {
           bracket_phase_name?: string
           event_name?: string
           identifier?: string
           tournament_id?: number
-          wave_identifier?: string
+          wave_identifier?: string | null
         }
         Relationships: [
           {
@@ -469,7 +469,7 @@ export type Database = {
             columns: ["wave_identifier", "tournament_id"]
             isOneToOne: false
             referencedRelation: "waves"
-            referencedColumns: ["identifier", "tournaments_id"]
+            referencedColumns: ["identifier", "tournament_id"]
           },
         ]
       }
@@ -617,20 +617,20 @@ export type Database = {
       waves: {
         Row: {
           identifier: string
-          tournaments_id: number
+          tournament_id: number
         }
         Insert: {
           identifier: string
-          tournaments_id: number
+          tournament_id: number
         }
         Update: {
           identifier?: string
-          tournaments_id?: number
+          tournament_id?: number
         }
         Relationships: [
           {
             foreignKeyName: "waves_tournaments_fk_01"
-            columns: ["tournaments_id"]
+            columns: ["tournament_id"]
             isOneToOne: false
             referencedRelation: "tournaments"
             referencedColumns: ["id"]
@@ -642,6 +642,25 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      insert_event: {
+        Args: {
+          address?: string
+          end_time: string
+          is_online: boolean
+          latitude?: number
+          longitude?: number
+          max_team_size?: number
+          name: string
+          place_id?: string
+          platform: string
+          price: number
+          start_time: string
+          teams_allowed: boolean
+          tournament_id: number
+          video_game: string
+        }
+        Returns: number
+      }
       insert_tournament: {
         Args: {
           is_online: boolean

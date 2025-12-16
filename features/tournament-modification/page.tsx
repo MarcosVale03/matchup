@@ -3,8 +3,8 @@
 import React, { useState } from 'react';
 import { updateTournament, TournamentUpdateErrors } from '@/server/mutations/tournaments.mutations'; 
 import { useRouter } from 'next/navigation';
+import {dateToInputString} from "@/lib/utils";
 
-const dateToInputString = (date: Date) => date.toISOString().substring(0, 16);
 
 interface FormState {
     id: number;
@@ -26,9 +26,9 @@ type Tournament = {
     end_time: Date;
     is_online: boolean;
     contact: { 
-        email?: string, 
-        discord?: string,
-    } | null; 
+        email: string | null,
+        discord: string | null,
+    };
     
     location: any | undefined | null; 
 }
@@ -43,7 +43,7 @@ export default function TournamentEditForm({ initialData }: { initialData: Tourn
     const end_time = initialData.end_time ?? new Date();
     const slug = initialData.slug ?? '';
     const is_online = initialData.is_online ?? false;
-    const contactInfo = initialData.contact ?? {}; 
+    const contactInfo = initialData.contact;
     const location = initialData.location ?? undefined;
 
 
@@ -58,8 +58,8 @@ export default function TournamentEditForm({ initialData }: { initialData: Tourn
         
         // DEFAULT VALUES
         isOnline: is_online, 
-        email: contactInfo.email || '',        // Defaults to '' if email is missing or contact is empty
-        discord: contactInfo.discord || '',    // Defaults to '' if discord is missing or contact is empty
+        email: contactInfo.email == null ? '' : contactInfo.email,        // Defaults to '' if email is missing or contact is empty
+        discord: contactInfo.discord == null ? '' : contactInfo.discord,    // Defaults to '' if discord is missing or contact is empty
         location: location,
     });
 
@@ -106,7 +106,7 @@ export default function TournamentEditForm({ initialData }: { initialData: Tourn
             formData.startTime,
             formData.endTime,
             formData.isOnline,
-            { email: formData.email, discord: formData.discord },
+            { email: formData.email?.trim() || undefined, discord: formData.discord?.trim() || undefined },
             formData.slug || undefined,
             formData.isOnline ? undefined : formData.location
         );
