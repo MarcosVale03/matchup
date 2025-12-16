@@ -122,10 +122,97 @@ export async function insertTournament(name: string, start_time: Date, end_time:
     }
 }
 
-async function isSlugUnique(supabase: SupabaseClient, slug: string) {
+async function isSlugUnique(supabase: SupabaseClient, slug: string, id?: number) {
     const {data, error} = await supabase.from('tournaments').select('id').eq('slug', slug)
     if (error || !data) {
         throw new Error("DB error while querying tournaments: " + error.details + " " + error.message)
     }
-    return data.length == 0
+    return data.length == 0 || (id ? id == data[0].id : false)
+}
+
+
+
+const TournamentUpdateSchema = TournamentInsertSchema.safeExtend({id: z.number()})
+
+type TournamentUpdateErrors = {
+    id?: string[],
+    name?: string[],
+    slug?: string[],
+    times?: string[],
+    is_online?: string[],
+    location?: string[],
+    contact?: string[]
+}
+
+export async function updateTournament(id: number, name: string, start_time: Date, end_time: Date, isOnline: boolean,
+                                       contact: {
+                                           email?: string,
+                                           discord?: string,
+                                       },
+                                       slug?: string,
+                                       location?: {
+                                           maps_place_id: string,
+                                           address: string,
+                                           latitude: number,
+                                           longitude: number
+                                       },
+): Promise<MutationResponse<number, TournamentUpdateErrors>> {
+    const cookieStore = await cookies()
+    const supabase = await createClient(cookieStore)
+
+    const result = TournamentUpdateSchema.safeParse({
+        id: id,
+        name: name,
+        slug: slug,
+        times: {
+            start_time: start_time,
+            end_time: end_time
+        },
+        is_online: isOnline,
+        location: location,
+        contact: contact
+    })
+
+    if (!result.success) {
+        const err = z.flattenError(result.error)
+        return {
+            success: false,
+            formErrors: err.formErrors.concat(["Please fix above errors and try again"]),
+            fieldErrors: err.fieldErrors
+        }
+    }
+
+    if (slug) {
+        const unique = await isSlugUnique(supabase, slug, id)
+        if (!unique) {
+            return {
+                success: false,
+                fieldErrors: {slug: ["This slug is taken"]}
+            }
+        }
+    }
+
+    const {data, error} = await supabase.rpc('update_tournament', {
+        t_id: result.data.id,
+        t_name: result.data.name,
+        t_start_time: result.data.times.start_time,
+        t_end_time: result.data.times.end_time,
+        is_online: result.data.is_online,
+        t_email: result.data.contact.email,
+        t_discord: result.data.contact.discord,
+        t_slug: result.data.slug,
+        t_place_id: result.data.location?.maps_place_id,
+        t_address: result.data.location?.address,
+        t_latitude: result.data.location?.latitude,
+        t_longitude: result.data.location?.longitude
+    })
+
+    if (error) {
+        throw new Error("DB Transaction Failed: " + error.details + " " + error.message)
+    }
+
+    return {
+        success: true,
+        data: data
+    }
 }
