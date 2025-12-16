@@ -1,4 +1,5 @@
 import { Tournament } from "@/lib/types/types";
+import Link from "next/link";
 
 export const SearchResults = ({ tournaments }: { tournaments: Tournament[] }) => {
     // will have to limit the amount of shown results
@@ -32,12 +33,14 @@ export const SearchResults = ({ tournaments }: { tournaments: Tournament[] }) =>
                             </div>
                         </div>
                     </div>
-                    <button 
-                        type="submit" 
-                        className="bg-[#BD2D2D] text-white p-2 rounded-lg hover:bg-red-800 hover:cursor-pointer"
-                    >
-                        View Details
-                    </button>
+                    <div className="flex-shrink-0">
+                        <Link
+                            href={`/tournaments/${tournament.id}`}
+                            className="bg-[#BD2D2D] text-white p-3 rounded-lg hover:bg-red-800 hover:cursor-pointer"
+                        >
+                            View Details
+                        </Link>
+                    </div>
                 </li>
             ))}
         </ul>
