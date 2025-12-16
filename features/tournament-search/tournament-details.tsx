@@ -3,20 +3,21 @@ import { Tournament } from "@/lib/types/types";
 import { formatTournamentDateTime } from "@/ui/format-time";
 import { useRouter } from "next/navigation";
 import NavigationBar from "@/ui/navigation-bar";
+import DeleteTournamentButton from "../tournament-delete/page";
 
 export default function TournamentDetails({ tournament }: { tournament: Tournament }) {
     
-    // const router = useRouter();
+    const router = useRouter();
 
-    // const handleEditClick = () => {
-    //     const url = `/tournaments/edit/${tournament.id}`;;
-    //     router.push(url);
-    // };
+    const handleEditClick = () => {
+        const url = `/tournaments/${tournament.id}/edit`;;
+        router.push(url);
+    };
 
     return (
         <>
             <NavigationBar hidden={false}/>
-            <main className="bg-white flex flex-col min-h-screen justify-center items-center">
+            <main className="bg-white flex flex-col justify-center items-center">
                 
                 {/* Header Section */}
                 <div className="text-center mb-10">
@@ -75,11 +76,15 @@ export default function TournamentDetails({ tournament }: { tournament: Tourname
                 {/* Join Tournament Button (will probably be removed since we're adding events) */}
                 <div className="mt-10 text-center">
                     <button 
-                        // onClick={handleEditClick}
+                        onClick={handleEditClick}
                         className="bg-[#BD2D2D] text-white font-bold text-lg py-3 px-8 rounded-full shadow-lg hover:bg-[#992323] transition duration-150 transform hover:scale-105"
                     >
                         Edit Details
                     </button>
+                    <DeleteTournamentButton 
+                        tournamentId={tournament.id}
+                        tournamentName={tournament.name}
+                    />
                 </div>
                 
             </main>

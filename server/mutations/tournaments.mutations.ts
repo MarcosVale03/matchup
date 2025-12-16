@@ -134,7 +134,7 @@ async function isSlugUnique(supabase: SupabaseClient, slug: string, id?: number)
 
 const TournamentUpdateSchema = TournamentInsertSchema.safeExtend({id: z.number()})
 
-type TournamentUpdateErrors = {
+export type TournamentUpdateErrors = {
     id?: string[],
     name?: string[],
     slug?: string[],

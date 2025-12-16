@@ -18,4 +18,5 @@ export type Tournament = {
     start_time: Date;
     end_time: Date;
     home_page: string;
+    is_online?: boolean;
 }
