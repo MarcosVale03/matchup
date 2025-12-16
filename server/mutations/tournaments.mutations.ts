@@ -113,7 +113,7 @@ export async function insertTournament(name: string, start_time: Date, end_time:
     })
 
     if (error) {
-        throw new Error("DB Transaction Failed: " + error.details + " " + error.message)
+        throw new Error("Tournament Insert Transaction Failed: " + error.details + " " + error.message)
     }
 
     return {
@@ -208,11 +208,26 @@ export async function updateTournament(id: number, name: string, start_time: Dat
     })
 
     if (error) {
-        throw new Error("DB Transaction Failed: " + error.details + " " + error.message)
+        throw new Error("Tournament Update Transaction Failed: " + error.details + " " + error.message)
     }
 
     return {
         success: true,
         data: data
+    }
+}
+
+
+
+export async function deleteTournament(id: number) {
+    const cookieStore = await cookies()
+    const supabase = await createClient(cookieStore)
+
+    const {error} = await supabase.from('tournaments').delete().eq('id', id)
+    if (error) {
+        throw new Error("DB Error while trying to delete from tournaments: " + error.details + " " + error.message)
+    }
+    return {
+        success: true,
     }
 }
