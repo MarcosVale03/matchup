@@ -40,7 +40,7 @@ export async function updateSession(request: NextRequest) {
     const {pathname} = request.nextUrl;
     if (
         !user &&
-        pathname == '/'
+        pathname == '/tournaments'
     ) {
         // no user
         const url = request.nextUrl.clone()
