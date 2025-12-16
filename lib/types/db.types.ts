@@ -642,6 +642,25 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      insert_event: {
+        Args: {
+          address?: string
+          end_time: string
+          is_online: boolean
+          latitude?: number
+          longitude?: number
+          max_team_size?: number
+          name: string
+          place_id?: string
+          platform: string
+          price: number
+          start_time: string
+          teams_allowed: boolean
+          tournament_id: number
+          video_game: string
+        }
+        Returns: number
+      }
       insert_tournament: {
         Args: {
           is_online: boolean
