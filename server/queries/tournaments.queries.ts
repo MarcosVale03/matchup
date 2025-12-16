@@ -17,6 +17,7 @@ const TournamentsFetchSchema = z.array(z.object({
 }))
 
 type TournamentsFetch = z.infer<typeof TournamentsFetchSchema>
+type Tournament = TournamentsFetch[0]
 
 export async function fetchTournaments(searchQuery: string = "", startAfter: Date = new Date(0)): Promise<QueryResponse<TournamentsFetch>> {
     /**
@@ -54,5 +55,53 @@ export async function fetchTournaments(searchQuery: string = "", startAfter: Dat
     return {
         success: true,
         data: result.data
+    }
+}
+
+
+export async function fetchTournamendIdFromSlug(slug: string): Promise<QueryResponse<number>> {
+    const cookieStore = await cookies()
+    const supabase = await createClient(cookieStore)
+
+    const {data, error} = await supabase.from('tournaments').select('id').eq('slug', slug)
+    if (error) {
+        if (error) {
+            console.log(error)
+            return {
+                success: false,
+                message: error.message
+            }
+        }
+    }
+    return {
+        success: true,
+        data: data[0].id
+    }
+}
+
+export async function fetchTournamentFromId(id: number): Promise<QueryResponse<Tournament>> {
+    const cookieStore = await cookies()
+    const supabase = await createClient(cookieStore)
+
+    const {data, error} = await supabase.from('tournaments').select().eq('id', id)
+
+    if (error) {
+        return {
+            success: false,
+            message: error.message
+        }
+    }
+
+    const result = TournamentsFetchSchema.safeParse(data)
+    if (!result.success) {
+        return {
+            success: false,
+            message: z.prettifyError(result.error)
+        }
+    }
+
+    return {
+        success: true,
+        data: result.data[0]
     }
 }
