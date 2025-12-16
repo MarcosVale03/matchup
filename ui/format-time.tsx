@@ -24,5 +24,5 @@ export function formatTournamentDateTime(date: Date | string): string {
         return 'N/A';
     }
     
-    return newDate.toLocaleString(undefined, customDateTimeOptions);
+    return date.toLocaleString(undefined, customDateTimeOptions);
 }
