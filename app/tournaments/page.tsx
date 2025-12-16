@@ -5,10 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { fetchTournaments } from '@/server/queries/tournaments.queries';
 import { SearchResults } from '@/features/tournament-search/search-results';
 import { Tournament } from '@/lib/types/types';
-
-const sleep = (ms: number) => {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
+import { sleep } from '@/features/sleep-function';
 
 export default function TournamentSearchPage() {
 	const [searchQuery, setSearchQuery] = useState('');

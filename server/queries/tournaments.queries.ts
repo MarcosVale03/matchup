@@ -5,21 +5,11 @@ import { cookies } from 'next/headers'
 import * as z from "zod"
 
 import {QueryResponse} from "@/lib/types/types";
-import {ISOToDateObj} from "@/lib/types/zod.types";
+import {Database} from "@/lib/types/db.types";
 
-const TournamentsFetchSchema = z.array(z.object({
-    id: z.number(),
-    name: z.string().min(3).max(80),
-    slug: z.nullable(z.string().min(3).max(80)),
-    start_time: ISOToDateObj,
-    end_time: ISOToDateObj,
-    home_page: z.string()
-}))
+type Tournament = Database["public"]["Tables"]["tournaments"]["Row"]
 
-type TournamentsFetch = z.infer<typeof TournamentsFetchSchema>
-type Tournament = TournamentsFetch[0]
-
-export async function fetchTournaments(searchQuery: string = "", startAfter: Date = new Date(0)): Promise<QueryResponse<TournamentsFetch>> {
+export async function fetchTournaments(searchQuery: string = "", startAfter: Date = new Date(0)): Promise<QueryResponse<Tournament[]>> {
     /**
      * @param {string}  searchQuery     Query placed within the search bar. Used to perform a websearch of the table.
      *                                  Default = ""
@@ -44,17 +34,10 @@ export async function fetchTournaments(searchQuery: string = "", startAfter: Dat
         }
     }
 
-    const result = TournamentsFetchSchema.safeParse(data)
-    if (!result.success) {
-        return {
-            success: false,
-            message: z.prettifyError(result.error)
-        }
-    }
 
     return {
         success: true,
-        data: result.data
+        data: data
     }
 }
 
@@ -92,16 +75,10 @@ export async function fetchTournamentFromId(id: number): Promise<QueryResponse<T
         }
     }
 
-    const result = TournamentsFetchSchema.safeParse(data)
-    if (!result.success) {
-        return {
-            success: false,
-            message: z.prettifyError(result.error)
-        }
-    }
+
 
     return {
         success: true,
-        data: result.data[0]
+        data: data[0]
     }
 }
