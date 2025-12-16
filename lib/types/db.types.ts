@@ -105,64 +105,6 @@ export type Database = {
         }
         Relationships: []
       }
-      contacts: {
-        Row: {
-          id: number
-        }
-        Insert: {
-          id?: number
-        }
-        Update: {
-          id?: number
-        }
-        Relationships: []
-      }
-      discord_contacts: {
-        Row: {
-          contact_id: number
-          invite_code: string
-        }
-        Insert: {
-          contact_id: number
-          invite_code: string
-        }
-        Update: {
-          contact_id?: number
-          invite_code?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "discord_contact_contacts_fk_01"
-            columns: ["contact_id"]
-            isOneToOne: true
-            referencedRelation: "contacts"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      email_contacts: {
-        Row: {
-          contact_id: number
-          email: string
-        }
-        Insert: {
-          contact_id: number
-          email: string
-        }
-        Update: {
-          contact_id?: number
-          email?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "email_contacts_contacts_fk_01"
-            columns: ["contact_id"]
-            isOneToOne: true
-            referencedRelation: "contacts"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       entrants: {
         Row: {
           event_name: string
@@ -603,38 +545,10 @@ export type Database = {
           },
         ]
       }
-      tournament_contacts: {
-        Row: {
-          contact_id: number
-          tournament_id: number
-        }
-        Insert: {
-          contact_id: number
-          tournament_id: number
-        }
-        Update: {
-          contact_id?: number
-          tournament_id?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "tournament_contacts_contacts_fk_01"
-            columns: ["contact_id"]
-            isOneToOne: false
-            referencedRelation: "contacts"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "tournament_contacts_tournaments_fk_01"
-            columns: ["tournament_id"]
-            isOneToOne: false
-            referencedRelation: "tournaments"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       tournaments: {
         Row: {
+          discord_invite: string | null
+          email_contact: string | null
           end_time: string
           home_page: string
           id: number
@@ -643,6 +557,8 @@ export type Database = {
           start_time: string
         }
         Insert: {
+          discord_invite?: string | null
+          email_contact?: string | null
           end_time: string
           home_page?: string
           id?: number
@@ -651,6 +567,8 @@ export type Database = {
           start_time: string
         }
         Update: {
+          discord_invite?: string | null
+          email_contact?: string | null
           end_time?: string
           home_page?: string
           id?: number
@@ -731,6 +649,23 @@ export type Database = {
           t_discord?: string
           t_email?: string
           t_end_time: string
+          t_latitude?: number
+          t_longitude?: number
+          t_name: string
+          t_place_id?: string
+          t_slug?: string
+          t_start_time: string
+        }
+        Returns: number
+      }
+      update_tournament: {
+        Args: {
+          is_online: boolean
+          t_address?: string
+          t_discord?: string
+          t_email?: string
+          t_end_time: string
+          t_id: number
           t_latitude?: number
           t_longitude?: number
           t_name: string
