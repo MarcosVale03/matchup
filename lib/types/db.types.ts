@@ -17,15 +17,15 @@ export type Database = {
       attendees: {
         Row: {
           tournament_id: number
-          user_email: string
+          user_id: string
         }
         Insert: {
           tournament_id: number
-          user_email: string
+          user_id: string
         }
         Update: {
           tournament_id?: number
-          user_email?: string
+          user_id?: string
         }
         Relationships: [
           {
@@ -37,10 +37,10 @@ export type Database = {
           },
           {
             foreignKeyName: "attendees_users_fk_01"
-            columns: ["user_email"]
+            columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
-            referencedColumns: ["email"]
+            referencedColumns: ["user_id"]
           },
         ]
       }
@@ -117,18 +117,18 @@ export type Database = {
         }
         Relationships: []
       }
-      discord_contact: {
+      discord_contacts: {
         Row: {
           contact_id: number
-          invite_link: string
+          invite_code: string
         }
         Insert: {
           contact_id: number
-          invite_link: string
+          invite_code: string
         }
         Update: {
           contact_id?: number
-          invite_link?: string
+          invite_code?: string
         }
         Relationships: [
           {
@@ -168,27 +168,27 @@ export type Database = {
           event_name: string
           team_name: string | null
           tournament_id: number
-          user_email: string
+          user_id: string
         }
         Insert: {
           event_name: string
           team_name?: string | null
           tournament_id: number
-          user_email: string
+          user_id: string
         }
         Update: {
           event_name?: string
           team_name?: string | null
           tournament_id?: number
-          user_email?: string
+          user_id?: string
         }
         Relationships: [
           {
             foreignKeyName: "entrants_attendees_fk_01"
-            columns: ["user_email", "tournament_id"]
+            columns: ["tournament_id", "user_id"]
             isOneToOne: false
             referencedRelation: "attendees"
-            referencedColumns: ["user_email", "tournament_id"]
+            referencedColumns: ["tournament_id", "user_id"]
           },
           {
             foreignKeyName: "entrants_events_fk_01"
@@ -238,36 +238,33 @@ export type Database = {
       }
       events: {
         Row: {
-          description: string
           end_time: string
           gaming_platform_name: string
           max_team_size: number | null
           name: string
-          price: unknown
+          price: number
           start_time: string
           teams_allowed: boolean
           tournament_id: number
           video_game_name: string
         }
         Insert: {
-          description: string
           end_time: string
           gaming_platform_name: string
           max_team_size?: number | null
           name: string
-          price: unknown
+          price: number
           start_time: string
           teams_allowed: boolean
           tournament_id: number
           video_game_name: string
         }
         Update: {
-          description?: string
           end_time?: string
           gaming_platform_name?: string
           max_team_size?: number | null
           name?: string
-          price?: unknown
+          price?: number
           start_time?: string
           teams_allowed?: boolean
           tournament_id?: number
@@ -305,21 +302,24 @@ export type Database = {
       locations: {
         Row: {
           address: string
-          coordinates: unknown
           id: number
-          mapsplaceid: string
+          latitude: number
+          longitude: number
+          maps_place_id: string
         }
         Insert: {
           address: string
-          coordinates: unknown
           id?: number
-          mapsplaceid: string
+          latitude: number
+          longitude: number
+          maps_place_id: string
         }
         Update: {
           address?: string
-          coordinates?: unknown
           id?: number
-          mapsplaceid?: string
+          latitude?: number
+          longitude?: number
+          maps_place_id?: string
         }
         Relationships: []
       }
@@ -492,49 +492,6 @@ export type Database = {
           },
         ]
       }
-      online_events: {
-        Row: {
-          event_name: string
-          tournament_id: number
-        }
-        Insert: {
-          event_name: string
-          tournament_id: number
-        }
-        Update: {
-          event_name?: string
-          tournament_id?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "online_events_events_fk_01"
-            columns: ["tournament_id", "event_name"]
-            isOneToOne: true
-            referencedRelation: "events"
-            referencedColumns: ["tournament_id", "name"]
-          },
-        ]
-      }
-      online_tournaments: {
-        Row: {
-          tournament_id: number
-        }
-        Insert: {
-          tournament_id: number
-        }
-        Update: {
-          tournament_id?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "online_tournaments_tournaments_fk_01"
-            columns: ["tournament_id"]
-            isOneToOne: true
-            referencedRelation: "tournaments"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       phase_groups: {
         Row: {
           bracket_phase_name: string
@@ -576,21 +533,21 @@ export type Database = {
       }
       seeds: {
         Row: {
-          entrant_user_email: string | null
+          entrant_user_id: string | null
           event_name: string
           seed_num: number
           team_name: string | null
           tournament_id: number
         }
         Insert: {
-          entrant_user_email?: string | null
+          entrant_user_id?: string | null
           event_name: string
           seed_num: number
           team_name?: string | null
           tournament_id: number
         }
         Update: {
-          entrant_user_email?: string | null
+          entrant_user_id?: string | null
           event_name?: string
           seed_num?: number
           team_name?: string | null
@@ -599,10 +556,10 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "seeds_entrants_fk_01"
-            columns: ["tournament_id", "event_name", "entrant_user_email"]
+            columns: ["tournament_id", "event_name", "entrant_user_id"]
             isOneToOne: false
             referencedRelation: "entrants"
-            referencedColumns: ["tournament_id", "event_name", "user_email"]
+            referencedColumns: ["tournament_id", "event_name", "user_id"]
           },
           {
             foreignKeyName: "seeds_events_fk_01"
@@ -678,27 +635,27 @@ export type Database = {
       }
       tournaments: {
         Row: {
-          description: string
           end_time: string
+          home_page: string
           id: number
           name: string
-          slug: string
+          slug: string | null
           start_time: string
         }
         Insert: {
-          description: string
           end_time: string
+          home_page?: string
           id?: number
           name: string
-          slug: string
+          slug?: string | null
           start_time: string
         }
         Update: {
-          description?: string
           end_time?: string
+          home_page?: string
           id?: number
           name?: string
-          slug?: string
+          slug?: string | null
           start_time?: string
         }
         Relationships: []
@@ -706,30 +663,24 @@ export type Database = {
       users: {
         Row: {
           display_name: string
-          email: string
           first_name: string
           last_name: string
-          passhash: string
           prefix: string
-          salt: string
+          user_id: string
         }
         Insert: {
           display_name: string
-          email: string
           first_name: string
           last_name: string
-          passhash: string
           prefix: string
-          salt: string
+          user_id: string
         }
         Update: {
           display_name?: string
-          email?: string
           first_name?: string
           last_name?: string
-          passhash?: string
           prefix?: string
-          salt?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -773,7 +724,22 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      insert_tournament: {
+        Args: {
+          is_online: boolean
+          t_address?: string
+          t_discord?: string
+          t_email?: string
+          t_end_time: string
+          t_latitude?: number
+          t_longitude?: number
+          t_name: string
+          t_place_id?: string
+          t_slug?: string
+          t_start_time: string
+        }
+        Returns: number
+      }
     }
     Enums: {
       [_ in never]: never
