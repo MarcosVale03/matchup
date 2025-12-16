@@ -30,7 +30,7 @@ export async function fetchTournaments(searchQuery: string = "", startAfter: Dat
 
     const {data, error} = searchQuery ?
         await supabase.from('tournaments').select().gt('start_time', startAfter.toISOString()).textSearch(
-        'tournaments', searchQuery, {
+        'name', searchQuery, {
             type: "websearch",
             config: "english"
         }) :
