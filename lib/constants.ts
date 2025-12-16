@@ -1,0 +1,1 @@
+export const UNALLOWED_SLUGS = ["api", "login", "signup", "tournaments"]

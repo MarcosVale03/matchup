@@ -6,10 +6,27 @@ import * as z from "zod"
 
 import {DateToISOStr, LocationSchema} from "@/lib/types/zod.types";
 import {MutationResponse} from "@/lib/types/types";
+import {UNALLOWED_SLUGS} from "@/lib/constants";
+import {SupabaseClient} from "@supabase/supabase-js";
 
 const TournamentInsertSchema = z.object({
     name: z.string().min(3).max(80),
-    slug: z.optional(z.string().min(3).max(80)),
+    slug: z.optional(z.string().min(3).max(80).superRefine((slug, ctx) => {
+        if (UNALLOWED_SLUGS.includes(slug)) {
+            ctx.addIssue({
+                code: "custom",
+                message: `Value not allowed`,
+                input: slug
+            })
+        }
+        if (!/^[a-zA-Z0-9]+$/.test(slug)) {
+            ctx.addIssue({
+                code: "custom",
+                message: "Slug must be all alphanumeric characters",
+                input: slug
+            })
+        }
+    })),
     times: z.object({
         start_time: DateToISOStr,
         end_time: DateToISOStr
@@ -71,6 +88,16 @@ export async function insertTournament(name: string, start_time: Date, end_time:
         }
     }
 
+    if (slug) {
+        const unique = await isSlugUnique(supabase, slug)
+        if (!unique) {
+            return {
+                success: false,
+                fieldErrors: {slug: ["This slug is taken"]}
+            }
+        }
+    }
+
     const {data, error} = await supabase.rpc('insert_tournament', {
         t_name: result.data.name,
         t_start_time: result.data.times.start_time,
@@ -93,4 +120,12 @@ export async function insertTournament(name: string, start_time: Date, end_time:
         success: true,
         data: data
     }
+}
+
+async function isSlugUnique(supabase: SupabaseClient, slug: string) {
+    const {data, error} = await supabase.from('tournaments').select('id').eq('slug', slug)
+    if (error || !data) {
+        throw new Error("DB error while querying tournaments: " + error.details + " " + error.message)
+    }
+    return data.length == 0
 }
