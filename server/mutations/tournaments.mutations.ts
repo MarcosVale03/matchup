@@ -42,7 +42,7 @@ const TournamentInsertSchema = z.object({
     }).refine(data => data.email || data.discord, {error: "Must provide at least one contact"})
 }).refine(data => data.is_online || data.location, {error: "Need location for offline event", path: ["location"],})
 
-type TournamentInsertErrors = {
+export type TournamentInsertErrors = {
     name?: string[],
     slug?: string[],
     times?: string[],

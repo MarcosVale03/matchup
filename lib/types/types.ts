@@ -10,3 +10,12 @@ export type MutationResponse<Data, FieldErrors> = {
     fieldErrors?: FieldErrors,
     data?: Data
 }
+
+export type Tournament = {
+    id: number;
+    name: string;
+    slug: string | null;
+    start_time: Date;
+    end_time: Date;
+    home_page: string;
+}
