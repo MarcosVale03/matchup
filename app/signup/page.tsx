@@ -27,7 +27,8 @@ export default function SignupPage() {
         }
 
         setLoading(true);
-        const result = await signUp(username, email, password);
+        // TODO: Change string literals into variables from form
+        const result = await signUp(email, password, "First Name", "Last Name", "Gamertag", "PRE");
         setLoading(false);
 
         if (!result.success) {
