@@ -1,6 +1,7 @@
 'use server'
 
 import {createClient} from "@/server/db/server"
+import { redirect } from "next/navigation"
 import {cookies} from 'next/headers'
 
 export async function signUp(email: string, password: string, firstName: string, lastName: string, displayName: string, prefix: string) {
@@ -21,10 +22,7 @@ export async function signUp(email: string, password: string, firstName: string,
         }
     }
 
-    return {
-        success: true,
-        message: "Check your email for confirmation link",
-    }
+    redirect("/verify-email");
 }
 
 export async function signInWithEmail(email: string, password: string) {
