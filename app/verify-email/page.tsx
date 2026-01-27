@@ -16,9 +16,6 @@ export default function VerifyEmailPage() {
                         <p className="text-md text-[#BD2D2D] text-center font-extralight">
                             Please check your email for a confirmation link.
                         </p>
-                        <Link href="/login" className="text-[#BD2D2D] hover:underline">
-                            Go to Login Page
-                        </Link>
                         </div>
                 </div>
             </div>
