@@ -1,7 +1,5 @@
 'use client'
-import { useState } from 'react';
 import NavigationBar from '@/ui/navigation-bar';
-import Link from 'next/link'
 
 export default function VerifyEmailPage() {
     return (
