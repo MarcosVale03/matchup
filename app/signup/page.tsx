@@ -36,7 +36,6 @@ export default function SignupPage() {
             return;
         }
 
-        setMessage(result.message ?? "Check your email for confirmation link");
     }
 
     return (
