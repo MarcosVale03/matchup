@@ -7,16 +7,19 @@ import NavigationBar from '@/ui/navigation-bar';
 
 export default function SignupPage() {
     const [email, setEmail] = useState('');
-    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [gamertag, setGamertag] = useState('');
+    const [prefix, setPrefix] = useState('');
     const [message, setMessage] = useState('');
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false);
 
     const handleSignup = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setMessage("");
 
-        if (!email || !username || !password) {
+        if (!email || !gamertag || !password || !firstName || !lastName || !gamertag || !prefix) {
             setMessage("All fields are required");
             return;
         }
@@ -27,8 +30,7 @@ export default function SignupPage() {
         }
 
         setLoading(true);
-        // TODO: Change string literals into variables from form
-        const result = await signUp(email, password, "First Name", "Last Name", "Gamertag", "PRE");
+        const result = await signUp(email, password, firstName, lastName, gamertag, prefix);
         setLoading(false);
 
         if (!result.success) {
@@ -39,26 +41,33 @@ export default function SignupPage() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-[#BD2D2D]">
-            <NavigationBar hidden={true}/>  
+        <div className="bg-[#BD2D2D] min-h-screen flex flex-col">
+            <NavigationBar hiddenButton={true} />
+            <div className='flex place-content-center md:pt-5 md:pl-18 md:pr-18 md:pb-18 overflow-y-auto'>
+                <div className="grid grid-cols-1 sm:grid-cols-2 drop-shadow-xl/30 md:max-w-4xl 2xl:max-w-[55vw]">
+                    {/* left side of card */}
+                    <MatchupDescription />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 max-w-6xl drop-shadow-xl/30">
-                {/* left side of card */}
-                <MatchupDescription />
-
-                {/* right side of card */}
-                <AuthCard
-                    email={email}
-                    username={username}
-                    password={password}
-                    message={message}
-                    isLoading={loading}
-                    authType="Signup"
-                    onEmailChange={setEmail}
-                    onUsernameChange={setUsername}
-                    onPasswordChange={setPassword}
-                    handleAuth={handleSignup}
-                />   
+                    {/* right side of card */}
+                    <AuthCard
+                        email={email}
+                        password={password}
+                        firstName={firstName}
+                        lastName={lastName}
+                        gamertag={gamertag}
+                        prefix={prefix}
+                        isLoading={loading}
+                        message={message}
+                        authType='Signup'
+                        handleAuth={handleSignup}
+                        onEmailChange={setEmail}
+                        onPasswordChange={setPassword}
+                        onFirstNameChange={setFirstName}
+                        onLastNameChange={setLastName}
+                        onGamerTagChange={setGamertag}
+                        onPREChange={setPrefix}
+                    />
+                </div>
             </div>
         </div>
     )

@@ -14,15 +14,12 @@ const customDateTimeOptions: Intl.DateTimeFormatOptions = {
  * @returns The formatted date and time string.
  */
 export function formatTournamentDateTime(date: Date | string): string {
-    let newDate: Date;
-    if (typeof date == 'string') {
-        newDate = new Date(date);
-    } else {
-        newDate = date;
-    } 
+    const newDate = typeof date === 'string' ? new Date(date) : date;
+
+    // Check for invalid dates
     if (!(newDate instanceof Date) || isNaN(newDate.getTime())) {
         return 'N/A';
     }
     
-    return date.toLocaleString(undefined, customDateTimeOptions);
+    return newDate.toLocaleString('en-US', customDateTimeOptions);
 }
