@@ -2,7 +2,7 @@ import { fetchTournamentFromId } from "@/server/queries/tournaments.queries";
 import { notFound } from "next/navigation";
 import { Tournament } from "@/lib/types/types";
 import TournamentDetails from "@/features/tournament-search/tournament-details";
-import DeleteTournamentButton from "@/features/tournament-delete/page";
+import NavigationBar from "@/ui/navigation-bar";
 
 export default async function Page({ params }: { params: { id: string } }) {
     const { id: idStr } = await params
@@ -12,15 +12,18 @@ export default async function Page({ params }: { params: { id: string } }) {
         notFound();
     }
 
-    const {success, data} = await fetchTournamentFromId(id)
+    const { success, data } = await fetchTournamentFromId(id)
     if (!success || !data) {
         notFound()
     }
 
     const tournament: Tournament = data;
     return (
-        <main className="min-h-screen bg-white flex flex-col justify-center">
-            <TournamentDetails tournament={tournament} />
+        <main className="min-h-screen bg-white flex flex-col">
+            <NavigationBar hiddenButton={false} />
+            <div>
+                <TournamentDetails tournament={tournament} />
+            </div>
         </main>
     );
 

@@ -4,7 +4,7 @@ import NavigationBar from '@/ui/navigation-bar';
 export default function VerifyEmailPage() {
     return (
             <div className="min-h-screen flex items-center justify-center bg-[#BD2D2D]">
-                <NavigationBar hidden={true}/>
+                <NavigationBar hiddenButton={true}/>
 
                 <div className="flex flex-cols-1 md:flex-cols-2 max-w-6xl drop-shadow-xl/30">
                     <div className="flex flex-col items-center justify-center w-full p-10 bg-white font-sans rounded-2xl">

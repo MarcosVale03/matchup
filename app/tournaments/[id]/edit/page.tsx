@@ -18,25 +18,26 @@ export default async function EditTournamentPage({ params }: { params: { id: str
     }
 
     return (
-        <>
-        <NavigationBar hidden={true} />
-        <main className="py-12 bg-white min-h-screen">
-            <TournamentEditForm initialData={{
-                name: tournament.name,
-                start_time: new Date(tournament.start_time),
-                end_time: new Date(tournament.end_time),
-                slug: tournament.slug,         
-                id: tournament.id,             
+            <main className="bg-white flex flex-col min-h-screen">
+                <NavigationBar hiddenButton={true} />
                 
-                is_online: false, 
-                contact: {
-                    email: tournament.email_contact,
-                    discord: tournament.discord_invite
-                },
-                location: null,
-            }} />
-        </main>
-        </>
-        
+                <div className="flex place-content-center">
+                    <TournamentEditForm initialData={{
+                        name: tournament.name,
+                        start_time: new Date(tournament.start_time),
+                        end_time: new Date(tournament.end_time),
+                        slug: tournament.slug,
+                        id: tournament.id,
+
+                        is_online: false,
+                        contact: {
+                            email: tournament.email_contact,
+                            discord: tournament.discord_invite
+                        },
+                        location: null,
+                    }} />
+                </div>
+
+            </main>
     );
 }
