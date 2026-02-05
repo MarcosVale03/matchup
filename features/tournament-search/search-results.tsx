@@ -21,10 +21,10 @@ export const SearchResults = ({ tournaments }: { tournaments: Tournament[] }) =>
                             {tournament.name}
                         </div>
                         <div className="text-sm text-gray-600">
-                            Start time: {tournament.start_time.toLocaleDateString()}
+                            Start time: {tournament.start_time}
                         </div>
                         <div className="text-sm text-gray-600">
-                            End time: {tournament.end_time.toLocaleDateString()}
+                            End time: {tournament.end_time}
                         </div>
                         <div className="flex flex-row gap-1 mt-1">
                             <img src="/globe.svg" alt="Organizer PFP" className="w-5" />

@@ -5,7 +5,7 @@ import {ReadonlyRequestCookies} from "next/dist/server/web/spec-extension/adapte
 import {Database} from "@/lib/types/db.types";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SECRET_KEY;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
 export const createClient = async (cookieStore: ReadonlyRequestCookies) => {
     return createServerClient<Database>(

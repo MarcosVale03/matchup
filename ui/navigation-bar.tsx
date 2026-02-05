@@ -17,7 +17,7 @@ export default function NavigationBar({ hidden }: { hidden: boolean }) {
 
                     {/* Right: Create Tournament Button */}
                     <Link
-                        href="/login"
+                        href="/tournaments/create"
                         className="flex-shrink-0 px-4 py-2 mr-2 bg-white text-[#BD2D2D] rounded-lg hover:bg-gray-200 transition duration-150 flex items-center gap-1 drop-shadow-lg"
                         hidden={hidden}
                     >

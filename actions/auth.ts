@@ -1,13 +1,19 @@
 'use server'
 
 import {createClient} from "@/server/db/server"
+import { redirect } from "next/navigation"
 import {cookies} from 'next/headers'
 
-export async function signUp(username: string, email: string, password: string) {
+export async function signUp(email: string, password: string, firstName: string, lastName: string, displayName: string, prefix: string) {
     const cookieStore = await cookies()
     const supabase = await createClient(cookieStore)
 
-    const {error} = await supabase.auth.signUp({email, password, options: {data: {username,}}}) 
+    const {error} = await supabase.auth.signUp({email, password, options: {data: {
+                first_name: firstName,
+                last_name: lastName,
+                display_name: displayName,
+                prefix: prefix
+            }}})
 
     if (error) {
         return {
@@ -16,10 +22,7 @@ export async function signUp(username: string, email: string, password: string) 
         }
     }
 
-    return {
-        success: true,
-        message: "Check your email for confirmation link",
-    }
+    redirect("/verify-email");
 }
 
 export async function signInWithEmail(email: string, password: string) {
