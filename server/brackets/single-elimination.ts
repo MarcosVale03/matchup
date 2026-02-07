@@ -1,24 +1,22 @@
 //  generates the structure of a single elimination bracket based on the number of entrants
 export interface GeneratedMatch {
-    id: string
-    round: number
-    matchInRound: number
-    advance_match_id: string | null
-    advance_slot_number: number | null
+    identifier: string          
+    round: number               
+    matchInRound: number        
+    advance_match_identifier: string | null  
+    advance_slot_num: number | null          
     slots: GeneratedSlot[]
 }
 
 // each slot is a position in the match. can either be occupied by seed num or be empty (null)
 export interface GeneratedSlot {
-    slot_number: number
-    seed_number: number | null
+    slot_num: number        
+    seed_num: number | null 
 }
 
 // generates the order of seeds for a given bracket size. For example, for 8 seeds, the order would be [1, 8, 4, 5, 2, 7, 3, 6]
 function generateSeedOrder(bracketSize: number): number[] {
-    if (bracketSize === 1) {
-        return [1]
-    }
+    if (bracketSize === 1) return [1]
 
     const half = bracketSize / 2
     const previousRound = generateSeedOrder(half)
@@ -31,12 +29,13 @@ function generateSeedOrder(bracketSize: number): number[] {
     return result
 }
 
+
 // generates the matches for a single elimination bracket based on the number of entrants. Deals w/ byes as well
 export function generateSingleEliminationBracket(numEntrants: number): GeneratedMatch[] {
-    // account for if num of entrants is invalid
     if (numEntrants < 2) {
-        throw new Error('At least 2 entrants needed for a bracket')
+        throw new Error("Need at least 2 entrants for a bracket")
     }
+
 
     // calc the number of rounds needed and the total bracket size (next power of 2)
     const numRounds = Math.ceil(Math.log2(numEntrants))
@@ -47,50 +46,51 @@ export function generateSingleEliminationBracket(numEntrants: number): Generated
     const matches: GeneratedMatch[] = []
 
     // generate matches round by round and assign seeds to first round, leaving the rest empty for now 
-    for (let round = 1; round <= numRounds; round++) {
+   for (let round = 1; round <= numRounds; round++) {
         const matchesInRound = bracketSize / Math.pow(2, round)
 
-        // for each match in the round, determine the match ID, which match it advances to, and the seeds for the first round
         for (let m = 1; m <= matchesInRound; m++) {
-            const id = `R${round}M${m}`
+            const identifier = `R${round}M${m}`
 
-            let advance_match_id: string | null = null
-            let advance_slot_number: number | null = null
+            let advance_match_identifier: string | null = null
+            let advance_slot_num: number | null = null
 
             if (round < numRounds) {
-                const nextMatchNumber = Math.ceil(m / 2)
-                advance_match_id = `R${round + 1}M${nextMatchNumber}`
-                advance_slot_number = (m % 2 === 1) ? 1 : 2
+                const nextMatchNum = Math.ceil(m / 2)
+                advance_match_identifier = `R${round + 1}M${nextMatchNum}`
+                // if m is odd, winner goes to slot 1; if even, slot 2
+                advance_slot_num = m % 2 === 1 ? 1 : 2
             }
 
+            
             const slots: GeneratedSlot[] = []
 
-            // first round assign seeds based on order, then others will be filled in as winners/players advance
             if (round === 1) {
-                const seedIndex1 = seedOrder[(m - 1) * 2]
-                const seedIndex2 = seedOrder[(m - 1) * 2 + 1]
+                const seedIndex1 = (m - 1) * 2       
+                const seedIndex2 = (m - 1) * 2 + 1   
                 const seed1 = seedOrder[seedIndex1]
                 const seed2 = seedOrder[seedIndex2]
 
-            slots.push({
-                    slot_number: 1,
-                    seed_number: seed1 <= numEntrants ? seed1 : null
+                
+                slots.push({
+                    slot_num: 1,
+                    seed_num: seed1 <= numEntrants ? seed1 : null
                 })
                 slots.push({
-                    slot_number: 2,
-                    seed_number: seed2 <= numEntrants ? seed2 : null
+                    slot_num: 2,
+                    seed_num: seed2 <= numEntrants ? seed2 : null
                 })
             } else {
-                slots.push({ slot_number: 1, seed_number: null })
-                slots.push({ slot_number: 2, seed_number: null })
+                slots.push({ slot_num: 1, seed_num: null })
+                slots.push({ slot_num: 2, seed_num: null })
             }
 
             matches.push({
-                id,
+                identifier,
                 round,
                 matchInRound: m,
-                advance_match_id,
-                advance_slot_number,
+                advance_match_identifier,
+                advance_slot_num,
                 slots
             })
         }
@@ -104,11 +104,11 @@ export function generateSingleEliminationBracket(numEntrants: number): Generated
 export function getByeWinner(match: GeneratedMatch): number | null {
     if (match.round !== 1) return null
 
-    const slot1HasSeed = match.slots[0].seed_number !== null
-    const slot2HasSeed = match.slots[1].seed_number !== null
+    const slot1HasSeed = match.slots[0].seed_num !== null
+    const slot2HasSeed = match.slots[1].seed_num !== null
 
-    if (slot1HasSeed && !slot2HasSeed) return match.slots[0].seed_number
-    if (!slot1HasSeed && slot2HasSeed) return match.slots[1].seed_number
+    if (slot1HasSeed && !slot2HasSeed) return match.slots[0].seed_num
+    if (!slot1HasSeed && slot2HasSeed) return match.slots[1].seed_num
 
     return null
 }

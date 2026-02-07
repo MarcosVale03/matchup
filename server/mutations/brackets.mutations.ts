@@ -107,7 +107,7 @@ export async function generateBracket(
     const generatedMatches = generateSingleEliminationBracket(numEntrants)
 
     const matchInserts = generatedMatches.map(match => ({
-        identifier: match.id,
+        identifier: match.identifier,
         tournament_id: tournamentId,
         event_name: eventName,
         phase_group_identifier: phaseGroupId,
@@ -129,12 +129,12 @@ export async function generateBracket(
     // based on generated matches, insert match slots with seeds for first round and null for later rounds
     const slotInserts = generatedMatches.flatMap(match =>
         match.slots.map(slot => ({
-            match_identifier: match.id,
+            match_identifier: match.identifier,
             tournament_id: tournamentId,
             event_name: eventName,
             phase_group_identifier: phaseGroupId,
-            slot_num: slot.slot_number,
-            seed_num: slot.seed_number,
+            slot_num: slot.slot_num,
+            seed_num: slot.seed_num,
         }))
     )
 
@@ -151,14 +151,14 @@ export async function generateBracket(
 
     // based on generated matches, want to see which match each one advances to
     for (const match of generatedMatches) {
-        if (match.advance_match_id && match.advance_slot_number) {
+        if (match.advance_match_identifier && match.advance_slot_num) {
             const { error: updateError } = await supabase
                 .from('matches')
                 .update({
-                    advance_match_identifier: match.advance_match_id,
-                    advance_slot_num: match.advance_slot_number,
+                    advance_match_identifier: match.advance_match_identifier,
+                    advance_slot_num: match.advance_slot_num,
                 })
-                .eq('identifier', match.id)
+                .eq('identifier', match.identifier)
                 .eq('tournament_id', tournamentId)
                 .eq('event_name', eventName)
                 .eq('phase_group_identifier', phaseGroupId)
@@ -166,7 +166,7 @@ export async function generateBracket(
             if (updateError) {
                 return {
                     success: false,
-                    fieldErrors: { general: [`Failed to set advancement for ${match.id}: ${updateError.message}`] }
+                    fieldErrors: { general: [`Failed to set advancement for ${match.identifier}: ${updateError.message}`] }
                 }
             }
         }
@@ -175,21 +175,21 @@ export async function generateBracket(
     // if entrant doesn't have match, they get a bye and advance to next round
     for (const match of generatedMatches) {
         const byeWinner = getByeWinner(match)
-        if (byeWinner !== null && match.advance_match_id && match.advance_slot_number) {
+        if (byeWinner !== null && match.advance_match_identifier && match.advance_slot_num) {
            
             const { error: byeError } = await supabase
                 .from('match_slots')
                 .update({ seed_num: byeWinner })
-                .eq('match_identifier', match.advance_match_id)
+                .eq('match_identifier', match.advance_match_identifier)
                 .eq('tournament_id', tournamentId)
                 .eq('event_name', eventName)
                 .eq('phase_group_identifier', phaseGroupId)
-                .eq('slot_num', match.advance_slot_number)
+                .eq('slot_num', match.advance_slot_num)
 
             if (byeError) {
                 return {
                     success: false,
-                    fieldErrors: { general: [`Failed to process bye for ${match.id}: ${byeError.message}`] }
+                    fieldErrors: { general: [`Failed to process bye for ${match.identifier}: ${byeError.message}`] }
                 }
             }
         }
