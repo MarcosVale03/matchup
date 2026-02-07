@@ -15,7 +15,7 @@ export default function SignupPage() {
     const handleSignup = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setMessage("");
-
+        
         if (!email || !username || !password) {
             setMessage("All fields are required");
             return;
@@ -28,8 +28,8 @@ export default function SignupPage() {
 
         setLoading(true);
         // TODO: Change string literals into variables from form
-        const result = await signUp(email, password, "First Name", "Last Name", "Gamertag", "PRE");
-        setLoading(false);
+        const result = await signUp(email, password, username, "User", username, "PRE");
+        setLoading(false);  
 
         if (!result.success) {
             setMessage(result.error || "Signup failed due to an unknown error.");
