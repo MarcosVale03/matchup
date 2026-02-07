@@ -32,7 +32,7 @@ function generateSeedOrder(bracketSize: number): number[] {
 }
 
 // generates the matches for a single elimination bracket based on the number of entrants. Deals w/ byes as well
-export function generateSingleEliminationMatches(numEntrants: number): GeneratedMatch[] {
+export function generateSingleEliminationBracket(numEntrants: number): GeneratedMatch[] {
     // account for if num of entrants is invalid
     if (numEntrants < 2) {
         throw new Error('At least 2 entrants needed for a bracket')
