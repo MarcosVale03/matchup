@@ -27,7 +27,7 @@ export default function BasicInputWithLabel({
 }: BasicInputProps) {
     return (
         <div>
-            <label htmlFor={inputName} className={labelClassName} >{labelText}</label>
+            <label htmlFor={inputId} className={labelClassName} >{labelText}</label>
             <input 
                 type={inputType}
                 name={inputName}

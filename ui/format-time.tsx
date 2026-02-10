@@ -2,7 +2,7 @@
 const customDateTimeOptions: Intl.DateTimeFormatOptions = {
     year: 'numeric',
     month: 'short', // Use 'short' (e.g., Dec) or 'numeric' (e.g., 12)
-    day: 'numeric',
+    day: '2-digit',
     hour: '2-digit',
     minute: '2-digit',
     hour12: true, // Use AM/PM format

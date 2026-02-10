@@ -103,97 +103,116 @@ export default function TournamentInsertForm() {
 
     // general classNames used in most of the inputs on this page
     const pageLabelClass = "block text-sm font-medium text-gray-700"
-    const pageInputClass = "mt-1 block w-full rounded-md border-gray-500 shadow-sm p-2 focus:border-[#BD2D2D] focus:ring-[#BD2D2D] text-gray-500"
-    
+    const pageInputClass = "mt-1 block w-full rounded-md border-gray-500 shadow-sm p-2 focus:border-primary focus:ring-primary text-gray-500"
+
     return (
         <div className="mt-10 place-content-center">
             <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-lg border p-10 max-h-[90vh] max-w-[95vw] overflow-y-auto">
-                <h2 className="text-3xl font-bold text-gray-800 text-center p-2">
+                {/* Error Message */}
+                {formError && (
+                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-2" role="alert">
+                        <p>
+                            {formError}
+                        </p>
+                    </div>
+                )}
+
+                <h1 className="text-3xl font-bold text-gray-800 text-center p-2 mb-2">
                     Create a New Tournament
-                </h2>
+                </h1>
 
                 {/* General Details */}
-                <fieldset className="space-y-4 mb-6 place-self-center md:grid md:grid-rows-3 md:grid-cols-2 md:gap-x-3 md:mb-0 ">
-                    <h1 className="text-xl font-semibold text-[#BD2D2D] col-span-2 md:self-end">
+                <fieldset className="space-y-4 mb-6 place-self-center w-full md:grid md:grid-cols-2 md:gap-x-3 md:mb-0">
+
+                    <h2 className="text-xl font-semibold text-primary col-span-2">
                         Basic Information
-                    </h1>
+                    </h2>
 
                     {/* Name */}
-                    <BasicInputWithLabel
-                        labelClassName={pageLabelClass}
-                        labelText="Name *"
-                        inputType='text'
-                        inputName="name"
-                        inputId="name"
-                        inputValue={formData.name}
-                        inputOnChange={handleChange}
-                        required={true}
-                        inputPlaceholder="Enter tournament name"
-                        inputClassName={pageInputClass}
+                    <div>
+                        <BasicInputWithLabel
+                            labelClassName={pageLabelClass}
+                            labelText="Name *"
+                            inputType='text'
+                            inputName="name"
+                            inputId="name"
+                            inputValue={formData.name}
+                            inputOnChange={handleChange}
+                            required={true}
+                            inputPlaceholder="Enter tournament name"
+                            inputClassName={pageInputClass}
 
-                    />
-                    {fieldErrors.name && <p className="text-sm text-red-500 mt-1">
-                        {fieldErrors.name[0]}
-                    </p>}
+                        />
+                        {fieldErrors.name && <p className="text-sm text-red-500 mt-1">
+                            {fieldErrors.name[0]}
+                        </p>}
+                    </div>
+
 
                     {/* Slug */}
-                    <BasicInputWithLabel
-                        labelClassName={pageLabelClass}
-                        labelText="Slug (Optional, for URL)"
-                        inputType="text"
-                        inputName="slug"
-                        inputId="slug"
-                        inputValue={formData.slug}
-                        inputOnChange={handleChange}
-                        required={false}
-                        inputPlaceholder="e.g., mytourney2025"
-                        inputClassName={pageInputClass}
-                    />
-                    {fieldErrors.slug && <p className="text-sm text-red-500 mt-1">
-                        {fieldErrors.slug[0]}
-                    </p>}
+                    <div>
+                        <BasicInputWithLabel
+                            labelClassName={pageLabelClass}
+                            labelText="Slug (Optional, for URL)"
+                            inputType="text"
+                            inputName="slug"
+                            inputId="slug"
+                            inputValue={formData.slug}
+                            inputOnChange={handleChange}
+                            required={false}
+                            inputPlaceholder="e.g., mytourney2025"
+                            inputClassName={pageInputClass}
+                        />
+                        {fieldErrors.slug && <p className="text-sm text-red-500 mt-1">
+                            {fieldErrors.slug[0]}
+                        </p>}
+                    </div>
 
                     {/* Start Time */}
-                    <BasicInputWithLabel
-                        labelClassName={pageLabelClass}
-                        labelText="Start Time *"
-                        inputType="datetime-local"
-                        inputName="startTime"
-                        inputId="startTime"
-                        inputValue={dateToInputString(formData.startTime)}
-                        inputOnChange={(e) => {
-                            if (!e.target.validity.valid) return;
-                            setFormData({ ...formData, startTime: new Date(e.target.value) });
-                        }}
-                        required={true}
-                        inputPlaceholder=""
-                        inputClassName={pageInputClass}
-                    />
+                    <div>
+                        <BasicInputWithLabel
+                            labelClassName={pageLabelClass}
+                            labelText="Start Time *"
+                            inputType="datetime-local"
+                            inputName="startTime"
+                            inputId="startTime"
+                            inputValue={dateToInputString(formData.startTime)}
+                            inputOnChange={(e) => {
+                                if (!e.target.validity.valid) return;
+                                setFormData({ ...formData, startTime: new Date(e.target.value) });
+                            }}
+                            required={true}
+                            inputPlaceholder=""
+                            inputClassName={pageInputClass}
+                        />
+                        {fieldErrors.times && <p className="text-sm text-red-500 mt-1">
+                            {fieldErrors.times[0]}
+                        </p>}
+                    </div>
 
                     {/* End Time */}
-                    <BasicInputWithLabel
-                        labelClassName={pageLabelClass}
-                        labelText="End Time *"
-                        inputType="datetime-local"
-                        inputName="endTime"
-                        inputId="endTime"
-                        inputValue={dateToInputString(formData.startTime)}
-                        inputOnChange={(e) => {
-                            if (!e.target.validity.valid) return;
-                            setFormData({ ...formData, startTime: new Date(e.target.value) });
-                        }}
-                        required={true}
-                        inputPlaceholder=""
-                        inputClassName={pageInputClass}
-                    />
-                    {fieldErrors.times && <p className="text-sm text-red-500 mt-1">
-                        {fieldErrors.times[0]}
-                    </p>}
+                    <div>
+                        <BasicInputWithLabel
+                            labelClassName={pageLabelClass}
+                            labelText="End Time *"
+                            inputType="datetime-local"
+                            inputName="endTime"
+                            inputId="endTime"
+                            inputValue={dateToInputString(formData.endTime)}
+                            inputOnChange={(e) => {
+                                if (!e.target.validity.valid) return;
+                                setFormData({ ...formData, endTime: new Date(e.target.value) });
+                            }}
+                            required={true}
+                            inputPlaceholder=""
+                            inputClassName={pageInputClass}
+                        />
+                    </div>
                 </fieldset>
 
                 {/* Type and Location */}
                 <fieldset className="space-y-4 mb-6 p-4 border rounded-md md:mb-0">
-                    <h1 className="text-xl font-semibold mb-3 text-[#BD2D2D]">
+                    <h1 className="text-xl font-semibold mb-3 text-primary">
                         Location Type
                     </h1>
 
@@ -205,7 +224,7 @@ export default function TournamentInsertForm() {
                             id="isOnline"
                             checked={formData.isOnline}
                             onChange={handleChange}
-                            className="h-4 w-4 accent-[#BD2D2D]"
+                            className="h-4 w-4 accent-primary"
                         />
                         <label htmlFor="isOnline" className="ml-2 block text-sm font-medium text-gray-700">
                             Online tournament?
@@ -236,7 +255,7 @@ export default function TournamentInsertForm() {
 
                 {/* Contact Information */}
                 <fieldset className="space-y-4 p-4 my-4 border rounded md:grid md:grid-rows-1 md:grid-cols-2 md:gap-x-3 md:mb-0">
-                    <h1 className="text-xl font-semibold mb-3 text-[#BD2D2D] md:col-span-2 md:self-end">
+                    <h1 className="text-xl font-semibold mb-3 text-primary md:col-span-2 md:self-end">
                         Contact Information (At least one required)
                     </h1>
 
@@ -278,21 +297,14 @@ export default function TournamentInsertForm() {
                         type="submit"
                         disabled={isSubmitting}
                         className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium 
-                                   text-white bg-[#BD2D2D] hover:bg-[#992323] focus:outline-none focus:ring-2 focus:ring-offset-2 
-                                   focus:ring-[#BD2D2D] disabled:opacity-50 mb-4"
+                                   text-white bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 
+                                   focus:ring-primary disabled:opacity-50 mb-4"
                     >
                         {isSubmitting ? 'Going to events...' : 'Create events for this tournament'}
                     </button>
                 </div>
 
-                {/* Error Message */}
-                {formError && (
-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4" role="alert">
-                        <p>
-                            {formError}
-                        </p>
-                    </div>
-                )}
+
             </form>
         </div>
     );

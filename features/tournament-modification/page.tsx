@@ -5,7 +5,6 @@ import { updateTournament, TournamentUpdateErrors } from '@/server/mutations/tou
 import { useRouter } from 'next/navigation';
 import { dateToInputString } from "@/lib/utils";
 import BasicInputWithLabel from '@/ui/basic-input-with-label';
-import { format } from 'path';
 import { sleep } from '../sleep-function';
 
 
@@ -102,7 +101,6 @@ export default function TournamentEditForm({ initialData }: { initialData: Tourn
         setFormErrors([]);
         setSuccessMessage(null);
 
-        // Map form state to server action arguments, including the ID
         try {
             const result = await updateTournament(
                 formData.id,
@@ -142,7 +140,7 @@ export default function TournamentEditForm({ initialData }: { initialData: Tourn
 
 
     const pageLabelClass = "block text-sm font-medium text-gray-700"
-    const pageInputClass = "mt-1 block w-full rounded-md border-gray-500 shadow-sm p-2 focus:border-[#BD2D2D] focus:ring-[#BD2D2D] text-gray-500"
+    const pageInputClass = "mt-1 block w-full rounded-md border-gray-500 shadow-sm p-2 focus:border-primary focus:ring-primary text-gray-500"
     return (
         <div className="mt-10">
             <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-lg border p-10 max-h-[90vh] max-w-[95vw] overflow-y-auto">
@@ -155,7 +153,7 @@ export default function TournamentEditForm({ initialData }: { initialData: Tourn
                 )}
 
                 <h1 className="text-3xl font-bold text-gray-800 text-center">
-                    Edit Tournament: <span className="text-[#BD2D2D]">{initialData.name}</span>
+                    Edit Tournament: <span className="text-primary">{initialData.name}</span>
                 </h1>
 
                 <div className="mt-5 flex">
@@ -248,7 +246,7 @@ export default function TournamentEditForm({ initialData }: { initialData: Tourn
 
                 {/* Type and Location */}
                 <fieldset className="space-y-4 mb-6 p-4 border rounded-md md:mb-0">
-                    <h1 className="text-xl font-semibold mb-3 text-[#BD2D2D]">
+                    <h1 className="text-xl font-semibold mb-3 text-primary">
                         Location Type
                     </h1>
 
@@ -260,7 +258,7 @@ export default function TournamentEditForm({ initialData }: { initialData: Tourn
                             id="isOnline"
                             checked={formData.isOnline}
                             onChange={handleLocationToggle}
-                            className="h-4 w-4 accent-[#BD2D2D]"
+                            className="h-4 w-4 accent-primary"
                         />
                         <label htmlFor="isOnline" className="ml-2 block text-sm font-medium text-gray-700">
                             Online Tournament
@@ -289,7 +287,7 @@ export default function TournamentEditForm({ initialData }: { initialData: Tourn
 
                 {/* Contact Information */}
                 <fieldset className="space-y-4 p-4 my-4 border rounded md:grid md:grid-rows-1 md:grid-cols-2 md:gap-x-3 md:mb-0">
-                    <h1 className="text-xl font-semibold mb-3 text-[#BD2D2D] md:col-span-2 md:self-end">
+                    <h1 className="text-xl font-semibold mb-3 text-primary md:col-span-2 md:self-end">
                         Contact Information (At least one is required)
                     </h1>
 
@@ -329,8 +327,8 @@ export default function TournamentEditForm({ initialData }: { initialData: Tourn
                         type="submit"
                         disabled={isSubmitting}
                         className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium 
-                                               text-white bg-[#BD2D2D] hover:bg-[#992323] focus:outline-none focus:ring-2 focus:ring-offset-2 
-                                               focus:ring-[#BD2D2D] disabled:opacity-50 mb-4"
+                                               text-white bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 
+                                               focus:ring-primary disabled:opacity-50 mb-4"
                     >
                         {isSubmitting ? 'Saving changes...' : "Edit this tournament"}
                     </button>

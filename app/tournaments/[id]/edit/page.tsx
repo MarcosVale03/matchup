@@ -19,7 +19,7 @@ export default async function EditTournamentPage({ params }: { params: { id: str
 
     return (
             <main className="bg-white flex flex-col min-h-screen">
-                <NavigationBar hiddenButton={true} />
+                <NavigationBar />
                 
                 <div className="flex place-content-center">
                     <TournamentEditForm initialData={{
