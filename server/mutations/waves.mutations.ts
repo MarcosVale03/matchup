@@ -33,7 +33,7 @@ export async function insertWave(tournament_id : number, identifier: string) : P
             fieldErrors: err.fieldErrors
         }
     }
-    // getting error supabase.rpc() might be because I havent made the other files
+    
     const {data, error} = await supabase.rpc('insert_wave', {
         w_tournament_id : result.data.tournament_id,
         w_identifier : result.data.identifier
