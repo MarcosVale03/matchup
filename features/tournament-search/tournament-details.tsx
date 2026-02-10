@@ -3,7 +3,7 @@ import { Tournament } from "@/lib/types/types";
 import { formatTournamentDateTime } from "@/ui/format-time";
 import { useRouter } from "next/navigation";
 
-// This page will probably change once we have events going
+// This page will change once we have events going
 export default function TournamentDetails({ tournament }: { tournament: Tournament }) {
 
     const router = useRouter();
@@ -23,13 +23,13 @@ export default function TournamentDetails({ tournament }: { tournament: Tourname
 
             {/* Header Section */}
             <div className="">
-                <h1 className="text-4xl text-center font-extrabold text-[#BD2D2D]">
+                <h1 className="text-4xl text-center font-extrabold text-primary">
                     {tournament.name}
                 </h1>
             </div>
 
             {/* Details Grid */}
-            <div className="bg-gray-50 p-5 rounded-xl shadow-lg border border-gray-200 max-w-[85vw] place-self-center w-full">
+            <div className="bg-gray-50 p-5 rounded-xl shadow-lg border border-gray-200 max-w-[75vw] place-self-center w-full">
                 <h2 className="text-left text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">
                     Event Details
                 </h2>
@@ -59,8 +59,10 @@ export default function TournamentDetails({ tournament }: { tournament: Tourname
                     {/* Contact Information | Discord */}
                     <div className={mainDiv}>
                         <p className={paragraphElement}>
-                            <span className={spanElement}>Discord: </span>  
-                            {tournament.discord_invite ? tournament.discord_invite : "N/A"}
+                            <span className={spanElement}>Discord: </span>
+                            {tournament.discord_invite
+                                ? `https://discord.gg/${tournament.discord_invite}`
+                                : "N/A"}
                         </p>
                     </div>
 

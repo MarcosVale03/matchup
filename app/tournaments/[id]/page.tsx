@@ -20,7 +20,7 @@ export default async function Page({ params }: { params: { id: string } }) {
     const tournament: Tournament = data;
     return (
         <main className="min-h-screen bg-white flex flex-col">
-            <NavigationBar hiddenButton={false} />
+            <NavigationBar />
             <div>
                 <TournamentDetails tournament={tournament} />
             </div>

@@ -36,9 +36,9 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="bg-[#BD2D2D] min-h-screen flex flex-col">
-            <NavigationBar hiddenButton={true} />
-            <div className='flex-grow flex place-content-center md:pt-5 md:pl-18 md:pr-18 md:pb-18'>
+        <div className="bg-[#BD2D2D] min-h-screen overflow-y-hidden">
+            <NavigationBar />
+            <div className='flex place-content-center md:pt-5 md:pl-18 md:pr-18 md:pb-18 overflow-y-auto min-h-[86vh]'>
                 <div className="grid grid-cols-1 sm:grid-cols-2 drop-shadow-xl/30 md:max-w-4xl 2xl:max-w-[55vw]">
                     {/* left side of card */}
                     <MatchupDescription />
@@ -56,7 +56,6 @@ export default function LoginPage() {
                     />
                 </div>
             </div>
-
         </div>
     )
 }

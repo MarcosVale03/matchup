@@ -43,14 +43,14 @@ export default function AuthCard({
     const footer = authType === 'Signup' ? 'Already have an account?' : "Don't have an account?";
     const href = authType === 'Signup' ? '/login' : '/signup';
 
-    const pageInputClass = "w-full rounded-md border border-gray-300 shadow-sm p-2 focus:border-[#BD2D2D] focus:ring-[#BD2D2D] text-gray-500"
+    const pageInputClass = "w-full rounded-md border border-gray-300 shadow-sm p-2 focus:border-primary focus:ring-primary text-gray-500"
     const pageLabelClass = "text-left text-gray-500 font-sans"
 
     return (
         <main className="flex flex-col place-content-center bg-white rounded-b-lg p-10 md:rounded-r-lg md:rounded-bl-none md:p-15 gap-3">
 
             <div>
-                <h1 className="text-4xl text-[#BD2D2D] text-center font-bold">
+                <h1 className="text-4xl text-primary text-center font-bold">
                     {headerMessage}
                 </h1>
                 <h2 className="text-sm text-gray-500 font-light text-center">
@@ -58,7 +58,7 @@ export default function AuthCard({
                 </h2>
             </div>
             
-            <form onSubmit={handleAuth} id="auth-form-submit" className="overflow-y-auto max-h-[40vh] flex flex-col gap-2 mr-2">
+            <form onSubmit={handleAuth} id="auth-form-submit" className="flex flex-col gap-2 mr-2">
                 {/* Email */}
                 <BasicInputWithLabel
                     labelClassName={pageLabelClass}
@@ -153,7 +153,7 @@ export default function AuthCard({
             <button
                 form="auth-form-submit"
                 type="submit"
-                className="bg-[#BD2D2D] text-white py-3 px-5 rounded-lg hover:bg-red-800 hover:cursor-pointer w-full"
+                className="bg-primary text-white py-3 px-5 rounded-lg hover:bg-red-800 hover:cursor-pointer w-full"
                 disabled={isLoading}
             >
                 {authType === 'Signup' ? 'Create' : 'Login'}
@@ -175,7 +175,7 @@ export default function AuthCard({
 
             <p className="text-sm text-gray-500 text-center">
                 {footer}{' '}
-                <Link href={href} className="text-[#BD2D2D] hover:underline">
+                <Link href={href} className="text-primary hover:underline">
                     {authType === 'Login' ? 'Signup' : 'Login'}
                 </Link>
             </p>
