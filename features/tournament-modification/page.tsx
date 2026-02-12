@@ -1,9 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import { updateTournament, TournamentUpdateErrors } from '@/server/mutations/tournaments.mutations'; 
+import { updateTournament, TournamentUpdateErrors } from '@/server/mutations/tournaments.mutations';
 import { useRouter } from 'next/navigation';
-import {dateToInputString} from "@/lib/utils";
+import { dateToInputString } from "@/lib/utils";
+import BasicInputWithLabel from '@/ui/basic-input-with-label';
+import { sleep } from '../sleep-function';
+import { X } from 'lucide-react';
 
 
 interface FormState {
@@ -25,17 +28,16 @@ type Tournament = {
     start_time: Date;
     end_time: Date;
     is_online: boolean;
-    contact: { 
+    contact: {
         email: string | null,
         discord: string | null,
     };
-    
-    location: any | undefined | null; 
+
+    location: any | undefined | null;
 }
 
-// this will definitely be changed later on
 export default function TournamentEditForm({ initialData }: { initialData: Tournament }) {
-    
+
     // defaults for now
     const id = initialData.id ?? 0;
     const name = initialData.name ?? "";
@@ -46,28 +48,26 @@ export default function TournamentEditForm({ initialData }: { initialData: Tourn
     const contactInfo = initialData.contact;
     const location = initialData.location ?? undefined;
 
-
-
     const [formData, setFormData] = useState<FormState>({
         // NON-DUMMY/PASSED VALUES
         id: id,
         name: name,
-        slug: slug || '', 
+        slug: slug || '',
         startTime: start_time,
         endTime: end_time,
-        
+
         // DEFAULT VALUES
-        isOnline: is_online, 
+        isOnline: is_online,
         email: contactInfo.email == null ? '' : contactInfo.email,        // Defaults to '' if email is missing or contact is empty
         discord: contactInfo.discord == null ? '' : contactInfo.discord,    // Defaults to '' if discord is missing or contact is empty
         location: location,
     });
 
-    const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [fieldErrors, setFieldErrors] = useState<TournamentUpdateErrors>({});
     const [formErrors, setFormErrors] = useState<string[]>([]);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
-    
+
     const router = useRouter();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -91,188 +91,254 @@ export default function TournamentEditForm({ initialData }: { initialData: Tourn
             location: !prev.isOnline ? undefined : prev.location, // Clear location if switching to online
         }));
     };
-    
+
+    // main update logic
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setStatus('loading');
+        setIsSubmitting(true)
         setFieldErrors({});
         setFormErrors([]);
         setSuccessMessage(null);
 
-        // Map form state to server action arguments, including the ID
-        const result = await updateTournament(
-            formData.id,
-            formData.name,
-            formData.startTime,
-            formData.endTime,
-            formData.isOnline,
-            { email: formData.email?.trim() || undefined, discord: formData.discord?.trim() || undefined },
-            formData.slug || undefined,
-            formData.isOnline ? undefined : formData.location
-        );
+        try {
+            const result = await updateTournament(
+                formData.id,
+                formData.name,
+                formData.startTime,
+                formData.endTime,
+                formData.isOnline,
+                { email: formData.email?.trim() || undefined, discord: formData.discord?.trim() || undefined },
+                formData.slug || undefined,
+                formData.isOnline ? undefined : formData.location
+            );
 
-        if (!result.success) {
-            setStatus('error');
-            setFieldErrors(result.fieldErrors || {});
-            setFormErrors(result.formErrors || ['An unknown validation error occurred during update.']);
-        } else {
-            setStatus('success');
-            setSuccessMessage(`Tournament ID ${formData.id} updated successfully!`);
-            router.push("/tournaments")
+            if (result.success) {
+                setSuccessMessage(`${formData.name} updated successfully!`);
+                router.push("/tournaments");
+            } else {
+                setFieldErrors(result.fieldErrors || {});
+                setFormErrors(result.formErrors || ['An unknown validation error occurred during update.']);
+            }
+
+        } catch (error: unknown) {
+            setFormErrors(["An unexpected error occured"]);
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
-    // Helper to display errors
+    // Helper to display errors for specific fields
     const ErrorMessage = ({ field }: { field: keyof TournamentUpdateErrors }) => {
         const errors = fieldErrors[field];
         return errors ? (
-            <div className="text-red-500 text-sm mt-1">
+            <div className="text-red-500 text-sm mt-2">
                 {errors.map((msg, i) => <p key={i}>* {msg}</p>)}
             </div>
         ) : null;
     };
 
 
+    const pageLabelClass = "block text-sm font-medium text-gray-700"
+    const pageInputClass = "mt-1 block w-full rounded-md border-gray-500 shadow-sm p-2 focus:border-primary focus:ring-primary text-gray-500"
     return (
-        <div className="max-w-xl mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg border ">
-            <h2 className="text-2xl font-bold mb-6 text-gray-800">Edit Tournament: {initialData.name}</h2>
-            
-            {/* Global Form Errors */}
-            {formErrors.length > 0 && (
-                <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-                    {formErrors.map((msg, i) => <p key={i}>{msg}</p>)}
-                </div>
-            )}
-            
-            {/* Success Message */}
-            {successMessage && (
-                <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded">
-                    {successMessage}
-                </div>
-            )}
+        <div className="mt-10">
+            <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-lg border p-10 max-h-[90vh] max-w-[95vw] overflow-y-auto">
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-                
-                {/* ID (Read-only for debugging/clarity) */}
-                <div>
-                    <label className="block text-sm font-medium text-gray-500">Tournament ID (Read-Only)</label>
-                    <p className="mt-1 text-lg font-semibold text-gray-900">{formData.id}</p>
-                </div>
-                
-                {/* Name Input */}
-                <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700">Tournament Name</label>
-                    <input
-                        type="text"
-                        name="name"
-                        id="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-gray-400"
-                    />
-                    <ErrorMessage field="name" />
-                </div>
-                
-                {/* Slug Input */}
-                <div>
-                    <label htmlFor="slug" className="block text-sm font-medium text-gray-700">Custom Slug (Optional)</label>
-                    <input
-                        type="text"
-                        name="slug"
-                        id="slug"
-                        value={formData.slug}
-                        onChange={handleChange}
-                        placeholder="e.g., valorant-summer-cup"
-                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-gray-400"
-                    />
-                    <ErrorMessage field="slug" />
+                {/* Global Form Errors */}
+                {formErrors.length > 0 && (
+                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4" role="alert">
+                        {formErrors.map((msg, i) => <p key={i}>{msg}</p>)}
+                    </div>
+                )}
+
+                <h1 className="text-3xl font-bold text-gray-800 text-center">
+                    Edit Tournament: <span className="text-primary">{initialData.name}</span>
+                </h1>
+
+                <div className="mt-5 flex">
+                    <p className="text-md text-gray-500 text-center">Tournament ID (Read-Only):
+                        <span className="font-semibold text-black whitespace-pre"> {formData.id}</span>
+                    </p>
                 </div>
 
-                {/* Times (Simplified Date/Time inputs) */}
-                <div className="flex space-x-4">
-                    <div className="flex-1">
-                        <label htmlFor="startTime" className="block text-sm font-medium text-gray-700">Start Time</label>
-                        <input
-                            type="datetime-local" 
-                            name="startTime"
-                            id="startTime"
-                            value={dateToInputString(formData.startTime)} 
-                            onChange={(e) => setFormData(p => ({...p, startTime: new Date(e.target.value)}))}
-                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-gray-400"
+                {/* General Details */}
+                <fieldset className="space-y-4 m-5 md:grid md:grid-rows-2 md:grid-cols-2 md:gap-x-3 md:mb-0">
+
+                    {/* Name */}
+                    <div>
+                        <BasicInputWithLabel
+                            labelClassName={pageLabelClass}
+                            labelText="Name *"
+                            inputType='text'
+                            inputName="name"
+                            inputId="name"
+                            inputValue={formData.name}
+                            inputOnChange={handleChange}
+                            required={true}
+                            inputPlaceholder={formData.name ? formData.name : "Enter a tournament name"}
+                            inputClassName={pageInputClass}
+
                         />
-                        <ErrorMessage field="times" /> 
+                        <ErrorMessage field="name" />
                     </div>
-                    <div className="flex-1">
-                        <label htmlFor="endTime" className="block text-sm font-medium text-gray-700">End Time</label>
-                        <input
-                            type="datetime-local"
-                            name="endTime"
-                            id="endTime"
-                            value={dateToInputString(formData.endTime)} 
-                            onChange={(e) => setFormData(p => ({...p, endTime: new Date(e.target.value)}))}
-                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-gray-400"
+
+                    <div>
+                        {/* Slug */}
+                        <BasicInputWithLabel
+                            labelClassName={pageLabelClass}
+                            labelText="Slug (Optional, for URL)"
+                            inputType="text"
+                            inputName="slug"
+                            inputId="slug"
+                            inputValue={formData.slug}
+                            inputOnChange={handleChange}
+                            required={false}
+                            inputPlaceholder={formData.slug ? formData.slug : "e.g., Tourney123"}
+                            inputClassName={pageInputClass}
+                        />
+
+                        <ErrorMessage field="slug" />
+                    </div>
+
+                    <div>
+
+                        {/* Start Time */}
+                        <BasicInputWithLabel
+                            labelClassName={pageLabelClass}
+                            labelText="Start Time *"
+                            inputType="datetime-local"
+                            inputName="startTime"
+                            inputId="startTime"
+                            inputValue={dateToInputString(formData.startTime)}
+                            inputOnChange={(e) => {
+                                if (!e.target.validity.valid) return;
+                                setFormData({ ...formData, startTime: new Date(e.target.value) });
+                            }}
+                            required={true}
+                            inputPlaceholder=""
+                            inputClassName={pageInputClass}
+                        />
+
+                        <ErrorMessage field="times" />
+                    </div>
+
+                    <div>
+                        {/* End Time */}
+                        <BasicInputWithLabel
+                            labelClassName={pageLabelClass}
+                            labelText="End Time *"
+                            inputType="datetime-local"
+                            inputName="endTime"
+                            inputId="endTime"
+                            inputValue={dateToInputString(formData.endTime)}
+                            inputOnChange={(e) => {
+                                if (!e.target.validity.valid) return;
+                                setFormData({ ...formData, endTime: new Date(e.target.value) });
+                            }}
+                            required={true}
+                            inputPlaceholder=""
+                            inputClassName={pageInputClass}
                         />
                     </div>
-                </div>
 
-                {/* Location Toggle */}
-                <div className="flex items-center">
-                    <input
-                        id="isOnline"
-                        name="isOnline"
-                        type="checkbox"
-                        checked={formData.isOnline}
-                        onChange={handleLocationToggle}
-                        className="h-4 w-4 border-gray-300 rounded"
-                    />
-                    <label htmlFor="isOnline" className="ml-2 block text-sm text-gray-900">
-                        Is this an Online Tournament?
-                    </label>
-                </div>
-                <ErrorMessage field="location" />
+                </fieldset>
 
-                {/* Contact Inputs */}
-                <fieldset className="border p-4 rounded-md">
-                    <legend className="text-base font-medium text-gray-900">Contact Information</legend>
-                    <div className="mt-2 space-y-2">
-                        <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-600">Email</label>
-                            <input
-                                type="email"
-                                name="email"
-                                id="email"
-                                value={formData.email}
-                                onChange={handleChange}
-                                placeholder="Enter your email"
-                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-gray-400"
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="discord" className="block text-sm font-medium text-gray-700">Discord Link</label>
-                            <input
-                                type="text"
-                                name="discord"
-                                id="discord"
-                                value={formData.discord}
-                                onChange={handleChange}
-                                placeholder="Paste the invite link"
-                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-gray-400"
-                            />
-                        </div>
+                {/* Type and Location */}
+                <fieldset className="space-y-4 mb-6 p-4 border rounded-md md:mb-0">
+                    <h1 className="text-xl font-semibold mb-3 text-primary">
+                        Location Type
+                    </h1>
+
+                    {/* isOnline Checkbox */}
+                    <div className="flex items-center">
+                        <input
+                            type="checkbox"
+                            name="isOnline"
+                            id="isOnline"
+                            checked={formData.isOnline}
+                            onChange={handleLocationToggle}
+                            className="h-4 w-4 accent-primary"
+                        />
+                        <label htmlFor="isOnline" className="ml-2 block text-sm font-medium text-gray-700">
+                            Online Tournament
+                        </label>
                     </div>
+
+                    {/* Location Address (Appears only if offline) */}
+                    {!formData.isOnline && (
+                        <>
+                            <BasicInputWithLabel
+                                labelClassName={pageLabelClass}
+                                labelText="Physical Location Address *"
+                                inputType="text"
+                                inputName="locationAddress"
+                                inputId="locationAddress"
+                                inputValue={formData.location}
+                                inputOnChange={handleChange}
+                                required={!formData.isOnline}
+                                inputPlaceholder={formData.location ? formData.location : "e.g., 123 Main St, Anytown"}
+                                inputClassName={pageInputClass}
+                            />
+                            <ErrorMessage field="location" />
+                        </>
+                    )}
+                </fieldset>
+
+                {/* Contact Information */}
+                <fieldset className="space-y-4 p-4 my-4 border rounded md:grid md:grid-rows-1 md:grid-cols-2 md:gap-x-3 md:mb-0">
+                    <h1 className="text-xl font-semibold mb-3 text-primary md:col-span-2 md:self-end">
+                        Contact Information (At least one is required)
+                    </h1>
+
+                    {/* Email */}
+                    <BasicInputWithLabel
+                        labelClassName='block text-sm font-medium text-gray-700'
+                        labelText='Email (Optional)'
+                        inputType='email'
+                        inputName='email'
+                        inputId='email'
+                        inputValue={formData.email}
+                        inputOnChange={handleChange}
+                        required={false}
+                        inputPlaceholder={formData.email ? formData.email : "Enter your email"}
+                        inputClassName={pageInputClass}
+                    />
+
+                    {/* Discord */}
+                    <BasicInputWithLabel
+                        labelClassName='block text-sm font-medium text-gray-700'
+                        labelText='Discord Link (Optional)'
+                        inputType='string'
+                        inputName='discord'
+                        inputId='discord'
+                        inputValue={formData.discord}
+                        inputOnChange={handleChange}
+                        required={false}
+                        inputPlaceholder={formData.discord ? formData.discord : "e.g., discord.gg/xxxxxxxx"}
+                        inputClassName={pageInputClass}
+                    />
                     <ErrorMessage field="contact" />
                 </fieldset>
 
                 {/* Submit Button */}
-                <button
-                    type="submit"
-                    disabled={status === 'loading'}
-                    className={`w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
-                        status === 'loading' ? 'bg-[#BD2D2D] cursor-not-allowed' : 'bg-[#BD2D2D] hover:bg-[#992323]'
-                    }`}
-                >
-                    {status === 'loading' ? 'Saving Changes...' : 'Update Tournament'}
-                </button>
+                <div className="pt-6 mt-4 border-t">
+                    <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium 
+                                               text-white bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 
+                                               focus:ring-primary disabled:opacity-50 mb-4"
+                    >
+                        {isSubmitting ? 'Saving changes...' : "Edit this tournament"}
+                    </button>
+                </div>
+
+                {/* Success message */}
+                {successMessage && (
+                    <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4" role="alert">
+                        {successMessage}
+                    </div>
+                )}
             </form>
         </div>
     );

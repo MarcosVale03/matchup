@@ -1,11 +1,11 @@
 'use client';
 
+import BasicInputWithLabel from '@/ui/basic-input-with-label';
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { insertTournament, TournamentInsertErrors } from '@/server/mutations/tournaments.mutations';
-import {dateToInputString} from "@/lib/utils";
-
-
+import { dateToInputString } from "@/lib/utils";
+import { ArrowRight, X } from 'lucide-react';
 
 const getDefaultFutureDate = (hours: number = 2) => {
     const d = new Date();
@@ -89,182 +89,230 @@ export default function TournamentInsertForm() {
             if (response.success) {
                 alert(`Tournament "${formData.name}" created successfully!`);
                 // Redirect to the new tournament's detail page
+                // will change this to push to create events page
                 router.push("/tournaments");
             } else {
                 setFieldErrors(response.fieldErrors || {});
                 setFormError(response.formErrors?.join(' ') || 'Validation failed. Check the fields above.');
             }
         } catch (error: unknown) {
-            console.error("Insertion Error:", error);
-            setFormError('An unexpected error occurred on the server.');
+            setFormError('An unexpected error occurred.');
         } finally {
             setIsSubmitting(false);
         }
     };
 
+    // Helper to display errors for specific fields
+    const ErrorMessage = ({ field }: { field: keyof TournamentInsertErrors }) => {
+        const errors = fieldErrors[field];
+        return errors ? (
+            <div className="text-red-500 text-sm mt-2 flex">
+                <X size={18} />
+                {errors.map((msg, i) => <p key={i}>{field !== "name" ? msg : "Tournament name should be longer than 3 characters"}</p>)}
+            </div>
+        ) : null;
+    };
+
+    // general classNames used in most of the inputs on this page
+    const pageLabelClass = "block text-sm font-medium text-gray-700 w-full"
+    const pageInputClass = "mt-1 block w-full rounded border border-gray-200 shadow-sm p-2 hover:shadow-md focus:outline-primary text-gray-500"
+
     return (
-        <div className="mt-10">
-            <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-lg border p-10 max-h-[90vh] overflow-y-auto">
-                <h2 className="text-3xl font-bold text-[#BD2D2D] mb-6 text-center pb-3">Create New Tournament</h2>
+        <div className="mt-6 sm:mt-10 w-full px-4 sm:px-6 lg:px-8 mx-auto max-w-7xl font-[Poppins]">
+            <div className="max-w-4xl mx-auto">
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-6">
+                    Create a New Tournament
+                </h1>
 
-                {formError && (
-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4" role="alert">
-                        <p>{formError}</p>
-                    </div>
-                )}
-
-                {/* General Details */}
-                <fieldset className="space-y-4 mb-6">
-                    <legend className="text-xl font-semibold mb-3 text-[#BD2D2D]">Basic Information</legend>
-
-                    {/* Name */}
-                    <div>
-                        <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name *</label>
-                        <input
-                            type="text"
-                            name="name"
-                            id="name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            required
-                            placeholder='Enter tournament name'
-                            className="mt-1 block w-full rounded-md border-gray-500 shadow-sm p-2 focus:border-[#BD2D2D] focus:ring-[#BD2D2D] text-gray-500"
-                        />
-                        {fieldErrors.name && <p className="text-sm text-red-500 mt-1">{fieldErrors.name[0]}</p>}
-                    </div>
-
-                    {/* Slug */}
-                    <div>
-                        <label htmlFor="slug" className="block text-sm font-medium text-gray-700">Slug (Optional, for URL)</label>
-                        <input
-                            type="text"
-                            name="slug"
-                            id="slug"
-                            value={formData.slug}
-                            onChange={handleChange}
-                            placeholder="e.g., mytourney2025"
-                            className="mt-1 block w-full rounded-md border-gray-500 shadow-sm p-2 focus:border-[#BD2D2D] focus:ring-[#BD2D2D] text-gray-500"
-                        />
-                        {fieldErrors.slug && <p className="text-sm text-red-500 mt-1">{fieldErrors.slug[0]}</p>}
-                    </div>
-
-                    {/* Start Time */}
-                    <div>
-                        <label htmlFor="startTime" className="block text-sm font-medium text-gray-700">Start Time *</label>
-                        <input
-                            type="datetime-local"
-                            name="startTime"
-                            id="startTime"
-                            value={dateToInputString(formData.startTime)}
-                            onChange={(e) => {
-                                if (!e.target.validity.valid) return;
-                                setFormData({...formData, startTime: new Date(e.target.value)});
-                            }}
-                            required
-                            className="mt-1 block w-full rounded-md border-gray-500 shadow-sm p-2 focus:border-[#BD2D2D] focus:ring-[#BD2D2D] text-gray-500"
-                        />
-                    </div>
-
-                    {/* End Time */}
-                    <div>
-                        <label htmlFor="endTime" className="block text-sm font-medium text-gray-700">End Time *</label>
-                        <input
-                            type="datetime-local"
-                            name="endTime"
-                            id="endTime"
-                            value={dateToInputString(formData.endTime)}
-                            onChange={(e) => setFormData({ ...formData, endTime: new Date(e.target.value) })}
-                            required
-                            className="mt-1 block w-full rounded-md border-gray-500 shadow-sm p-2 focus:border-[#BD2D2D] focus:ring-[#BD2D2D] text-gray-500"
-                        />
-                    </div>
-                    {fieldErrors.times && <p className="text-sm text-red-500 mt-1">{fieldErrors.times[0]}</p>}
-                </fieldset>
-
-                {/* Type and Location */}
-                <fieldset className="space-y-4 mb-6 p-4 border rounded-md">
-                    <legend className="text-xl font-semibold mb-3 text-[#BD2D2D]">Location Type</legend>
-
-                    {/* isOnline Checkbox */}
-                    <div className="flex items-center">
-                        <input
-                            type="checkbox"
-                            name="isOnline"
-                            id="isOnline"
-                            checked={formData.isOnline}
-                            onChange={handleChange}
-                            className="h-4 w-4 border-gray-300 rounded"
-                        />
-                        <label htmlFor="isOnline" className="ml-2 block text-sm font-medium text-gray-700">
-                            Is this an Online Tournament?
-                        </label>
-                    </div>
-
-                    {/* Location Address (Appears only if offline) */}
-                    {!formData.isOnline && (
-                        <div className="pt-2">
-                            <label htmlFor="locationAddress" className="block text-sm font-medium text-gray-700">Physical Location Address *</label>
-                            <input
-                                type="text"
-                                name="locationAddress"
-                                id="locationAddress"
-                                value={formData.locationAddress}
-                                onChange={handleChange}
-                                required={!formData.isOnline}
-                                placeholder="e.g., 123 Main St, Anytown"
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                            />
-                            {fieldErrors.location && <p className="text-sm text-red-500 mt-1">{fieldErrors.location[0]}</p>}
+                <form onSubmit={handleSubmit} className="bg-white border border-gray-200 shadow-md rounded-lg p-4 sm:p-6 lg:p-8 max-h-[calc(100vh-200px)] sm:max-h-[70vh] overflow-y-auto">
+                    {/* Error Message */}
+                    {formError && (
+                        <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 sm:px-4 sm:py-3 rounded mb-4 text-sm sm:text-base" role="alert">
+                            {formError}
                         </div>
                     )}
-                </fieldset>
 
-                {/* Contact Information */}
-                <fieldset className="space-y-4 mb-6">
-                    <legend className="text-xl font-semibold mb-3 text-[#BD2D2D]">Contact Information (At least one required)</legend>
+                    <h2 className="text-lg sm:text-xl font-semibold text-primary mb-4">
+                        Basic Information
+                    </h2>
 
-                    {/* Email */}
-                    <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email (Optional)</label>
-                        <input
-                            type="email"
-                            name="email"
-                            id="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            placeholder='Enter your email'
-                            className="mt-1 block w-full rounded-md border-gray-500 shadow-sm p-2 focus:border-[#BD2D2D] focus:ring-[#BD2D2D] text-black"
-                        />
+                    {/* General Details */}
+                    <fieldset className="space-y-4 mb-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {/* Name */}
+                            <div className="md:col-span-2">
+                                <BasicInputWithLabel
+                                    labelClassName={pageLabelClass}
+                                    labelText="Name *"
+                                    inputType='text'
+                                    inputName="name"
+                                    inputId="name"
+                                    inputValue={formData.name}
+                                    inputOnChange={handleChange}
+                                    required={true}
+                                    inputPlaceholder="Enter tournament name"
+                                    inputClassName={pageInputClass}
+                                />
+                                <ErrorMessage field='name' />
+                            </div>
+
+                            {/* Slug */}
+                            <div className="md:col-span-2">
+                                <BasicInputWithLabel
+                                    labelClassName={pageLabelClass}
+                                    labelText="Slug (Optional, for URL)"
+                                    inputType="text"
+                                    inputName="slug"
+                                    inputId="slug"
+                                    inputValue={formData.slug}
+                                    inputOnChange={handleChange}
+                                    required={false}
+                                    inputPlaceholder="e.g., mytourney2025"
+                                    inputClassName={pageInputClass}
+                                />
+                                <ErrorMessage field='slug' />
+                            </div>
+
+                            {/* Start Time */}
+                            <div>
+                                <BasicInputWithLabel
+                                    labelClassName={pageLabelClass}
+                                    labelText="Start Time *"
+                                    inputType="datetime-local"
+                                    inputName="startTime"
+                                    inputId="startTime"
+                                    inputValue={dateToInputString(formData.startTime)}
+                                    inputOnChange={(e) => {
+                                        if (!e.target.validity.valid) return;
+                                        setFormData({ ...formData, startTime: new Date(e.target.value) });
+                                    }}
+                                    required={true}
+                                    inputPlaceholder=""
+                                    inputClassName={pageInputClass}
+                                />
+                                <ErrorMessage field='times' />
+                            </div>
+
+                            {/* End Time */}
+                            <div>
+                                <BasicInputWithLabel
+                                    labelClassName={pageLabelClass}
+                                    labelText="End Time *"
+                                    inputType="datetime-local"
+                                    inputName="endTime"
+                                    inputId="endTime"
+                                    inputValue={dateToInputString(formData.endTime)}
+                                    inputOnChange={(e) => {
+                                        if (!e.target.validity.valid) return;
+                                        setFormData({ ...formData, endTime: new Date(e.target.value) });
+                                    }}
+                                    required={true}
+                                    inputPlaceholder=""
+                                    inputClassName={pageInputClass}
+                                />
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    {/* Type and Location */}
+                    <fieldset className="space-y-4 p-4 sm:p-5 border rounded-md mb-6">
+                        <h2 className="text-lg sm:text-xl font-semibold text-primary">
+                            Location Type
+                        </h2>
+
+                        {/* isOnline Checkbox */}
+                        <div className="flex items-center">
+                            <input
+                                type="checkbox"
+                                name="isOnline"
+                                id="isOnline"
+                                checked={formData.isOnline}
+                                onChange={handleChange}
+                                className="h-4 w-4 accent-primary flex-shrink-0"
+                            />
+                            <label htmlFor="isOnline" className="ml-2 block text-sm font-medium text-gray-700">
+                                Online tournament?
+                            </label>
+                        </div>
+
+                        {/* Location Address (Appears only if offline) */}
+                        {!formData.isOnline && (
+                            <>
+                                <BasicInputWithLabel
+                                    labelClassName={pageLabelClass}
+                                    labelText="Physical Location Address *"
+                                    inputType="text"
+                                    inputName="locationAddress"
+                                    inputId="locationAddress"
+                                    inputValue={formData.locationAddress}
+                                    inputOnChange={handleChange}
+                                    required={!formData.isOnline}
+                                    inputPlaceholder="e.g., 123 Main St, Anytown"
+                                    inputClassName={pageInputClass}
+                                />
+                                <ErrorMessage field='location' />
+                            </>
+                        )}
+                    </fieldset>
+
+                    {/* Contact Information */}
+                    <fieldset className="space-y-4 p-4 sm:p-5 border rounded-md mb-6">
+                        <h2 className="text-lg sm:text-xl font-semibold text-primary mb-4">
+                            Contact Information (At least one required)
+                        </h2>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {/* Email */}
+                            <div>
+                                <BasicInputWithLabel
+                                    labelClassName='block text-sm font-medium text-gray-700'
+                                    labelText='Email (Optional)'
+                                    inputType='email'
+                                    inputName='email'
+                                    inputId='email'
+                                    inputValue={formData.email}
+                                    inputOnChange={handleChange}
+                                    required={false}
+                                    inputPlaceholder='Enter your email'
+                                    inputClassName={pageInputClass}
+                                />
+                            </div>
+
+                            {/* Discord */}
+                            <div>
+                                <BasicInputWithLabel
+                                    labelClassName='block text-sm font-medium text-gray-700'
+                                    labelText='Discord Link (Optional)'
+                                    inputType='text'
+                                    inputName='discord'
+                                    inputId='discord'
+                                    inputValue={formData.discord}
+                                    inputOnChange={handleChange}
+                                    required={false}
+                                    inputPlaceholder='e.g., https://discord.gg/xxxxxxxx'
+                                    inputClassName={pageInputClass}
+                                />
+                            </div>
+                        </div>
+                        <ErrorMessage field='contact' />
+                    </fieldset>
+
+                    {/* Submit Button */}
+                    <div className="pt-4 sm:pt-6 mt-4 border-t border-t-gray-300">
+                        <button
+                            type="submit"
+                            disabled={isSubmitting}
+                            className="w-full flex items-center justify-center gap-2 py-2.5 sm:py-3 px-4 border border-transparent rounded-md shadow-sm text-sm sm:text-base font-medium 
+                                       text-white bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 
+                                       focus:ring-primary disabled:opacity-50 transition-colors"
+                        >
+                            <span>{isSubmitting ? 'Going to events...' : 'Create events for this tournament'}</span>
+                            <ArrowRight size={18} className='flex-shrink-0' />
+                        </button>
                     </div>
-
-                    {/* Discord */}
-                    <div>
-                        <label htmlFor="discord" className="block text-sm font-medium text-gray-700">Discord Link (Optional)</label>
-                        <input
-                            type="text"
-                            name="discord"
-                            id="discord"
-                            value={formData.discord}
-                            onChange={handleChange}
-                            placeholder="e.g., https://discord.gg/xxxxxxxx"
-                            className="mt-1 block w-full rounded-md border-gray-500 shadow-sm p-2 focus:border-[#BD2D2D] focus:ring-[#BD2D2D] text-black"
-                        />
-                    </div>
-                    {fieldErrors.contact && <p className="text-sm text-red-500 mt-1">{fieldErrors.contact[0]}</p>}
-                </fieldset>
-
-                {/* Submit Button */}
-                <div className="pt-6 border-t">
-                    <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#BD2D2D] hover:bg-[#992323] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#BD2D2D] disabled:opacity-50"
-                    >
-                        {isSubmitting ? 'Creating...' : 'Create Tournament'}
-                    </button>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
-
     );
 }
+

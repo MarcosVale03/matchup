@@ -2,7 +2,7 @@
 const customDateTimeOptions: Intl.DateTimeFormatOptions = {
     year: 'numeric',
     month: 'short', // Use 'short' (e.g., Dec) or 'numeric' (e.g., 12)
-    day: 'numeric',
+    day: '2-digit',
     hour: '2-digit',
     minute: '2-digit',
     hour12: true, // Use AM/PM format
@@ -14,15 +14,12 @@ const customDateTimeOptions: Intl.DateTimeFormatOptions = {
  * @returns The formatted date and time string.
  */
 export function formatTournamentDateTime(date: Date | string): string {
-    let newDate: Date;
-    if (typeof date == 'string') {
-        newDate = new Date(date);
-    } else {
-        newDate = date;
-    } 
+    const newDate = typeof date === 'string' ? new Date(date) : date;
+
+    // Check for invalid dates
     if (!(newDate instanceof Date) || isNaN(newDate.getTime())) {
         return 'N/A';
     }
     
-    return date.toLocaleString(undefined, customDateTimeOptions);
+    return newDate.toLocaleString('en-US', customDateTimeOptions);
 }

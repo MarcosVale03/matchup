@@ -2,11 +2,10 @@
 import { Tournament } from "@/lib/types/types";
 import { formatTournamentDateTime } from "@/ui/format-time";
 import { useRouter } from "next/navigation";
-import NavigationBar from "@/ui/navigation-bar";
-import DeleteTournamentButton from "../tournament-delete/page";
 
+// This page will change once we have events going
 export default function TournamentDetails({ tournament }: { tournament: Tournament }) {
-    
+
     const router = useRouter();
 
     const handleEditClick = () => {
@@ -14,80 +13,81 @@ export default function TournamentDetails({ tournament }: { tournament: Tourname
         router.push(url);
     };
 
+    // listed items classnames
+    const mainDiv = "border-b pb-2";
+    const paragraphElement = "flex justify-between text-sm text-gray-800 whitespace-pre sm:text-md";
+    const spanElement = "font-bold text-black";
+
     return (
-        <>
-            <NavigationBar hidden={false}/>
-            <main className="bg-white flex flex-col justify-center items-center">
-                
-                {/* Header Section */}
-                <div className="text-center mb-10">
-                    <h1 className="text-4xl font-extrabold text-gray-900 mb-2">
-                        {tournament.name}
-                    </h1>
-                </div>
-                
-                {/* Details Grid */}
-                <div className="bg-gray-50 p-6 rounded-xl shadow-lg border border-gray-200">
-                    <h2 className="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">
-                        Event Details
-                    </h2>
+        <main className="bg-white flex flex-col gap-5 m-3">
 
-                    <dl className="space-y-3">
-                        {/* Start Time */}
-                        <div className="flex justify-between items-center border-b pb-2">
-                            <dt className="font-medium text-gray-600">
-                                Start Time:  
-                            </dt>
-                            <dd className="text-gray-900">
-                                {formatTournamentDateTime(tournament.start_time)}
-                            </dd>
-                        </div>
-                        
-                        {/* End Time */}
-                        <div className="flex justify-between items-center border-b pb-2">
-                            <dt className="font-medium text-gray-600">
-                                End Time:
-                            </dt>
-                            <dd className="text-gray-900">
-                                {formatTournamentDateTime(tournament.end_time)}
-                            </dd>
-                        </div>
+            {/* Header Section */}
+            <div className="">
+                <h1 className="text-4xl text-center font-extrabold text-primary">
+                    {tournament.name}
+                </h1>
+            </div>
 
-                        {/* Homepage Link */}
-                        <div className="flex justify-between items-center">
-                            <dt className="font-medium text-gray-600">
-                                Official Homepage
-                            </dt>
-                            <dd>
-                                {/* <Link 
+            {/* Details Grid */}
+            <div className="bg-gray-50 p-5 rounded-xl shadow-lg border border-gray-200 max-w-[75vw] place-self-center w-full">
+                <h2 className="text-left text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">
+                    Event Details
+                </h2>
+
+                <dl className="space-y-3">
+                    {/* Start Time */}
+                    <div className={mainDiv}>
+                        <p className={paragraphElement}>
+                            <span className={spanElement}>Start Time: </span> {formatTournamentDateTime(tournament.start_time)}
+                        </p>
+                    </div>
+
+                    {/* End Time */}
+                    <div className={mainDiv}>
+                        <p className={paragraphElement}>
+                            <span className={spanElement}>End Time: </span>  {formatTournamentDateTime(tournament.end_time)}
+                        </p>
+                    </div>
+
+                    {/* Contact Information | Email */}
+                    <div className={mainDiv}>
+                        <p className={paragraphElement}>
+                            <span className={spanElement}>Email: </span>  {tournament.email_contact}
+                        </p>
+                    </div>
+
+                    {/* Contact Information | Discord */}
+                    <div className={mainDiv}>
+                        <p className={paragraphElement}>
+                            <span className={spanElement}>Discord: </span>
+                            {tournament.discord_invite
+                                ? `https://discord.gg/${tournament.discord_invite}`
+                                : "N/A"}
+                        </p>
+                    </div>
+
+                    {/* Homepage Link */}
+                    {/* To be implemented */}
+                    <div className="flex justify-between items-center">
+                        <p className="font-medium text-gray-600">
+                            Official Homepage
+                        </p>
+                        <div>
+                            {/* <Link 
                                     href={tournament.home_page} 
                                     className="text-blue-600 hover:text-blue-800 font-medium underline"
                                 >
                                     Visit Site
                                 </Link> */}
-                                <p className="text-blue-600 hover:text-blue-800 font-medium underline cursor-pointer">
-                                    Visit Site
-                                </p>
-                            </dd>
-                        </div>
-                    </dl>
-                </div>
 
-                {/* Join Tournament Button (will probably be removed since we're adding events) */}
-                <div className="mt-10 text-center">
-                    <button 
-                        onClick={handleEditClick}
-                        className="bg-[#BD2D2D] text-white font-bold text-lg py-3 px-8 rounded-full shadow-lg hover:bg-[#992323] transition duration-150 transform hover:scale-105"
-                    >
-                        Edit Details
-                    </button>
-                    <DeleteTournamentButton 
-                        tournamentId={tournament.id}
-                        tournamentName={tournament.name}
-                    />
-                </div>
-                
-            </main>
-        </>
+                            <p className="text-blue-600 hover:text-blue-800 font-medium underline cursor-pointer">
+                                Visit Site
+                            </p>
+                        </div>
+                    </div>
+                </dl>
+            </div>
+        </main>
+
     );
 }
