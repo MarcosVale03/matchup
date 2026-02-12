@@ -21,7 +21,6 @@ export default function VerifyEmailPage() {
             }
     }
     
-
     return (
             <div className="min-h-screen flex items-center justify-center bg-[#BD2D2D]">
                 <NavigationBar hidden={true}/>
