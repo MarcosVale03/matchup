@@ -17,8 +17,13 @@ export const SearchResults = ({ tournaments }: { tournaments: Tournament[] }) =>
         return (
             <ul>
                 {tournaments.map((tournament) => (
-                    <li key={tournament.id} className="flex flex-col p-3 gap-4 my-3 mr-2 border border-gray-200 rounded-3xl shadow-md sm:my-3.5 sm:ml-0  
-                                                       sm:flex-row sm:justify-between sm:items-center sm:p-4 sm:hover:shadow-md/20 transition duration-150">
+                    <li 
+                        key={tournament.id} 
+                        className="flex flex-col p-3 gap-4 my-3 mr-2 border 
+                                   border-gray-200 rounded-3xl shadow-md sm:my-3.5 
+                                   sm:ml-0 sm:flex-row sm:justify-between sm:items-center 
+                                   sm:p-4 sm:hover:shadow-md/20 transition duration-150"
+                    >
                         <div className="min-w-0 w-full"> 
                             {/* Tournament Name */}
                             <h1 className="font-bold text-lg text-primary text-center break-words sm:text-left">
@@ -37,7 +42,11 @@ export const SearchResults = ({ tournaments }: { tournaments: Tournament[] }) =>
 
                             {/* Organizer Name */}
                             <div className="flex flex-row mt-1 place-self-center sm:place-self-start">
-                                <img src="/globe.svg" alt="Organizer PFP" className="w-5 mr-1" />
+                                <img 
+                                    src="/globe.svg" 
+                                    alt="Organizer PFP" 
+                                    className="w-5 mr-1" 
+                                />
                                 <p className="text-sm text-gray-800 font-bold">
                                     Organizer Name
                                 </p>

@@ -43,22 +43,31 @@ export default function AuthCard({
     const footer = authType === 'Signup' ? 'Already have an account?' : "Don't have an account?";
     const href = authType === 'Signup' ? '/login' : '/signup';
 
-    const pageInputClass = "w-full rounded-md border border-gray-300 shadow-sm p-2 focus:border-primary focus:ring-primary text-gray-500"
-    const pageLabelClass = "text-left text-gray-500 font-sans"
+
+    const pageInputClass = `w-full rounded-md border border-gray-300 shadow-sm p-2 sm:p-2.5 
+                        focus:border-primary focus:ring-primary text-gray-500 focus:outline-none 
+                        focus:border-primary text-sm sm:text-base`;
+    const pageLabelClass = "text-left text-gray-500 text-sm sm:text-base";
+
 
     return (
-        <main className="flex flex-col place-content-center bg-white rounded-b-lg p-10 md:rounded-r-lg md:rounded-bl-none md:p-15 gap-3">
-
-            <div>
-                <h1 className="text-4xl text-primary text-center font-bold">
+        <main className="flex flex-col place-content-center bg-white rounded-b-lg sm:rounded-r-lg 
+                     sm:rounded-bl-none p-6 sm:p-8 md:p-10 lg:p-12 gap-3 "
+        >
+            <div className="space-y-1 sm:space-y-2">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl text-primary text-center font-bold">
                     {headerMessage}
                 </h1>
-                <h2 className="text-sm text-gray-500 font-light text-center">
+                <h2 className="text-xs sm:text-sm text-gray-500 font-light text-center">
                     {subHeaderMessage}
                 </h2>
             </div>
-            
-            <form onSubmit={handleAuth} id="auth-form-submit" className="flex flex-col gap-2 mr-2">
+
+            <form
+                onSubmit={handleAuth}
+                id="auth-form-submit"
+                className="max-h-[50vh] sm:max-h-[45vh] md:max-h-[40vh] lg:max-h-[35vh] pr-1 sm:pr-2 overflow-auto space-y-2"
+            >
                 {/* Email */}
                 <BasicInputWithLabel
                     labelClassName={pageLabelClass}
@@ -85,7 +94,6 @@ export default function AuthCard({
                     required={true}
                     inputPlaceholder={authType === "Signup" ? "At least 8 characters" : "Enter your password"}
                     inputClassName={pageInputClass}
-
                 />
 
                 {/* For signup */}
@@ -153,29 +161,31 @@ export default function AuthCard({
             <button
                 form="auth-form-submit"
                 type="submit"
-                className="bg-primary text-white py-3 px-5 rounded-lg hover:bg-red-800 hover:cursor-pointer w-full"
+                className="bg-primary text-white py-2.5 sm:py-3 px-4 sm:px-5 rounded-lg 
+                       hover:bg-red-800 hover:cursor-pointer w-full 
+                       transition-colors duration-150 text-sm sm:text-base font-medium
+                       focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
+                       disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={isLoading}
             >
-                {authType === 'Signup' ? 'Create' : 'Login'}
+                {isLoading ? 'Loading...' : (authType === 'Signup' ? 'Create Account' : 'Login')}
             </button>
 
             {/* Error/Email confirmation message */}
-            <>
-                {message && (
-                    <p
-                        className={`text-sm text-center ${message === "Check your email for confirmation link"
+            {message && (
+                <p
+                    className={`text-xs sm:text-sm text-center px-2 ${message === "Check your email for confirmation link"
                             ? "text-blue-500"
                             : "text-red-500"
-                            }`}
-                    >
-                        {message}
-                    </p>
-                )}
-            </>
+                        }`}
+                >
+                    {message}
+                </p>
+            )}
 
-            <p className="text-sm text-gray-500 text-center">
+            <p className="text-xs sm:text-sm text-gray-500 text-center">
                 {footer}{' '}
-                <Link href={href} className="text-primary hover:underline">
+                <Link href={href} className="text-primary hover:underline font-medium">
                     {authType === 'Login' ? 'Signup' : 'Login'}
                 </Link>
             </p>

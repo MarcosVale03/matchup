@@ -33,7 +33,7 @@ export default function NavigationBar({hidden}: {hidden?: boolean}) {
 
     const generalButtonClass = "text-white flex flex-row justify-center rounded-md sm:rounded-none hover:bg-gray-200 hover:text-primary transition duration-150 p-2 drop-shadow-lg/70 gap-1";
     return (
-        <nav className="bg-primary p-3 w-full sticky top-0 z-10 border-b border-primary font-[Poppins] font-semibold">
+        <nav className="fixed bg-primary p-3 w-full sticky top-0 z-10 border-b border-primary font-[Poppins] font-semibold">
             <ul className="flex justify-between items-center list-none">
                 
                 {/* Left: Logo */}
@@ -42,12 +42,12 @@ export default function NavigationBar({hidden}: {hidden?: boolean}) {
                 </Link>
 
                 {/* Right: Navigation Buttons */}
-                <div className="flex flex-row">
+                <div className="flex flex-row sm:gap-1">
                     
                     {/* Create Tournament | Only available if signed in */}
                     {!loading && user && !isAuthPage && (
                         <Link href="/tournaments/create" className={generalButtonClass} hidden={hidden}>
-                            <Plus size={18} className="place-self-center" />
+                            <Plus size={20} className="place-self-center" />
                             <p className="hidden sm:block">Create Tournament</p>
                         </Link>
                     )}

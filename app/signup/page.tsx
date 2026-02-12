@@ -40,15 +40,17 @@ export default function SignupPage() {
 
     }
 
-    return (
-        <div className="bg-[#BD2D2D] min-h-screen">
-            <NavigationBar />
-            <div className='flex place-content-center md:pt-5 md:pl-18 md:pr-18 md:pb-18 overflow-y-auto'>
-                <div className="grid grid-cols-1 sm:grid-cols-2 drop-shadow-xl/30 md:max-w-4xl 2xl:max-w-[55vw]">
+return (
+    <div className="bg-primary min-h-screen font-[Poppins] flex flex-col">
+        <NavigationBar />
+        <div className="flex-1 flex 2xl:items-center justify-center px-4 sm:px-6 lg:px-8 py-6 sm:py-0">
+            <div className="w-full max-w-md sm:max-w-2xl md:max-w-3xl lg:max-w-4xl 2xl:max-w-5xl mt-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 drop-shadow-xl/30 rounded-lg overflow-hidden">
                     {/* left side of card */}
                     <MatchupDescription />
 
-                    {/* right side of card */}
+
+                    {/* right side of card */}  
                     <AuthCard
                         email={email}
                         password={password}
@@ -70,5 +72,8 @@ export default function SignupPage() {
                 </div>
             </div>
         </div>
-    )
+    </div>
+);
+
+
 }

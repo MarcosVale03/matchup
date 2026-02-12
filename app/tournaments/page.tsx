@@ -56,19 +56,20 @@ export default function TournamentSearchPage() {
         <main className="bg-white flex flex-col min-h-screen font-[Poppins]">
             <NavigationBar />
 
-            <div className="m-5 place-self-center w-full max-w-[85vw] drop sm:max-w-[60vw] 2xl:max-w[95vw]">
-                <h1 className="text-center font-bold text-primary mb-5 text-xl sm:text-2xl">
+            <div className="px-4 sm:px-6 lg:px-8 py-5 sm:py-6 lg:py-8 mx-auto w-full max-w-7xl">
+                <h1 className="text-center font-bold text-primary mb-5 sm:mb-6 lg:mb-8 text-xl sm:text-2xl lg:text-3xl">
                     The Arena Awaits: Find Your Competition
                 </h1>
 
-                <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row bg-white">
+                <form onSubmit={handleSearchSubmit} className="flex flex-col gap-3 sm:flex-row sm:gap-0 bg-white mb-6 sm:mb-8">
                     {/* Search Bar */}
                     <input
                         type="search"
                         value={searchQuery}
                         onChange={handleInputChange}
                         placeholder="Search by name..."
-                        className="grow place-self-center p-4 text-gray-800 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary 
+                        className="w-full p-3 sm:p-4 text-sm sm:text-base text-gray-800 border-2 
+                                   border-gray-300 rounded-lg focus:outline-none focus:border-primary 
                                    transition duration-150 sm:rounded-r-none"
                     />
 
@@ -80,28 +81,28 @@ export default function TournamentSearchPage() {
                         onChange={(e) => {
                             setStartDateFilter(e.target.value ? new Date(e.target.value) : null)
                         }}
-                        className="place-self-center p-4 text-gray-800 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary 
-                                   transition duration-150 cursor-pointer sm:rounded-l-none"
+                        className="w-full sm:w-auto p-3 sm:p-4 text-sm sm:text-base text-gray-800 border-2 border-gray-300 
+                                   rounded-lg focus:outline-none focus:border-primary transition duration-150 cursor-pointer 
+                                   sm:rounded-l-none sm:min-w-[180px]"
                     />
                 </form>
 
-
                 {/* Search results window */}
-                <div className="mt-8 flex flex-col gap-2">
+                <div className="flex flex-col gap-3 sm:gap-4">
 
-                    <h2 className="text-xl font-semibold text-gray-700">
+                    <h2 className="text-lg sm:text-xl font-semibold text-gray-700">
                         Found {displayedTournaments.length} Tournament(s):
                     </h2>
 
-                    <div className="min-h-[35rem] max-h-[35rem] 2xl:max-h-[80rem] overflow-y-auto">
+                    <div className="min-h-[400px] max-h-[500px] sm:min-h-[35rem] sm:max-h-[35rem] lg:max-h-[40rem] 2xl:max-h-[80rem] overflow-y-auto">
                         {isLoading && (
-                            <div className="p-4 text-center text-gray-500">
+                            <div className="p-6 sm:p-8 text-center text-gray-500">
                                 Loading...
                             </div>
                         )}
 
                         {error && (
-                            <div className="text-center mt-8 text-red-600">
+                            <div className="text-center mt-6 sm:mt-8 text-red-600 px-4">
                                 Error: {error}
                             </div>
                         )}

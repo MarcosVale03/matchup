@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { dateToInputString } from "@/lib/utils";
 import BasicInputWithLabel from '@/ui/basic-input-with-label';
 import { sleep } from '../sleep-function';
+import { X } from 'lucide-react';
 
 
 interface FormState {
@@ -46,8 +47,6 @@ export default function TournamentEditForm({ initialData }: { initialData: Tourn
     const is_online = initialData.is_online ?? false;
     const contactInfo = initialData.contact;
     const location = initialData.location ?? undefined;
-
-
 
     const [formData, setFormData] = useState<FormState>({
         // NON-DUMMY/PASSED VALUES

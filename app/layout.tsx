@@ -23,9 +23,9 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Matchup Homepage",
-  
-  description: "Offical Matchup Homepage",
+    title: "Matchup Homepage",
+
+    description: "Official Matchup Homepage",
 };
 
 export default function RootLayout({
