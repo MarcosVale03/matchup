@@ -11,12 +11,13 @@ export async function signUp(email: string, password: string, firstName: string,
     const {error} = await supabase.auth.signUp({email, password, options: {data: {
                 first_name: firstName,
                 last_name: lastName,
-                display_name: displayName,
-                prefix: prefix
-            }}})
+                display_name: displayName, 
+                prefix: prefix,     
+            },  
+    }})
 
     if (error) {
-        return {
+        return {    
             success: false,
             error: error.message,
         }
@@ -25,6 +26,8 @@ export async function signUp(email: string, password: string, firstName: string,
     redirect("/verify-email");
 }
 
+
+    
 export async function signInWithEmail(email: string, password: string) {
     const cookieStore = await cookies()
     const supabase = await createClient(cookieStore)
