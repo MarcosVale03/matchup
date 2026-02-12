@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-    title: 'Matchup - Tournaments',
+    title: 'MatchUp - Tournaments',
     description : 'Sign Up page for Matchup'
 }
 

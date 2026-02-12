@@ -22,7 +22,24 @@ export async function signUp(email: string, password: string, firstName: string,
         }
     }
 
-    redirect("/verify-email");
+    redirect(`/verify-email?email=${email}`);
+}
+
+export async function verifyEmail(email : string, token : string) {
+    const cookieStore = await cookies()
+    const supabase = await createClient(cookieStore)
+
+    const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'email' })
+
+    if (error) {
+        return {
+            success : false, 
+            message : error.message,
+        }
+    }
+
+    redirect("/tournaments")
+
 }
 
 export async function signInWithEmail(email: string, password: string) {
