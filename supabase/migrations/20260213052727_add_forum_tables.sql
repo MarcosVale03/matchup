@@ -80,8 +80,6 @@ alter table "public"."users" drop constraint "public.users_auth.users_fk_01";
 
 alter table "public"."waves" drop constraint "waves_tournaments_fk_01";
 
-drop function if exists "public"."handle_new_user"();
-
 drop function if exists "public"."insert_event"(tournament_id bigint, name character varying, start_time timestamp with time zone, end_time timestamp with time zone, price numeric, video_game text, platform text, teams_allowed boolean, is_online boolean, max_team_size integer, place_id text, address text, latitude double precision, longitude double precision);
 
 drop function if exists "public"."insert_tournament"(t_name character varying, t_start_time timestamp with time zone, t_end_time timestamp with time zone, is_online boolean, t_email character varying, t_discord character varying, t_slug character varying, t_place_id text, t_address text, t_latitude double precision, t_longitude double precision);
