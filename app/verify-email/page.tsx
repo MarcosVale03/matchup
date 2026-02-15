@@ -1,7 +1,7 @@
 'use client'
-import NavigationBar from '@/ui/navigation-bar';
 
 export default function VerifyEmailPage() {
+    // simple page letting the user know to check their email to confirm their account 
     return (
             <div className="min-h-screen flex items-center justify-center bg-[#BD2D2D]">
                 <div className="flex flex-col md:flex-row max-w-6xl drop-shadow-lg">
