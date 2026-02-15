@@ -1,29 +1,3 @@
-alter table "public"."events" drop constraint "events_check";
-
-alter table "public"."events" drop constraint "events_name_check";
-
-alter table "public"."gaming_platforms" drop constraint "gaming_platforms_name_check";
-
-alter table "public"."video_games" drop constraint "video_games_name_check";
-
-alter table "public"."events" add constraint "events_name_min_len_check" CHECK ((length((name)::text) >= 3)) not valid;
-
-alter table "public"."events" validate constraint "events_name_min_len_check";
-
-alter table "public"."events" add constraint "events_start_end_time_check" CHECK ((start_time < end_time)) not valid;
-
-alter table "public"."events" validate constraint "events_start_end_time_check";
-
-alter table "public"."gaming_platforms" add constraint "gaming_platforms_name_min_len_check" CHECK ((length(name) >= 2)) not valid;
-
-alter table "public"."gaming_platforms" validate constraint "gaming_platforms_name_min_len_check";
-
-alter table "public"."video_games" add constraint "video_games_name_min_len_check" CHECK ((length(name) >= 3)) not valid;
-
-alter table "public"."video_games" validate constraint "video_games_name_min_len_check";
-
-set check_function_bodies = off;
-
 CREATE OR REPLACE FUNCTION public.insert_event(tournament_id bigint, name character varying, start_time timestamp with time zone, end_time timestamp with time zone, price numeric, video_game text, platform text, teams_allowed boolean, is_online boolean, max_team_size integer DEFAULT NULL::integer, place_id text DEFAULT NULL::text, address text DEFAULT NULL::text, latitude double precision DEFAULT NULL::double precision, longitude double precision DEFAULT NULL::double precision)
  RETURNS integer
  LANGUAGE plpgsql
