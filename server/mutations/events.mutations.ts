@@ -61,6 +61,9 @@ export async function insertEvent(tournamentId: number, name: string, startTime:
                                       latitude: number,
                                       longitude: number
                                   }) {
+    /*
+     * FUNCTION NOT READY FOR USE
+     */
     const cookieStore = await cookies()
     const supabase = await createClient(cookieStore)
 
