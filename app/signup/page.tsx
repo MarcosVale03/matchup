@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react';
 import { signUp } from '@/actions/auth';
+import { useRouter } from 'next/navigation';
 import MatchupDescription from '@/features/account-creation/matchup-des';
 import AuthCard from '@/features/account-creation/auth-card';
 import NavigationBar from '@/ui/navigation-bar';
@@ -14,12 +15,13 @@ export default function SignupPage() {
     const [prefix, setPrefix] = useState('');
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(false);
+    const router = useRouter();
 
     const handleSignup = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setMessage("");
 
-        if (!email || !gamertag || !password || !firstName || !lastName || !gamertag || !prefix) {
+        if (!email || !gamertag || !password || !firstName || !lastName) {
             setMessage("All fields are required");
             return;
         }
@@ -37,6 +39,9 @@ export default function SignupPage() {
             setMessage(result.error || "Signup failed due to an unknown error.");
             return;
         }
+
+        setMessage(result.message || "Signup successful!");
+        router.push("/verify-email");
 
     }
 
