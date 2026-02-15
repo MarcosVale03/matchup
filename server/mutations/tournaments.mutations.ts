@@ -40,7 +40,7 @@ const TournamentInsertSchema = z.object({
                 z.transform(link => link.slice(-8))
         ))
     }).refine(data => data.email || data.discord, {error: "Must provide at least one contact"})
-}).refine(data => data.is_online || data.location, {error: "Need location for offline event", path: ["location"],})
+}).refine(data => data.is_online || data.location, {error: "Need location for offline tournament", path: ["location"],})
 
 export type TournamentInsertErrors = {
     name?: string[],
@@ -225,7 +225,7 @@ export async function deleteTournament(id: number) {
 
     const {error} = await supabase.from('tournaments').delete().eq('id', id)
     if (error) {
-        throw new Error("DB Error while trying to delete from tournaments: " + error.details + " " + error.message)
+        throw new Error("DB error while trying to delete from tournaments: " + error.details + " " + error.message)
     }
     return {
         success: true,
