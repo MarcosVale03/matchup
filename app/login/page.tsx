@@ -21,12 +21,12 @@ export default function LoginPage() {
         if (!email || !password) {
             setMessage("Please enter your email and password");
             return;
-        } 
+        }
 
         setLoading(true);
         const result = await signInWithEmail(email, password);
         setLoading(false);
-        
+
         if (!result.success) {
             setMessage(result.error || "Login failed due to an unknown error.");
             return;
@@ -36,25 +36,30 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-[#BD2D2D]">
-            <NavigationBar hidden={true}/>
+        <div className="bg-primary min-h-screen font-[Poppins] flex flex-col">
+            <NavigationBar />
+            <div className="flex-1 flex 2xl:items-center justify-center px-4 sm:px-6 lg:px-8 py-6 sm:py-0">
+                <div className="w-full max-w-md sm:max-w-2xl md:max-w-3xl lg:max-w-4xl 2xl:max-w-5xl mt-5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 drop-shadow-xl/30 rounded-lg overflow-hidden min-h-[73vh] 2xl:min-h-[55vh]">
+                        {/* left side of card */}
+                        <MatchupDescription />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 max-w-6xl drop-shadow-xl/30">
-                {/* left side of card */}
-                <MatchupDescription />
 
-                {/* right side of card */}
-                <AuthCard 
-                    email={email}
-                    password={password}
-                    message={message}
-                    isLoading={loading}
-                    authType='Login'
-                    onEmailChange={setEmail}
-                    onPasswordChange={setPassword}
-                    handleAuth={handleLogin}
-                />
+                        {/* right side of card */}
+                        <AuthCard
+                            email={email}
+                            password={password}
+                            isLoading={loading}
+                            message={message}
+                            authType='Login'
+                            handleAuth={handleLogin}
+                            onEmailChange={setEmail}
+                            onPasswordChange={setPassword}
+                        />
+                    </div>
+                </div>
             </div>
         </div>
-    )
+    );
+
 }

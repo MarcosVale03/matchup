@@ -47,7 +47,7 @@ export default function DeleteTournamentButton({ tournamentId, tournamentName }:
             <button
                 onClick={handleDelete}
                 disabled={isDeleting}
-                className="bg-[#BD2D2D] mt-3 text-white font-bold text-lg py-3 px-8 rounded-full shadow-lg hover:bg-[#992323] transition duration-150 transform hover:scale-105"
+                className="bg-primary mt-3 text-white font-bold text-lg py-3 px-8 rounded-full shadow-lg hover:bg-secondary transition duration-150 transform hover:scale-105"
             >
                 {isDeleting ? 'Deleting...' : `Delete "${tournamentName}"`}
             </button>
