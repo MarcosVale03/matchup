@@ -66,7 +66,7 @@ export default function AuthCard({
             <form
                 onSubmit={handleAuth}
                 id="auth-form-submit"
-                className="max-h-[50vh] sm:max-h-[45vh] md:max-h-[40vh] lg:max-h-[35vh] pr-1 sm:pr-2 overflow-auto space-y-2"
+                className="max-h-[50vh] sm:max-h-[45vh] md:max-h-[40vh] lg:max-h-[35vh] pr-1 sm:pr-2 pb-1 overflow-auto space-y-2 "
             >
                 {/* Email */}
                 <BasicInputWithLabel
@@ -144,7 +144,7 @@ export default function AuthCard({
                         {/* Prefix */}
                         <BasicInputWithLabel
                             labelClassName={pageLabelClass}
-                            labelText="Prefix"
+                            labelText="Prefix (Optional)"
                             inputType="text"
                             inputName="prefixInput"
                             inputId="prefix"
@@ -157,7 +157,8 @@ export default function AuthCard({
                     </>
                 )}
             </form>
-
+            
+            {/* Submit Button */}
             <button
                 form="auth-form-submit"
                 type="submit"
@@ -183,6 +184,7 @@ export default function AuthCard({
                 </p>
             )}
 
+            {/* Footer to switch to login/signup */}
             <p className="text-xs sm:text-sm text-gray-500 text-center">
                 {footer}{' '}
                 <Link href={href} className="text-primary hover:underline font-medium">
