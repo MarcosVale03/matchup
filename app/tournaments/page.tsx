@@ -1,10 +1,10 @@
 'use client'
-import NavigationBar from '@/ui/navigation-bar'
 import { useCallback, useEffect, useState } from 'react';
 import { fetchTournaments } from '@/server/queries/tournaments.queries';
 import { SearchResults } from '@/features/tournament-search/search-results';
 import { Tournament } from '@/lib/types/types';
 import { sleep } from '@/features/sleep-function';
+import SearchBar from '@/ui/search-bar';
 
 export default function TournamentSearchPage() {
     const [searchQuery, setSearchQuery] = useState('');
@@ -31,6 +31,7 @@ export default function TournamentSearchPage() {
         setIsLoading(false);
     }, []);
 
+    // Load tournaments on initial render and whenever searchQuery or startDateFilter changes
     const dateToSearch = startDateFilter ?? new Date(0);
     useEffect(() => {
         const handler = setTimeout(() => {
@@ -53,24 +54,22 @@ export default function TournamentSearchPage() {
     }, []);
 
     return (
-        <main className="bg-white flex flex-col min-h-screen font-[Poppins]">
-            <NavigationBar />
-
+        <main className="bg-white flex flex-col font-[Poppins] overflow-hidden">
             <div className="px-4 sm:px-6 lg:px-8 py-5 sm:py-6 lg:py-8 mx-auto w-full max-w-7xl">
                 <h1 className="text-center font-bold text-primary mb-5 sm:mb-6 lg:mb-8 text-xl sm:text-2xl lg:text-3xl">
                     The Arena Awaits: Find Your Competition
                 </h1>
 
+                {/* Search form */}
                 <form onSubmit={handleSearchSubmit} className="flex flex-col gap-3 sm:flex-row sm:gap-0 bg-white mb-6 sm:mb-8">
-                    {/* Search Bar */}
-                    <input
-                        type="search"
-                        value={searchQuery}
-                        onChange={handleInputChange}
-                        placeholder="Search by name..."
-                        className="w-full p-3 sm:p-4 text-sm sm:text-base text-gray-800 border-2 
-                                   border-gray-300 rounded-lg focus:outline-none focus:border-primary 
-                                   transition duration-150 sm:rounded-r-none"
+                    
+                    <SearchBar 
+                        searchQuery={searchQuery} 
+                        handleInputChange={handleInputChange}
+                        searchPlaceholder="Search tournaments by name..." 
+                        inputClassName="w-full p-3 pl-10 sm:p-4 sm:pl-10 text-sm sm:text-base text-gray-800 border-2 
+                                        border-gray-300 rounded-lg focus:outline-none focus:border-primary 
+                                        transition duration-150 sm:rounded-r-none"
                     />
 
                     {/* Date filter */}
@@ -88,7 +87,7 @@ export default function TournamentSearchPage() {
                 </form>
 
                 {/* Search results window */}
-                <div className="flex flex-col gap-3 sm:gap-4">
+                <div className="flex flex-col gap-3 sm:gap-4 max-h-[60vh]">
 
                     <h2 className="text-lg sm:text-xl font-semibold text-gray-700">
                         Found {displayedTournaments.length} Tournament(s):
