@@ -14,8 +14,8 @@ const getDefaultFutureDate = (hours: number = 2) => {
     return d;
 };
 
-// Initial state for the form
-interface FormState {
+// type for form state
+type FormState = {
     name: string;
     slug: string;
     startTime: Date;
@@ -119,7 +119,7 @@ export default function TournamentInsertForm() {
         ) : null;
     };
 
-    // general classNames used in the inputs on this page
+    // general classNames used in most of the inputs on this page
     const pageLabelClass = "block text-sm font-medium text-gray-700 w-full"
     const pageInputClass = "mt-1 block w-full rounded border border-gray-200 shadow-sm p-2 hover:shadow-md focus:outline-primary text-gray-500"
 

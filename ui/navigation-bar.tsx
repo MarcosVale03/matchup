@@ -16,8 +16,6 @@ export default function NavigationBar({ hidden, user  }: {hidden?: boolean, user
             <ul className="flex justify-between items-center list-none">
                 
                 {/* Left: Logo */}
-                <Link href='/'>
-                    <Image src="/matchup-logo-2.png" width={967} height={324} alt="Matchup Logo" className="shrink-0 w-35 h-11 lg:w-42 lg:h-13 hover:cursor-pointer" />
                 <Link href='/tournaments'>
                     <Image
                         src="/matchup-logo-2.png"
@@ -49,7 +47,7 @@ export default function NavigationBar({ hidden, user  }: {hidden?: boolean, user
                     )}
 
                     {/* Log In if not logged in */}
-                    {!loading && !user && !isAuthPage && (
+                    {!user && !isAuthPage && (
                         <Link href="/login" className={generalButtonClass}>
                             <CircleUser size={18} className="place-self-center" />
                             Log In

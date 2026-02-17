@@ -21,7 +21,7 @@ export const SearchResults = ({ tournaments }: { tournaments: TournamentsQueryRe
                         <li
                             key={tournament.id}
                             className="flex flex-col p-3 gap-4 my-3 border
-                                   border-gray-200 rounded-3xl shadow-md sm:my-3.5 
+                                   border-gray-200 rounded-3xl shadow-md sm:my-3.5
                                    sm:ml-0 sm:flex-row sm:justify-between sm:items-center 
                                    sm:p-4 sm:hover:shadow-md/20 transition duration-150"
                         >
