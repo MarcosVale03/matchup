@@ -1,113 +1,84 @@
 'use client';
-
 import BasicInputWithLabel from '@/ui/basic-input-with-label';
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { insertTournament, TournamentInsertErrors } from '@/server/mutations/tournaments.mutations';
-import { dateToInputString } from "@/lib/utils";
-import { ArrowRight, X } from 'lucide-react';
+import { updateTournament, TournamentUpdateErrors } from '@/server/mutations/tournaments.mutations';
+import { ArrowLeft, Save, X } from 'lucide-react';
+import { Tournament } from '@/lib/types/types';
+import { toDateTimeLocalInput } from '@/ui/format-time';
 
-const getDefaultFutureDate = (hours: number = 2) => {
-    const d = new Date();
-    d.setHours(d.getHours() + hours);
-    d.setMinutes(Math.floor(d.getMinutes() / 5) * 5);
-    return d;
-};
 
-// Initial state for the form
-interface FormState {
-    name: string;
-    slug: string;
-    startTime: Date;
-    endTime: Date;
-    isOnline: boolean;
-    email: string;
-    discord: string;
-    // Location is simplified for the form input
-    locationAddress: string;
-}
-
-const initialFormState: FormState = {
-    name: '',
-    slug: '',
-    startTime: new Date(),
-    endTime: getDefaultFutureDate(2),
-    isOnline: true,
-    email: '',
-    discord: '',
-    locationAddress: '',
-};
-
-export default function TournamentInsertForm() {
+export default function TournamentEditForm({ initialData }: { initialData: Tournament }) {
     const router = useRouter();
-    const [formData, setFormData] = useState<FormState>(initialFormState);
-    const [fieldErrors, setFieldErrors] = useState<TournamentInsertErrors>({});
+
+    const [formData, setFormData] = useState({
+        id: initialData.id,
+        name: initialData.name ?? '',
+        slug: initialData.slug ?? '',
+        startTime: toDateTimeLocalInput(initialData.start_time),
+        endTime: toDateTimeLocalInput(initialData.end_time),
+        isOnline: true,                    // add is_online to DB later
+        email: initialData.email_contact ?? '',
+        discord: initialData.discord_invite ?? '',
+        locationAddress: 'Los Angeles, CA', // add location later
+    });
+
+    const [fieldErrors, setFieldErrors] = useState<TournamentUpdateErrors>({});
     const [formError, setFormError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // Placeholder for location data (we would integrate Google Maps API here)
-    // For now, we only use the address input
-    const mockLocationData = {
-        maps_place_id: 'mock_place_id',
-        address: formData.locationAddress,
-        latitude: 34.0522, // Mock data for LA
-        longitude: -118.2437, // Mock data for LA
-    };
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { name, value, type } = e.target;
-
+    // handler for text, email, datetime-local, checkbox
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value, type, checked } = e.target;
         setFormData(prev => ({
             ...prev,
-            [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
+            [name]: type === 'checkbox' ? checked : value,
         }));
     };
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    // submit handler calls the updateTournament and handles success/error states
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
         setFieldErrors({});
         setFormError(null);
 
-        const locationArg = formData.isOnline ? undefined : mockLocationData;
-        const slugArg = formData.slug.trim() || undefined;
+        const response = await updateTournament(
+            formData.id,
+            formData.name,
+            new Date(formData.startTime),
+            new Date(formData.endTime),
+            formData.isOnline,
+            {
+                email: formData.email.trim() || undefined,
+                discord: formData.discord.trim() || undefined,
+            },
+            formData.slug.trim() || undefined,
+            formData.isOnline
+                ? undefined
+                : {
+                    // mock location data for now - in real app this would come from an API based on the address
+                    maps_place_id: 'mock_place_id',
+                    address: formData.locationAddress,
+                    latitude: 34.0522,
+                    longitude: -118.2437,
+                }
+        );
 
-        const startTimeArg = new Date(formData.startTime);
-        const endTimeArg = new Date(formData.endTime);
-
-        try {
-            /**
-             * @todo Incorporate isPublic parameter into form
-             */
-            const response = await insertTournament(
-                formData.name,
-                startTimeArg,
-                endTimeArg,
-                formData.isOnline,
-                { email: formData.email.trim() || undefined, discord: formData.discord.trim() || undefined },
-                true,
-                slugArg,
-                locationArg
-            );
-
-            if (response.success) {
-                alert(`Tournament "${formData.name}" created successfully!`);
-                // Redirect to the new tournament's detail page
-                // will change this to push to create events page
-                router.push("/tournaments");
-            } else {
-                setFieldErrors(response.fieldErrors || {});
-                setFormError(response.formErrors?.join(' ') || 'Validation failed. Check the fields above.');
-            }
-        } catch (error: unknown) {
-            setFormError('An unexpected error occurred.');
-        } finally {
-            setIsSubmitting(false);
+        if (response.success) {
+            alert(`Tournament "${formData.name}" updated successfully!`);
+            router.push(`/tournaments/${formData.id}`);
+        } else {
+            setFieldErrors(response.fieldErrors || {});
+            setFormError(response.formErrors?.join(' ') || 'Validation failed.');
         }
+
+        setIsSubmitting(false);
     };
 
+    const owner = initialData.owner ?? 'Organizer';
     // Helper to display errors for specific fields
-    const ErrorMessage = ({ field }: { field: keyof TournamentInsertErrors }) => {
+    const ErrorMessage = ({ field }: { field: keyof TournamentUpdateErrors }) => {
         const errors = fieldErrors[field];
         return errors ? (
             <div className="text-red-500 text-sm mt-2 flex">
@@ -125,10 +96,14 @@ export default function TournamentInsertForm() {
         <div className="mt-6 sm:mt-10 w-full px-4 sm:px-6 lg:px-8 mx-auto max-w-7xl font-[Poppins]">
             <div className="max-w-4xl mx-auto">
                 <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-6">
-                    Create a New Tournament
+                    Updating Tournament: <span className="text-primary">{formData.name}</span>
                 </h1>
 
-                <form onSubmit={handleSubmit} className="bg-white border border-gray-200 shadow-md rounded-lg p-4 sm:p-6 lg:p-8 max-h-[calc(100vh-200px)] sm:max-h-[70vh] overflow-y-auto">
+                <form 
+                    onSubmit={handleSubmit} 
+                    className="bg-white border border-gray-200 shadow-md rounded-lg p-4 sm:p-6 
+                               lg:p-8 max-h-[calc(100vh-200px)] sm:max-h-[75vh] overflow-y-auto mb-4"
+                    >
                     {/* Error Message */}
                     {formError && (
                         <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 sm:px-4 sm:py-3 rounded mb-4 text-sm sm:text-base" role="alert">
@@ -136,8 +111,13 @@ export default function TournamentInsertForm() {
                         </div>
                     )}
 
-                    <h2 className="text-lg sm:text-xl font-semibold text-primary mb-4">
-                        Basic Information
+                    <h2 className="text-lg sm:text-xl font-semibold text-primary mb-4 sm:flex justify-between">
+                        <p>
+                            Tournament ID: <span className="text-gray-700">{formData.id}</span>
+                        </p>
+                        <p>
+                            Owner: <span className="text-gray-700">Organizer</span>
+                        </p>
                     </h2>
 
                     {/* General Details */}
@@ -185,11 +165,8 @@ export default function TournamentInsertForm() {
                                     inputType="datetime-local"
                                     inputName="startTime"
                                     inputId="startTime"
-                                    inputValue={dateToInputString(formData.startTime)}
-                                    inputOnChange={(e) => {
-                                        if (!e.target.validity.valid) return;
-                                        setFormData({ ...formData, startTime: new Date(e.target.value) });
-                                    }}
+                                    inputValue={formData.startTime}
+                                    inputOnChange={handleChange}
                                     required={true}
                                     inputPlaceholder=""
                                     inputClassName={pageInputClass}
@@ -205,11 +182,8 @@ export default function TournamentInsertForm() {
                                     inputType="datetime-local"
                                     inputName="endTime"
                                     inputId="endTime"
-                                    inputValue={dateToInputString(formData.endTime)}
-                                    inputOnChange={(e) => {
-                                        if (!e.target.validity.valid) return;
-                                        setFormData({ ...formData, endTime: new Date(e.target.value) });
-                                    }}
+                                    inputValue={formData.endTime}
+                                    inputOnChange={handleChange}
                                     required={true}
                                     inputPlaceholder=""
                                     inputClassName={pageInputClass}
@@ -301,8 +275,18 @@ export default function TournamentInsertForm() {
                         <ErrorMessage field='contact' />
                     </fieldset>
 
-                    {/* Submit Button */}
-                    <div className="pt-4 sm:pt-6 mt-4 border-t border-t-gray-300">
+                    {/* Back/Submit Button */}
+                    <div className="pt-4 sm:pt-6 mt-4 border-t border-t-gray-300 flex gap-2 ">
+                        <button
+                            type="button"
+                            onClick={() => router.back()}
+                            className="w-full flex items-center justify-center gap-2 py-2.5 sm:py-3 px-4 border border-transparent rounded-md shadow-sm text-sm sm:text-base font-medium 
+                                       text-white bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 
+                                       focus:ring-primary disabled:opacity-50 transition-colors"
+                        > 
+                            <ArrowLeft className="size-8 sm:size-4" />
+                            Back to details
+                        </button>
                         <button
                             type="submit"
                             disabled={isSubmitting}
@@ -310,8 +294,8 @@ export default function TournamentInsertForm() {
                                        text-white bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 
                                        focus:ring-primary disabled:opacity-50 transition-colors"
                         >
-                            <span>{isSubmitting ? 'Going to events...' : 'Create events for this tournament'}</span>
-                            <ArrowRight size={18} className='flex-shrink-0' />
+                            <span>{isSubmitting ? 'Saving...' : 'Save Changes'}</span>
+                            <Save className="size-6 sm:size-4" />
                         </button>
                     </div>
                 </form>

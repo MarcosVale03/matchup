@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { signUp } from '@/lib/auth';
 import MatchupDescription from '@/features/account-creation/matchup-des';
 import AuthCard from '@/features/account-creation/auth-card';
-import NavigationBar from '@/ui/navigation-bar';
 
 export default function SignupPage() {
     const [email, setEmail] = useState('');
@@ -42,8 +41,7 @@ export default function SignupPage() {
 
 return (
     <div className="bg-primary min-h-screen font-[Poppins] flex flex-col">
-        <NavigationBar />
-        <div className="flex-1 flex 2xl:items-center justify-center px-4 sm:px-6 lg:px-8 py-6 sm:py-0">
+        <div className="flex-1 flex 2xl:items-center 2xl:mb-20 justify-center px-4 sm:px-6 lg:px-8 py-6 sm:py-0">
             <div className="w-full max-w-md sm:max-w-2xl md:max-w-3xl lg:max-w-4xl 2xl:max-w-5xl mt-5">
                 <div className="grid grid-cols-1 sm:grid-cols-2 drop-shadow-xl/30 rounded-lg overflow-hidden">
                     {/* left side of card */}

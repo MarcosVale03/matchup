@@ -2,92 +2,143 @@
 import { Tournament } from "@/lib/types/types";
 import { formatTournamentDateTime } from "@/ui/format-time";
 import { useRouter } from "next/navigation";
+import { Calendar, Clock, ExternalLink, Mail, MessageCircle, User, Pencil, MessageCircleMore } from "lucide-react";
 
-// This page will change once we have events going
+// Reusable classes
+const cardContainer = "border-2 border-gray-200 shadow-lg rounded-2xl overflow-hidden flex";
+const detailRow = "flex items-start gap-3.5 sm:gap-4 p-4 hover:bg-gray-100 transition-colors";
+const iconBase = "p-2.5 bg-primary rounded-full text-white shrink-0";
+const labelClass = "text-sm font-semibold text-gray-700 mb-0.5";
+const valueClass = "text-base sm:text-lg text-gray-900 font-medium";
+const buttonClass =`w-full flex items-center justify-center gap-2 py-2.5 sm:py-3 px-4 border border-transparent 
+                    rounded-md shadow-sm text-sm sm:text-base font-medium text-white bg-primary hover:bg-secondary 
+                    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 
+                    transition-colors`;
+
 export default function TournamentDetails({ tournament }: { tournament: Tournament }) {
-
     const router = useRouter();
 
     const handleEditClick = () => {
-        const url = `/tournaments/${tournament.id}/edit`;;
-        router.push(url);
+        router.push(`/tournaments/${tournament.id}/edit`);
     };
 
-    // listed items classnames
-    const mainDiv = "border-b pb-2";
-    const paragraphElement = "flex justify-between text-sm text-gray-800 whitespace-pre sm:text-md";
-    const spanElement = "font-bold text-black";
+    const handleForumClick = () => {
+        router.push(`/tournaments/${tournament.id}/forum`)
+    }
 
     return (
-        <main className="bg-white flex flex-col gap-5 m-3">
+        <main className="p-4 pt-6 overflow-y-auto">
+            <div className="mx-auto max-w-2xl lg:max-w-3xl">
+                {/* Header */}
+                <div className="mb-3 sm:mb-5 text-center">
+                    <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-primary tracking-tight">
+                        {tournament.name}
+                    </h1>
+                </div>
 
-            {/* Header Section */}
-            <div className="">
-                <h1 className="text-4xl text-center font-extrabold text-primary">
-                    {tournament.name}
-                </h1>
-            </div>
+                {/* Action Buttons */}
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-4 sm:mb-6">
+                    {/* Edit Tournament */}
+                    <button
+                        onClick={handleEditClick}
+                        className={buttonClass}
+                    >
+                        <Pencil size={19} />
+                        Edit Tournament
+                    </button>
 
-            {/* Details Grid */}
-            <div className="bg-gray-50 p-5 rounded-xl shadow-lg border border-gray-200 max-w-[75vw] place-self-center w-full">
-                <h2 className="text-left text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">
-                    Event Details
-                </h2>
+                    {/* Tournament Forum */}
+                    <button
+                        onClick={handleForumClick}
+                        className={buttonClass}
+                        disabled={true} // Disabled for now
+                    >
+                        <MessageCircleMore size={19} />
+                        Tournament Forum
+                    </button>
+                </div>
 
-                <dl className="space-y-3">
-                    {/* Start Time */}
-                    <div className={mainDiv}>
-                        <p className={paragraphElement}>
-                            <span className={spanElement}>Start Time: </span> {formatTournamentDateTime(tournament.start_time)}
-                        </p>
-                    </div>
+                {/* Details Card*/}
+                <div className={cardContainer}>
+                    <div className="p-5 sm:p-6 lg:p-8 space-y-3 sm:space-y-3 w-full">
+                        {/* Owner */}
+                        <div className={detailRow}>
+                            <div className={iconBase}>
+                                <User size={22} />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <h3 className={labelClass}>Tournament Owner</h3>
+                                <p className={valueClass}>Organizer</p>
+                            </div>
+                        </div>
 
-                    {/* End Time */}
-                    <div className={mainDiv}>
-                        <p className={paragraphElement}>
-                            <span className={spanElement}>End Time: </span>  {formatTournamentDateTime(tournament.end_time)}
-                        </p>
-                    </div>
+                        {/* Start Time */}
+                        <div className={detailRow}>
+                            <div className={iconBase}>
+                                <Calendar size={22} />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <h3 className={labelClass}>Start Time</h3>
+                                <p className={valueClass}>
+                                    {formatTournamentDateTime(tournament.start_time)}
+                                </p>
+                            </div>
+                        </div>
 
-                    {/* Contact Information | Email */}
-                    <div className={mainDiv}>
-                        <p className={paragraphElement}>
-                            <span className={spanElement}>Email: </span>  {tournament.email_contact}
-                        </p>
-                    </div>
+                        {/* End Time */}
+                        <div className={detailRow}>
+                            <div className={iconBase}>
+                                <Clock size={22} />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <h3 className={labelClass}>End Time</h3>
+                                <p className={valueClass}>
+                                    {formatTournamentDateTime(tournament.end_time)}
+                                </p>
+                            </div>
+                        </div>
 
-                    {/* Contact Information | Discord */}
-                    <div className={mainDiv}>
-                        <p className={paragraphElement}>
-                            <span className={spanElement}>Discord: </span>
-                            {tournament.discord_invite
-                                ? `https://discord.gg/${tournament.discord_invite}`
-                                : "N/A"}
-                        </p>
-                    </div>
+                        {/* Email */}
+                        <div className={detailRow}>
+                            <div className={iconBase}>
+                                <Mail size={22} />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <h3 className={labelClass}>Email</h3>
+                                <p className={`${valueClass} break-all`}>
+                                    {tournament.email_contact || "—"}
+                                </p>
+                            </div>
+                        </div>
 
-                    {/* Homepage Link */}
-                    {/* To be implemented */}
-                    <div className="flex justify-between items-center">
-                        <p className="font-medium text-gray-600">
-                            Official Homepage
-                        </p>
-                        <div>
-                            {/* <Link 
-                                    href={tournament.home_page} 
-                                    className="text-blue-600 hover:text-blue-800 font-medium underline"
-                                >
-                                    Visit Site
-                                </Link> */}
+                        {/* Discord */}
+                        <div className={detailRow}>
+                            <div className={iconBase}>
+                                <MessageCircle size={22} />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <h3 className={labelClass}>Discord</h3>
+                                <p className={`${valueClass} break-words`}>
+                                    {tournament.discord_invite
+                                        ? `https://discord.gg/${tournament.discord_invite}`
+                                        : "Not provided"}
+                                </p>
+                            </div>
+                        </div>
 
-                            <p className="text-blue-600 hover:text-blue-800 font-medium underline cursor-pointer">
+                        {/* Visit Site Button */}
+                        <div className="pt-3">
+                            <button
+                                onClick={() => console.log('Visit site clicked')}
+                                className={buttonClass}
+                            >
+                                <ExternalLink size={20} />
                                 Visit Site
-                            </p>
+                            </button>
                         </div>
                     </div>
-                </dl>
+                </div>
             </div>
         </main>
-
     );
 }
