@@ -32,7 +32,7 @@ export default function LoginPage() {
             return;
         }
 
-        router.replace("/tournaments");
+        //router.replace("/tournaments");
     }
 
     return (
