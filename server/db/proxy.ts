@@ -42,12 +42,22 @@ export async function updateSession(request: NextRequest) {
     if (
         !user &&
         (pathname.startsWith('/admin') ||
-        pathname.startsWith('/tournaments/create') || 
-        pathname.startsWith('/tournaments'))    
+        pathname.startsWith('/tournaments/create'))
     ) {
         // no user, potentially respond by redirecting the user to the login page
         const url = request.nextUrl.clone()
         url.pathname = '/login'
+        return NextResponse.redirect(url)
+    }
+
+    if (user && 
+        (pathname.startsWith('/login') ||
+        pathname.startsWith('/signup') ||
+        pathname.startsWith('/verify-email'))
+    ) {
+        // if they are a user dont let them visit the signup/login/verify-email page anymore
+        const url = request.nextUrl.clone()
+        url.pathname = '/tournaments'
         return NextResponse.redirect(url)
     }
 
