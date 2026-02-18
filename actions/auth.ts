@@ -38,9 +38,6 @@ export async function signInWithEmail(email: string, password: string) {
         }
     }
 
-    return {
-        success: true,
-        message: "Successfully logged in!",
-    }
+    redirect('/tournaments')
 
 }
