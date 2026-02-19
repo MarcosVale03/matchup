@@ -21,6 +21,7 @@ interface FormState {
     startTime: Date;
     endTime: Date;
     isOnline: boolean;
+    isPrivate: boolean;
     email: string;
     discord: string;
     // Location is simplified for the form input
@@ -33,6 +34,7 @@ const initialFormState: FormState = {
     startTime: new Date(),
     endTime: getDefaultFutureDate(2),
     isOnline: true,
+    isPrivate: false,
     email: '',
     discord: '',
     locationAddress: '',
@@ -82,6 +84,7 @@ export default function TournamentInsertForm() {
                 endTimeArg,
                 formData.isOnline,
                 { email: formData.email.trim() || undefined, discord: formData.discord.trim() || undefined },
+                formData.isPrivate,
                 slugArg,
                 locationArg
             );
@@ -254,6 +257,32 @@ export default function TournamentInsertForm() {
                             </>
                         )}
                     </fieldset>
+
+                    {/* Visibility */}
+                    <fieldset className="space-y-4 p-4 sm:p-5 border rounded-md mb-6">
+                        <h2 className="text-lg sm:text-xl font-semibold text-primary">
+                            Visibility
+                        </h2>
+
+                        <div className="flex items-center">
+                            <input
+                                type="checkbox"
+                                name="isPrivate"
+                                id="isPrivate"
+                                checked={formData.isPrivate}
+                                onChange={handleChange}
+                                className="h-4 w-4 accent-primary flex-shrink-0"
+                            />
+                            <label htmlFor="isPrivate" className="ml-2 block text-sm font-medium text-gray-700">
+                                Private?
+                            </label>
+                        </div>
+                        <p className="text-xs text-gray-500">
+                            {formData.isPrivate
+                                ? 'This tournament will only be visible to people with a direct link.'
+                                : 'This tournament will be publicly listed and searchable.'}
+                        </p>
+                    </fieldset> 
 
                     {/* Contact Information */}
                     <fieldset className="space-y-4 p-4 sm:p-5 border rounded-md mb-6">

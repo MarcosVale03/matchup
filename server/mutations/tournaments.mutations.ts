@@ -32,6 +32,7 @@ const TournamentInsertSchema = z.object({
         end_time: DateToISOStr
     }).refine(data => data.start_time < data.end_time, {error: "Start time must be before end time"}),
     is_online: z.boolean(),
+    is_private: z.boolean(),
     location: z.optional(LocationSchema),
     contact: z.object({
         email: z.optional(z.email().max(254)),
@@ -47,6 +48,7 @@ export type TournamentInsertErrors = {
     slug?: string[],
     times?: string[],
     is_online?: string[],
+    is_private?: string[],
     location?: string[],
     contact?: string[]
 }
@@ -56,6 +58,7 @@ export async function insertTournament(name: string, start_time: Date, end_time:
                                             email?: string,
                                             discord?: string,
                                        },
+                                       isPrivate: boolean = false,
                                        slug?: string,
                                        location?: {
                                             maps_place_id: string,
@@ -75,6 +78,7 @@ export async function insertTournament(name: string, start_time: Date, end_time:
             end_time: end_time
         },
         is_online: isOnline,
+        is_private: isPrivate,
         location: location,
         contact: contact
     })
@@ -103,6 +107,7 @@ export async function insertTournament(name: string, start_time: Date, end_time:
         t_start_time: result.data.times.start_time,
         t_end_time: result.data.times.end_time,
         is_online: result.data.is_online,
+        is_private: result.data.is_private,
         t_email: result.data.contact.email,
         t_discord: result.data.contact.discord,
         t_slug: result.data.slug,
@@ -140,6 +145,7 @@ export type TournamentUpdateErrors = {
     slug?: string[],
     times?: string[],
     is_online?: string[],
+    is_private?: string[],
     location?: string[],
     contact?: string[]
 }
@@ -149,6 +155,7 @@ export async function updateTournament(id: number, name: string, start_time: Dat
                                            email?: string,
                                            discord?: string,
                                        },
+                                       isPrivate: boolean = false,
                                        slug?: string,
                                        location?: {
                                            maps_place_id: string,
@@ -169,6 +176,7 @@ export async function updateTournament(id: number, name: string, start_time: Dat
             end_time: end_time
         },
         is_online: isOnline,
+        is_private: isPrivate,
         location: location,
         contact: contact
     })
@@ -198,6 +206,7 @@ export async function updateTournament(id: number, name: string, start_time: Dat
         t_start_time: result.data.times.start_time,
         t_end_time: result.data.times.end_time,
         is_online: result.data.is_online,
+        is_private: result.data.is_private,
         t_email: result.data.contact.email,
         t_discord: result.data.contact.discord,
         t_slug: result.data.slug,

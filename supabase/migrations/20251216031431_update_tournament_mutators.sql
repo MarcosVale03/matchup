@@ -1,6 +1,6 @@
 DROP FUNCTION insert_tournament;
 
-CREATE FUNCTION insert_tournament (t_name varchar(80), t_start_time timestamptz, t_end_time timestamptz, is_online boolean,
+CREATE FUNCTION insert_tournament (t_name varchar(80), t_start_time timestamptz, t_end_time timestamptz, is_online boolean, is_private boolean,
                                    t_email varchar(254) default null, t_discord varchar(8) default null,
                                    t_slug varchar(80) default null, t_place_id text default null, t_address text default null,
                                    t_latitude double precision default null, t_longitude double precision default null)
@@ -39,7 +39,7 @@ $$ language plpgsql;
 
 
 
-CREATE FUNCTION update_tournament (t_id bigint, t_name varchar(80), t_start_time timestamptz, t_end_time timestamptz, is_online boolean,
+CREATE FUNCTION update_tournament (t_id bigint, t_name varchar(80), t_start_time timestamptz, t_end_time timestamptz, is_online boolean, is_private boolean,
                                    t_email varchar(254) default null, t_discord varchar(8) default null,
                                    t_slug varchar(80) default null, t_place_id text default null, t_address text default null,
                                    t_latitude double precision default null, t_longitude double precision default null)
@@ -50,7 +50,7 @@ DECLARE
     loc_id bigint;
 BEGIN
     UPDATE tournaments
-    SET name = t_name, start_time = t_start_time, end_time = t_end_time, slug = t_slug, email_contact = t_email, discord_invite = t_discord
+    SET name = t_name, start_time = t_start_time, end_time = t_end_time, slug = t_slug, email_contact = t_email, discord_invite = t_discord, is_private = update_tournament.is_private
     WHERE id = t_id;
 
     IF is_online THEN

@@ -1,4 +1,4 @@
-CREATE FUNCTION insert_tournament (t_name varchar(80), t_start_time timestamptz, t_end_time timestamptz, is_online boolean,
+CREATE FUNCTION insert_tournament (t_name varchar(80), t_start_time timestamptz, t_end_time timestamptz, is_online boolean, is_private boolean,
                                    t_email varchar(254) default null, t_discord varchar(8) default null,
                                    t_slug varchar(80) default null, t_place_id text default null, t_address text default null,
                                    t_latitude double precision default null, t_longitude double precision default null)
@@ -9,8 +9,8 @@ DECLARE
     discord_id bigint;
     loc_id bigint;
 BEGIN
-    INSERT INTO tournaments (name, start_time, end_time, slug)
-    VALUES (t_name, t_start_time, t_end_time, t_slug)
+    INSERT INTO tournaments (name, start_time, end_time, slug, is_private)
+    VALUES (t_name, t_start_time, t_end_time, t_slug, is_private)
     RETURNING id
     INTO t_id;
 
