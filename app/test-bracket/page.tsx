@@ -80,7 +80,6 @@ export default function TestBracketPage() {
                         value={tournamentId}
                         onChange={e => setTournamentId(e.target.value)}
                         className="border-2 border-gray-300 rounded px-3 py-2 w-36 bg-white text-black focus:border-blue-500 focus:outline-none"
-                        placeholder="e.g. 2"
                     />
                 </div>
                 <div>
@@ -90,7 +89,6 @@ export default function TestBracketPage() {
                         value={eventName}
                         onChange={e => setEventName(e.target.value)}
                         className="border-2 border-gray-300 rounded px-3 py-2 w-52 bg-white text-black focus:border-blue-500 focus:outline-none"
-                        placeholder="e.g. Test Event"
                     />
                 </div>
             </div>
@@ -140,7 +138,7 @@ export default function TestBracketPage() {
             <div className="mb-8">
                 <h2 className="text-lg font-bold mb-2">Log</h2>
                 <div className="bg-gray-100 border-2 border-gray-300 text-black p-4 rounded font-mono text-sm max-h-48 overflow-y-auto">
-                    {log.length === 0 && <p className="text-gray-400">No actions yet...</p>}
+                    {log.length === 0 && <p className="text-gray-400"></p>}
                     {log.map((entry, i) => (
                         <p key={i} className={entry.includes('✅') ? 'text-green-700' : entry.includes('❌') ? 'text-red-600' : 'text-black'}>
                             {entry}
