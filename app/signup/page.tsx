@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react';
-import { signUp } from '@/actions/auth';
+import { signUp } from '@/lib/auth';
 import MatchupDescription from '@/features/account-creation/matchup-des';
 import AuthCard from '@/features/account-creation/auth-card';
 import NavigationBar from '@/ui/navigation-bar';

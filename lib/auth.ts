@@ -37,7 +37,7 @@ export async function signInWithEmail(email: string, password: string) {
     const supabase = await createClient(cookieStore)
 
     // uses supabase built in auth sign in method 
-    const { data, error } = await supabase.auth.signInWithPassword({email: email, password: password,})
+    const { error } = await supabase.auth.signInWithPassword({email: email, password: password,})
      
      // checks if we ran into any errors
      if (error) {
@@ -64,7 +64,7 @@ export async function signOut() {
      if (error) {
         return {
             success: false,
-            error: error.message,
+            message: error.message,
         }
     }
 
