@@ -1,14 +1,16 @@
 'use client'
 import Link from "next/link";
-import { CircleUser, MessageCircle, MessageCircleMore, Plus } from "lucide-react";
+import { CircleUser, MessageCircleMore, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation"; 
 import { createClient } from "@/server/db/client";
+import {User} from "@supabase/auth-js";
+import Image from "next/image";
 
 const supabase = createClient();
 
 export default function NavigationBar({hidden}: {hidden?: boolean}) {
-    const [user, setUser] = useState<any>(null);
+    const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
     const pathname = usePathname(); 
 
@@ -33,12 +35,12 @@ export default function NavigationBar({hidden}: {hidden?: boolean}) {
 
     const generalButtonClass = "text-white flex flex-row justify-center rounded-md sm:rounded-none hover:bg-gray-200 hover:text-primary transition duration-150 p-2 drop-shadow-lg/70 gap-1";
     return (
-        <nav className="fixed bg-primary p-3 w-full sticky top-0 z-10 border-b border-primary font-[Poppins] font-semibold">
+        <nav className="bg-primary p-3 w-full sticky top-0 z-10 border-b border-primary font-[Poppins] font-semibold">
             <ul className="flex justify-between items-center list-none">
                 
                 {/* Left: Logo */}
-                <Link href='/tournaments'>
-                    <img src="/matchup-logo-2.png" alt="Matchup Logo" className="flex-shrink-0 w-35 h-11 lg:w-42 lg:h-13 hover:cursor-pointer" />
+                <Link href='/'>
+                    <Image src="/matchup-logo-2.png" width={967} height={324} alt="Matchup Logo" className="shrink-0 w-35 h-11 lg:w-42 lg:h-13 hover:cursor-pointer" />
                 </Link>
 
                 {/* Right: Navigation Buttons */}
@@ -52,11 +54,26 @@ export default function NavigationBar({hidden}: {hidden?: boolean}) {
                         </Link>
                     )}
 
+                    {/* Sign Out | Only available if signed in */}
+                    {!loading && user && !isAuthPage && (
+                        <Link href="/signout" className={generalButtonClass} hidden={hidden}>
+                            <p className="hidden sm:block">Sign Out</p>
+                        </Link>
+                    )}
+
                     {/* Signup if not logged in */}
                     {!loading && !user && !isAuthPage && (
                         <Link href="/signup" className={generalButtonClass}>
                             <CircleUser size={18} className="place-self-center" />
                             Signup
+                        </Link>
+                    )}
+
+                    {/* Log In if not logged in */}
+                    {!loading && !user && !isAuthPage && (
+                        <Link href="/login" className={generalButtonClass}>
+                            <CircleUser size={18} className="place-self-center" />
+                            Log In
                         </Link>
                     )}
 
