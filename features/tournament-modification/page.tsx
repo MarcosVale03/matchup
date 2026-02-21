@@ -101,6 +101,9 @@ export default function TournamentEditForm({ initialData }: { initialData: Tourn
         setSuccessMessage(null);
 
         try {
+            /**
+             * @todo Incorporate isPublic parameter into form
+             */
             const result = await updateTournament(
                 formData.id,
                 formData.name,
@@ -108,6 +111,7 @@ export default function TournamentEditForm({ initialData }: { initialData: Tourn
                 formData.endTime,
                 formData.isOnline,
                 { email: formData.email?.trim() || undefined, discord: formData.discord?.trim() || undefined },
+                true,
                 formData.slug || undefined,
                 formData.isOnline ? undefined : formData.location
             );
@@ -121,7 +125,7 @@ export default function TournamentEditForm({ initialData }: { initialData: Tourn
             }
 
         } catch (error: unknown) {
-            setFormErrors(["An unexpected error occured"]);
+            setFormErrors(["An unexpected error occurred"]);
         } finally {
             setIsSubmitting(false);
         }
@@ -244,6 +248,9 @@ export default function TournamentEditForm({ initialData }: { initialData: Tourn
                 </fieldset>
 
                 {/* Type and Location */}
+                {/**
+                * @todo Fix bug where online tournament has isOnline unchecked when edited
+                */}
                 <fieldset className="space-y-4 mb-6 p-4 border rounded-md md:mb-0">
                     <h1 className="text-xl font-semibold mb-3 text-primary">
                         Location Type
