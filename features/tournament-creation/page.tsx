@@ -76,12 +76,16 @@ export default function TournamentInsertForm() {
         const endTimeArg = new Date(formData.endTime);
 
         try {
+            /**
+             * @todo Incorporate isPublic parameter into form
+             */
             const response = await insertTournament(
                 formData.name,
                 startTimeArg,
                 endTimeArg,
                 formData.isOnline,
                 { email: formData.email.trim() || undefined, discord: formData.discord.trim() || undefined },
+                true,
                 slugArg,
                 locationArg
             );
