@@ -1,4 +1,4 @@
-import {fetchTournamendIdFromSlug} from "@/server/queries/tournaments.queries";
+import {fetchTournamentIdFromSlug} from "@/server/queries/tournaments.queries";
 import {notFound, redirect} from "next/navigation";
 
 export async function GET(
@@ -6,7 +6,7 @@ export async function GET(
     { params }: { params: Promise<{ slug: string }> }
 ) {
     const { slug } = await params
-    const { success, data: id } = await fetchTournamendIdFromSlug(slug)
+    const { success, data: id } = await fetchTournamentIdFromSlug(slug)
     if (!success) {
         notFound()
     }

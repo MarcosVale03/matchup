@@ -39,7 +39,8 @@ const TournamentInsertSchema = z.object({
             new RegExp("(https?://)?(www.)?(discord.gg|discordapp.com)(/invite)?/[^\\s/]{8}?(?=\\b)")).pipe(
                 z.transform(link => link.slice(-8))
         ))
-    }).refine(data => data.email || data.discord, {error: "Must provide at least one contact"})
+    }).refine(data => data.email || data.discord, {error: "Must provide at least one contact"}),
+    is_public: z.boolean(),
 }).refine(data => data.is_online || data.location, {error: "Need location for offline tournament", path: ["location"],})
 
 export type TournamentInsertErrors = {
@@ -48,15 +49,42 @@ export type TournamentInsertErrors = {
     times?: string[],
     is_online?: string[],
     location?: string[],
-    contact?: string[]
+    contact?: string[],
+    is_public?: string[],
 }
 
-export async function insertTournament(name: string, start_time: Date, end_time: Date, isOnline: boolean,
+
+/**
+ * Inserts a new tournament row into the tournaments table of the database.
+ * @param {string} name - The name of the tournament.
+ * @param {Date} startTime - The start date and time of the tournament.
+ * @param {Date} endTime - The end date and time of the tournament. Must be later than start_time.
+ * @param {boolean} isOnline - True if the tournament is an online tournament. False if the tournament is offline.
+ * @param {Object} contact - Object containing either a contact email or discord invite link. One of the two must be present.
+ * @param {string} contact.email - Email used to contact tournament organizers.
+ * @param {string} contact.discord - Discord invite link to the tournament discord.
+ * @param {boolean} [isPublic] - Optional. True if the tournament is a public tournament. False if the tournament is private.
+ * @param {string} [slug] - Optional slug to use as a shorter link to the tournament.
+ * @param {Object} [location] - Location data for an offline tournament. Required only if isOnline is false.
+ * @param {string} location.maps_place_id - Google Maps place id for the given location.
+ * @param {string} location.address - Written address for the given location.
+ * @param {number} location.latitude - Latitude coordinate of the given location.
+ * @param {number} location.longitute - Longitude coordinate of the given location.
+ *
+ * @returns Response from mutation.
+ * @returns success - True if the DB mutation is successful. False if it fails.
+ * @returns formErrors - Optional. Contains error messages that apply to the whole form.
+ * @returns fieldErrors - Optional. Contains error messages that apply to specific parts of the form.
+ * @returns data - Returns tournament id of inserted tournament if success is true
+ *
+ * @throws - Will throw an exception if an error occurs while entering data into the database..
+ */
+export async function insertTournament(name: string, startTime: Date, endTime: Date, isOnline: boolean,
                                        contact: {
                                             email?: string,
                                             discord?: string,
                                        },
-                                       slug?: string,
+                                       isPublic?: boolean, slug?: string,
                                        location?: {
                                             maps_place_id: string,
                                             address: string,
@@ -64,21 +92,25 @@ export async function insertTournament(name: string, start_time: Date, end_time:
                                             longitude: number
                                        },
                                      ): Promise<MutationResponse<number, TournamentInsertErrors>> {
+    // Create supabase client
     const cookieStore = await cookies()
     const supabase = await createClient(cookieStore)
 
+    // Validates data using Zod schema
     const result = TournamentInsertSchema.safeParse({
         name: name,
         slug: slug,
         times: {
-            start_time: start_time,
-            end_time: end_time
+            start_time: startTime,
+            end_time: endTime
         },
         is_online: isOnline,
         location: location,
-        contact: contact
+        contact: contact,
+        is_public: isPublic,
     })
 
+    // Returns errors if validation isn't successful
     if (!result.success) {
         const err = z.flattenError(result.error)
         return {
@@ -88,6 +120,7 @@ export async function insertTournament(name: string, start_time: Date, end_time:
         }
     }
 
+    // Checks if provided slug already exists in the database. Returns an error if it does.
     if (slug) {
         const unique = await isSlugUnique(supabase, slug)
         if (!unique) {
@@ -98,6 +131,7 @@ export async function insertTournament(name: string, start_time: Date, end_time:
         }
     }
 
+    // Attempts to add row to database
     const {data, error} = await supabase.rpc('insert_tournament', {
         t_name: result.data.name,
         t_start_time: result.data.times.start_time,
@@ -109,19 +143,29 @@ export async function insertTournament(name: string, start_time: Date, end_time:
         t_place_id: result.data.location?.maps_place_id,
         t_address: result.data.location?.address,
         t_latitude: result.data.location?.latitude,
-        t_longitude: result.data.location?.longitude
+        t_longitude: result.data.location?.longitude,
+        t_is_public: result.data.is_public,
     })
 
+    // Throws error if something goes wrong
     if (error) {
         throw new Error("Tournament Insert Transaction Failed: " + error.details + " " + error.message)
     }
 
+    // Returns successful
     return {
         success: true,
         data: data
     }
 }
 
+
+/**
+ * Returns true if slug doesn't already exist in the database.
+ * @param supabase
+ * @param slug
+ * @param id
+ */
 async function isSlugUnique(supabase: SupabaseClient, slug: string, id?: number) {
     const {data, error} = await supabase.from('tournaments').select('id').eq('slug', slug)
     if (error || !data) {
@@ -144,12 +188,38 @@ export type TournamentUpdateErrors = {
     contact?: string[]
 }
 
-export async function updateTournament(id: number, name: string, start_time: Date, end_time: Date, isOnline: boolean,
+/**
+ * Updates an existing tournament row in the tournaments table of the database.
+ * @param {number} id - The id of the tournament.
+ * @param {string} name - The name of the tournament.
+ * @param {Date} startTime - The start date and time of the tournament.
+ * @param {Date} endTime - The end date and time of the tournament. Must be later than start_time.
+ * @param {boolean} isOnline - True if the tournament is an online tournament. False if the tournament is offline.
+ * @param {Object} contact - Object containing either a contact email or discord invite link. One of the two must be present.
+ * @param {string} contact.email - Email used to contact tournament organizers.
+ * @param {string} contact.discord - Discord invite link to the tournament discord.
+ * @param {boolean} [isPublic] - Optional. True if the tournament is a public tournament. False if the tournament is private.
+ * @param {string} [slug] - Optional slug to use as a shorter link to the tournament.
+ * @param {Object} [location] - Location data for an offline tournament. Required only if isOnline is false.
+ * @param {string} location.maps_place_id - Google Maps place id for the given location.
+ * @param {string} location.address - Written address for the given location.
+ * @param {number} location.latitude - Latitude coordinate of the given location.
+ * @param {number} location.longitute - Longitude coordinate of the given location.
+ *
+ * @returns Response from mutation.
+ * @returns success - True if the DB mutation is successful. False if it fails.
+ * @returns formErrors - Optional. Contains error messages that apply to the whole form.
+ * @returns fieldErrors - Optional. Contains error messages that apply to specific parts of the form.
+ * @returns data - Returns tournament id of updated tournament if success is true.
+ *
+ * @throws - Will throw an exception if an error occurs while entering data into the database.
+ */
+export async function updateTournament(id: number, name: string, startTime: Date, endTime: Date, isOnline: boolean,
                                        contact: {
                                            email?: string,
                                            discord?: string,
                                        },
-                                       slug?: string,
+                                       isPublic?: boolean, slug?: string,
                                        location?: {
                                            maps_place_id: string,
                                            address: string,
@@ -157,22 +227,26 @@ export async function updateTournament(id: number, name: string, start_time: Dat
                                            longitude: number
                                        },
 ): Promise<MutationResponse<number, TournamentUpdateErrors>> {
+    // Creates supabase client
     const cookieStore = await cookies()
     const supabase = await createClient(cookieStore)
 
+    // Validates data using Zod schema
     const result = TournamentUpdateSchema.safeParse({
         id: id,
         name: name,
         slug: slug,
         times: {
-            start_time: start_time,
-            end_time: end_time
+            start_time: startTime,
+            end_time: endTime
         },
         is_online: isOnline,
         location: location,
-        contact: contact
+        contact: contact,
+        is_public: isPublic
     })
 
+    // Returns errors if validation isn't successful
     if (!result.success) {
         const err = z.flattenError(result.error)
         return {
@@ -182,6 +256,7 @@ export async function updateTournament(id: number, name: string, start_time: Dat
         }
     }
 
+    // Checks if provided slug already exists in the database. Returns an error if it does.
     if (slug) {
         const unique = await isSlugUnique(supabase, slug, id)
         if (!unique) {
@@ -192,6 +267,7 @@ export async function updateTournament(id: number, name: string, start_time: Dat
         }
     }
 
+    // Attempts to update row in database
     const {data, error} = await supabase.rpc('update_tournament', {
         t_id: result.data.id,
         t_name: result.data.name,
@@ -204,13 +280,16 @@ export async function updateTournament(id: number, name: string, start_time: Dat
         t_place_id: result.data.location?.maps_place_id,
         t_address: result.data.location?.address,
         t_latitude: result.data.location?.latitude,
-        t_longitude: result.data.location?.longitude
+        t_longitude: result.data.location?.longitude,
+        t_is_public: result.data.is_public,
     })
 
+    // Throws error if something goes wrong
     if (error) {
         throw new Error("Tournament Update Transaction Failed: " + error.details + " " + error.message)
     }
 
+    // Returns successful
     return {
         success: true,
         data: data
@@ -218,7 +297,15 @@ export async function updateTournament(id: number, name: string, start_time: Dat
 }
 
 
-
+/**
+ * Deletes a given tournament from the database.
+ * @param id - ID of the tournament to be deleted
+ *
+ * @returns Response from mutation.
+ * @returns success - True if the DB mutation is successful. False if it fails.
+ *
+ * @throws - Will throw an exception if an error occurs while entering data into the database.
+ */
 export async function deleteTournament(id: number) {
     const cookieStore = await cookies()
     const supabase = await createClient(cookieStore)

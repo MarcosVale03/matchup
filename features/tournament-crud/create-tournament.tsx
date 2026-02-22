@@ -4,23 +4,22 @@ import BasicInputWithLabel from '@/ui/basic-input-with-label';
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { insertTournament, TournamentInsertErrors } from '@/server/mutations/tournaments.mutations';
+import { dateToInputString } from "@/lib/utils";
 import { ArrowRight, X } from 'lucide-react';
 
-const getDefaultFutureDateString = (hoursOffset = 2) => {
+const getDefaultFutureDate = (hours: number = 2) => {
     const d = new Date();
-    d.setHours(d.getHours() + hoursOffset);
+    d.setHours(d.getHours() + hours);
     d.setMinutes(Math.floor(d.getMinutes() / 5) * 5);
-    d.setSeconds(0);
-    d.setMilliseconds(0);
-    return d.toISOString().slice(0, 16); // "YYYY-MM-DDTHH:mm"
+    return d;
 };
 
-// type for form state 
-type FormState = {
+// Initial state for the form
+interface FormState {
     name: string;
     slug: string;
-    startTime: string;
-    endTime: string;
+    startTime: Date;
+    endTime: Date;
     isOnline: boolean;
     email: string;
     discord: string;
@@ -28,12 +27,11 @@ type FormState = {
     locationAddress: string;
 }
 
-// Initial form state with default values
 const initialFormState: FormState = {
     name: '',
     slug: '',
-    startTime: getDefaultFutureDateString(0),
-    endTime: getDefaultFutureDateString(2),
+    startTime: new Date(),
+    endTime: getDefaultFutureDate(2),
     isOnline: true,
     email: '',
     discord: '',
@@ -42,63 +40,67 @@ const initialFormState: FormState = {
 
 export default function TournamentInsertForm() {
     const router = useRouter();
-    const [values, setValues] = useState<FormState>(initialFormState);
+    const [formData, setFormData] = useState<FormState>(initialFormState);
     const [fieldErrors, setFieldErrors] = useState<TournamentInsertErrors>({});
     const [formError, setFormError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // handler for fields
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value, type, checked } = e.target;
-        setValues(prev => ({
+    // Placeholder for location data (we would integrate Google Maps API here)
+    // For now, we only use the address input
+    const mockLocationData = {
+        maps_place_id: 'mock_place_id',
+        address: formData.locationAddress,
+        latitude: 34.0522, // Mock data for LA
+        longitude: -118.2437, // Mock data for LA
+    };
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value, type } = e.target;
+
+        setFormData(prev => ({
             ...prev,
-            [name]: type === 'checkbox' ? checked : value,
+            [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
         }));
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsSubmitting(true);
         setFieldErrors({});
         setFormError(null);
 
-        // Convert strings to Date
-        const start = new Date(values.startTime);
-        const end = new Date(values.endTime);
+        const locationArg = formData.isOnline ? undefined : mockLocationData;
+        const slugArg = formData.slug.trim() || undefined;
 
-        const location = values.isOnline
-            ? undefined
-            : {
-                maps_place_id: 'mock_place_id',
-                address: values.locationAddress.trim(),
-                latitude: 34.0522,
-                longitude: -118.2437,
-            };
+        const startTimeArg = new Date(formData.startTime);
+        const endTimeArg = new Date(formData.endTime);
 
         try {
+            /**
+             * @todo Incorporate isPublic parameter into form
+             */
             const response = await insertTournament(
-                values.name.trim(),
-                start,
-                end,
-                values.isOnline,
-                {
-                    email: values.email.trim() || undefined,
-                    discord: values.discord.trim() || undefined,
-                },
-                values.slug.trim() || undefined,
-                location
+                formData.name,
+                startTimeArg,
+                endTimeArg,
+                formData.isOnline,
+                { email: formData.email.trim() || undefined, discord: formData.discord.trim() || undefined },
+                true,
+                slugArg,
+                locationArg
             );
 
             if (response.success) {
-                alert(`Tournament "${values.name}" created successfully!`);
-                router.push("/tournaments"); // change to events later
+                alert(`Tournament "${formData.name}" created successfully!`);
+                // Redirect to the new tournament's detail page
+                // will change this to push to create events page
+                router.push("/tournaments");
             } else {
                 setFieldErrors(response.fieldErrors || {});
-                setFormError(response.formErrors?.join(' • ') || 'Validation failed');
+                setFormError(response.formErrors?.join(' ') || 'Validation failed. Check the fields above.');
             }
-        } catch (err) {
-            setFormError('An unexpected error occurred');
-            console.error(err);
+        } catch (error: unknown) {
+            setFormError('An unexpected error occurred.');
         } finally {
             setIsSubmitting(false);
         }
@@ -115,7 +117,7 @@ export default function TournamentInsertForm() {
         ) : null;
     };
 
-    // general classNames used in the inputs on this page
+    // general classNames used in most of the inputs on this page
     const pageLabelClass = "block text-sm font-medium text-gray-700 w-full"
     const pageInputClass = "mt-1 block w-full rounded border border-gray-200 shadow-sm p-2 hover:shadow-md focus:outline-primary text-gray-500"
 
@@ -126,12 +128,7 @@ export default function TournamentInsertForm() {
                     Create a New Tournament
                 </h1>
 
-                <form 
-                    onSubmit={handleSubmit} 
-                    className="bg-white border border-gray-200 shadow-md rounded-lg 
-                               p-4 sm:p-6 lg:p-8 max-h-[calc(100vh-200px)] sm:max-h-[75vh] 
-                               overflow-y-auto"
-                >
+                <form onSubmit={handleSubmit} className="bg-white border border-gray-200 shadow-md rounded-lg p-4 sm:p-6 lg:p-8 max-h-[calc(100vh-200px)] sm:max-h-[70vh] overflow-y-auto">
                     {/* Error Message */}
                     {formError && (
                         <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 sm:px-4 sm:py-3 rounded mb-4 text-sm sm:text-base" role="alert">
@@ -154,7 +151,7 @@ export default function TournamentInsertForm() {
                                     inputType='text'
                                     inputName="name"
                                     inputId="name"
-                                    inputValue={values.name}
+                                    inputValue={formData.name}
                                     inputOnChange={handleChange}
                                     required={true}
                                     inputPlaceholder="Enter tournament name"
@@ -171,7 +168,7 @@ export default function TournamentInsertForm() {
                                     inputType="text"
                                     inputName="slug"
                                     inputId="slug"
-                                    inputValue={values.slug}
+                                    inputValue={formData.slug}
                                     inputOnChange={handleChange}
                                     required={false}
                                     inputPlaceholder="e.g., mytourney2025"
@@ -188,8 +185,11 @@ export default function TournamentInsertForm() {
                                     inputType="datetime-local"
                                     inputName="startTime"
                                     inputId="startTime"
-                                    inputValue={values.startTime}
-                                    inputOnChange={handleChange}
+                                    inputValue={dateToInputString(formData.startTime)}
+                                    inputOnChange={(e) => {
+                                        if (!e.target.validity.valid) return;
+                                        setFormData({ ...formData, startTime: new Date(e.target.value) });
+                                    }}
                                     required={true}
                                     inputPlaceholder=""
                                     inputClassName={pageInputClass}
@@ -205,8 +205,11 @@ export default function TournamentInsertForm() {
                                     inputType="datetime-local"
                                     inputName="endTime"
                                     inputId="endTime"
-                                    inputValue={values.endTime}
-                                    inputOnChange={handleChange}
+                                    inputValue={dateToInputString(formData.endTime)}
+                                    inputOnChange={(e) => {
+                                        if (!e.target.validity.valid) return;
+                                        setFormData({ ...formData, endTime: new Date(e.target.value) });
+                                    }}
                                     required={true}
                                     inputPlaceholder=""
                                     inputClassName={pageInputClass}
@@ -227,7 +230,7 @@ export default function TournamentInsertForm() {
                                 type="checkbox"
                                 name="isOnline"
                                 id="isOnline"
-                                checked={values.isOnline}
+                                checked={formData.isOnline}
                                 onChange={handleChange}
                                 className="h-4 w-4 accent-primary flex-shrink-0"
                             />
@@ -237,7 +240,7 @@ export default function TournamentInsertForm() {
                         </div>
 
                         {/* Location Address (Appears only if offline) */}
-                        {!values.isOnline && (
+                        {!formData.isOnline && (
                             <>
                                 <BasicInputWithLabel
                                     labelClassName={pageLabelClass}
@@ -245,9 +248,9 @@ export default function TournamentInsertForm() {
                                     inputType="text"
                                     inputName="locationAddress"
                                     inputId="locationAddress"
-                                    inputValue={values.locationAddress}
+                                    inputValue={formData.locationAddress}
                                     inputOnChange={handleChange}
-                                    required={!values.isOnline}
+                                    required={!formData.isOnline}
                                     inputPlaceholder="e.g., 123 Main St, Anytown"
                                     inputClassName={pageInputClass}
                                 />
@@ -271,7 +274,7 @@ export default function TournamentInsertForm() {
                                     inputType='email'
                                     inputName='email'
                                     inputId='email'
-                                    inputValue={values.email}
+                                    inputValue={formData.email}
                                     inputOnChange={handleChange}
                                     required={false}
                                     inputPlaceholder='Enter your email'
@@ -287,7 +290,7 @@ export default function TournamentInsertForm() {
                                     inputType='text'
                                     inputName='discord'
                                     inputId='discord'
-                                    inputValue={values.discord}
+                                    inputValue={formData.discord}
                                     inputOnChange={handleChange}
                                     required={false}
                                     inputPlaceholder='e.g., https://discord.gg/xxxxxxxx'

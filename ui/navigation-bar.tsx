@@ -12,7 +12,7 @@ export default function NavigationBar({ hidden, user  }: {hidden?: boolean, user
     const generalButtonClass = `flex flex-row justify-center rounded-md sm:rounded-none hover:bg-gray-200 
                                 hover:text-primary transition duration-150 p-2 drop gap-1`;
     return (
-        <nav className="fixed bg-primary p-3 w-full sticky top-0 z-10 border-b border-primary font-[Poppins] font-semibold">
+        <nav className=" bg-primary p-3 w-full sticky top-0 z-10 border-b border-primary font-[Poppins] font-semibold">
             <ul className="flex justify-between items-center list-none">
                 
                 {/* Left: Logo */}
