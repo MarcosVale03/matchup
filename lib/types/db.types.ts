@@ -623,6 +623,7 @@ export type Database = {
           end_time: string
           home_page: string
           id: number
+          is_public: boolean
           name: string
           owner: string
           slug: string | null
@@ -634,6 +635,7 @@ export type Database = {
           end_time: string
           home_page?: string
           id?: number
+          is_public?: boolean
           name: string
           owner: string
           slug?: string | null
@@ -645,6 +647,7 @@ export type Database = {
           end_time?: string
           home_page?: string
           id?: number
+          is_public?: boolean
           name?: string
           owner?: string
           slug?: string | null
@@ -758,6 +761,7 @@ export type Database = {
           t_discord?: string
           t_email?: string
           t_end_time: string
+          t_is_public: boolean
           t_latitude?: number
           t_longitude?: number
           t_name: string
@@ -783,6 +787,7 @@ export type Database = {
           t_email?: string
           t_end_time: string
           t_id: number
+          t_is_public: boolean
           t_latitude?: number
           t_longitude?: number
           t_name: string
