@@ -16,7 +16,7 @@ export type TournamentsQueryResponse = {
         first_name: string,
         last_name: string,
         display_name: string,
-        prefix: string
+        prefix: string | null
     }
     slug: string | null
     start_time: string

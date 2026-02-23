@@ -4,7 +4,7 @@ import {createClient} from "@/server/db/server"
 import { redirect } from "next/navigation"
 import {cookies} from 'next/headers'
 
-// this fucntions signs up the user
+// this function signs up the user
 export async function signUp(email: string, password: string, firstName: string, lastName: string, displayName: string, prefix: string) {
     // creates client
     const cookieStore = await cookies()
@@ -15,7 +15,7 @@ export async function signUp(email: string, password: string, firstName: string,
                 first_name: firstName,
                 last_name: lastName,
                 display_name: displayName,
-                prefix: prefix
+                prefix: prefix || null
             }}})
 
     // checks if we ran into any errors

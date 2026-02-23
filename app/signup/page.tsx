@@ -19,7 +19,7 @@ export default function SignupPage() {
         event.preventDefault();
         setMessage("");
 
-        if (!email || !gamertag || !password || !firstName || !lastName || !gamertag || !prefix) {
+        if (!email || !gamertag || !password || !firstName || !lastName || !gamertag) {
             setMessage("All fields are required");
             return;
         }

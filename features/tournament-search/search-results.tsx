@@ -48,7 +48,7 @@ export const SearchResults = ({ tournaments }: { tournaments: TournamentsQueryRe
                                     className="w-5 mr-1" 
                                 />
                                 <p className="text-sm text-gray-800 font-bold">
-                                    {tournament.owner.prefix + " | " || ""} {tournament.owner.display_name}
+                                    {tournament.owner.prefix && tournament.owner.prefix + " | "}{tournament.owner.display_name}
                                 </p>
                             </div>
                         </div>
