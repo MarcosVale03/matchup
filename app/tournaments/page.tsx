@@ -1,14 +1,13 @@
 'use client'
 import NavigationBar from '@/ui/navigation-bar'
 import { useCallback, useEffect, useState } from 'react';
-import { fetchTournaments } from '@/server/queries/tournaments.queries';
+import { fetchTournaments, TournamentsQueryResponse } from '@/server/queries/tournaments.queries';
 import { SearchResults } from '@/features/tournament-search/search-results';
-import { Tournament } from '@/lib/types/types';
 import { sleep } from '@/features/sleep-function';
 
 export default function TournamentSearchPage() {
     const [searchQuery, setSearchQuery] = useState('');
-    const [displayedTournaments, setDisplayedTournaments] = useState<Tournament[]>([]);
+    const [displayedTournaments, setDisplayedTournaments] = useState<TournamentsQueryResponse[]>([]);
     const [startDateFilter, setStartDateFilter] = useState<Date | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -18,12 +17,12 @@ export default function TournamentSearchPage() {
         setIsLoading(true);
         setError(null);
 
-        const response = await fetchTournaments(query, startAfter);
-
-        if (response.success) {
-            setDisplayedTournaments(response.data ?? []);
-        } else {
-            setError(response.message ?? "Error in searching tournaments");
+        try {
+            const response = await fetchTournaments(query, startAfter);
+            setDisplayedTournaments(response ?? []);
+        } catch (err) {
+            console.error(err);
+            setError("Something went wrong, please try again later.");
             setDisplayedTournaments([]);
         }
 

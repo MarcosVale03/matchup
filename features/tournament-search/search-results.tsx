@@ -1,9 +1,9 @@
-import { Tournament } from "@/lib/types/types";
 import { formatTournamentDateTime } from "@/ui/format-time";
 import Link from "next/link";
+import {TournamentsQueryResponse} from "@/server/queries/tournaments.queries";
 
 
-export const SearchResults = ({ tournaments }: { tournaments: Tournament[] }) => {
+export const SearchResults = ({ tournaments }: { tournaments: TournamentsQueryResponse[] }) => {
     // will have to limit the amount of shown results if too many are returned
 
     if (tournaments.length === 0) {
@@ -48,7 +48,7 @@ export const SearchResults = ({ tournaments }: { tournaments: Tournament[] }) =>
                                     className="w-5 mr-1" 
                                 />
                                 <p className="text-sm text-gray-800 font-bold">
-                                    Organizer Name
+                                    {tournament.owner.prefix + " | " || ""} {tournament.owner.display_name}
                                 </p>
                             </div>
                         </div>

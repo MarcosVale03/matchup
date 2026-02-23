@@ -1,5 +1,3 @@
-import {Database} from "@/lib/types/db.types";
-
 export type QueryResponse<T> = {
     success: boolean,
     data?: T,
@@ -12,5 +10,3 @@ export type MutationResponse<Data, FieldErrors> = {
     fieldErrors?: FieldErrors,
     data?: Data
 }
-
-export type Tournament = Database["public"]["Tables"]["tournaments"]["Row"]

@@ -3,7 +3,42 @@
 import {createClient} from "@/server/db/server";
 import { cookies } from 'next/headers'
 
-import {QueryResponse, Tournament} from "@/lib/types/types";
+export type TournamentsQueryResponse = {
+    discord_invite: string | null
+    email_contact: string | null
+    end_time: string
+    home_page: string
+    id: number
+    is_public: boolean
+    name: string
+    owner: {
+        user_id: string,
+        first_name: string,
+        last_name: string,
+        display_name: string,
+        prefix: string
+    }
+    slug: string | null
+    start_time: string
+}
+
+const tournamentsSelectQuery = `
+        id,
+        name,
+        start_time,
+        end_time,
+        slug,
+        home_page,
+        discord_invite,
+        email_contact,
+        is_public,
+        owner:users!tournaments_users_fk_01 (
+            user_id,
+            first_name,
+            last_name,
+            display_name,
+            prefix
+        )`
 
 /**
  * Returns all public tournaments in the database. If a search query is provided, the results are filtered by the query.
@@ -18,17 +53,22 @@ import {QueryResponse, Tournament} from "@/lib/types/types";
  *
  * @throws - Will throw an exception if an error occurs while querying the database.
  */
-export async function fetchTournaments(searchQuery: string = "", startAfter: Date = new Date(0)): Promise<QueryResponse<Tournament[]>> {
+export async function fetchTournaments(searchQuery: string = "", startAfter: Date = new Date(0)): Promise<TournamentsQueryResponse[]> {
     const cookieStore = await cookies()
     const supabase = await createClient(cookieStore)
 
-    const {data, error} = searchQuery ?
-        await supabase.from('tournaments').select().eq('is_public', true).gt('start_time', startAfter.toISOString()).textSearch(
+    // Create db query
+    let query = supabase.from('tournaments').select(tournamentsSelectQuery)
+        .eq('is_public', true).gt('start_time', startAfter.toISOString())
+
+    // Appends text search to query if searchQuery param is given
+    query = searchQuery ? query.textSearch(
         'name', searchQuery, {
             type: "websearch",
             config: "english"
-        }) :
-        await supabase.from('tournaments').select().eq('is_public', true).gt('start_time', startAfter.toISOString())
+        }) : query
+
+    const {data, error} = await query
 
     // Throws error if something goes wrong
     if (error) {
@@ -36,10 +76,7 @@ export async function fetchTournaments(searchQuery: string = "", startAfter: Dat
     }
 
 
-    return {
-        success: true,
-        data: data
-    }
+    return data
 }
 
 
@@ -54,21 +91,24 @@ export async function fetchTournaments(searchQuery: string = "", startAfter: Dat
  *
  * @throws - Will throw an exception if an error occurs while querying the database.
  */
-export async function fetchTournamentIdFromSlug(slug: string): Promise<QueryResponse<number>> {
+export async function fetchTournamentIdFromSlug(slug: string): Promise<{
+    success: boolean,
+    id?: number
+}> {
     const cookieStore = await cookies()
     const supabase = await createClient(cookieStore)
 
-    const {data, error} = await supabase.from('tournaments').select('id').eq('slug', slug)
+    const {data, error} = await supabase.from('tournaments').select('id').eq('slug', slug).maybeSingle()
 
     // Throws error if something goes wrong
     if (error) {
         throw new Error("Tournament Query Failed: " + error.details + " " + error.message)
     }
 
-    if (data?.length > 0) {
+    if (data) {
         return {
             success: true,
-            data: data[0].id
+            id: data.id
         }
     }
     return {
@@ -89,20 +129,29 @@ export async function fetchTournamentIdFromSlug(slug: string): Promise<QueryResp
  *
  * @throws - Will throw an exception if an error occurs while querying the database.
  */
-export async function fetchTournamentFromId(id: number): Promise<QueryResponse<Tournament>> {
+export async function fetchTournamentFromId(id: number): Promise<{
+    success: boolean,
+    tournament?: TournamentsQueryResponse
+}> {
     const cookieStore = await cookies()
     const supabase = await createClient(cookieStore)
 
-    const {data, error} = await supabase.from('tournaments').select().eq('id', id)
+    const {data, error} = await supabase.from('tournaments').select(tournamentsSelectQuery).eq('id', id).maybeSingle()
 
     // Throws error if something goes wrong
     if (error) {
         throw new Error("Tournament Query Failed: " + error.details + " " + error.message)
     }
 
+    if (!data) {
+        return {
+            success: false
+        }
+    }
+
 
     return {
         success: true,
-        data: data[0]
+        tournament: data
     }
 }
