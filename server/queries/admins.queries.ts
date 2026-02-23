@@ -34,14 +34,7 @@ export async function isUserTournamentAdmin(userId: string, tournamentId: number
 }
 
 
-
-/**
- * @param userId - ID of the user in question
- * @returns Array of objects containing the tournament the user is an admin for and what permission level they have.
- *
- * @throws - Will throw an exception if an error occurs while querying the database.
- */
-export async function fetchAdminsFromUser(userId: string): Promise<{
+export type AdminsFromUserResponse = {
     permission_levels: {
         id: number,
         name: string
@@ -50,7 +43,15 @@ export async function fetchAdminsFromUser(userId: string): Promise<{
         id: number,
         name: string
     }
-}[]> {
+}
+
+/**
+ * @param userId - ID of the user in question
+ * @returns Array of objects containing the tournament the user is an admin for and what permission level they have.
+ *
+ * @throws - Will throw an exception if an error occurs while querying the database.
+ */
+export async function fetchAdminsFromUser(userId: string): Promise<AdminsFromUserResponse[]> {
     // Create supabase client
     const cookieStore = await cookies()
     const supabase = await createClient(cookieStore)
@@ -78,14 +79,7 @@ export async function fetchAdminsFromUser(userId: string): Promise<{
 }
 
 
-
-/**
- * @param tournamentId - ID of the tournament in question
- * @returns Array of objects containing the tournament the user is an admin for and what permission level they have.
- *
- * @throws - Will throw an exception if an error occurs while querying the database.
- */
-export async function fetchAdminsFromTournament(tournamentId: number): Promise<{
+export type AdminsFromTournamentResponse = {
     permission_levels: {
         id: number,
         name: string,
@@ -93,12 +87,20 @@ export async function fetchAdminsFromTournament(tournamentId: number): Promise<{
     },
     users: {
         user_id: string,
-        prefix: string,
+        prefix: string | null,
         display_name: string,
         first_name: string,
         last_name: string
     }
-}[]> {
+}
+
+/**
+ * @param tournamentId - ID of the tournament in question
+ * @returns Array of objects containing the tournament the user is an admin for and what permission level they have.
+ *
+ * @throws - Will throw an exception if an error occurs while querying the database.
+ */
+export async function fetchAdminsFromTournament(tournamentId: number): Promise<AdminsFromTournamentResponse[]> {
     // Create supabase client
     const cookieStore = await cookies()
     const supabase = await createClient(cookieStore)

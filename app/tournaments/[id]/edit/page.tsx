@@ -10,7 +10,7 @@ export default async function EditTournamentPage({ params }: { params: { id: str
     //     redirect('/unauthorized'); 
     // }
 
-    const { success, data: tournament } = await fetchTournamentFromId(id);
+    const { success, tournament } = await fetchTournamentFromId(id);
 
     if (!success || !tournament) {
         console.log("HELLO")

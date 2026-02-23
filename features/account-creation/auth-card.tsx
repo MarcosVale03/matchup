@@ -150,7 +150,7 @@ export default function AuthCard({
                             inputId="prefix"
                             inputValue={prefix}
                             inputOnChange={(e) => onPREChange?.(e.target.value)}
-                            required={true}
+                            required={false}
                             inputPlaceholder={"Enter a prefix"}
                             inputClassName={pageInputClass}
                         />

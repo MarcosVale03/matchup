@@ -1,6 +1,5 @@
 import { fetchTournamentFromId } from "@/server/queries/tournaments.queries";
 import { notFound } from "next/navigation";
-import { Tournament } from "@/lib/types/types";
 import TournamentDetails from "@/features/tournament-search/tournament-details";
 import NavigationBar from "@/ui/navigation-bar";
 
@@ -12,12 +11,11 @@ export default async function Page({ params }: { params: { id: string } }) {
         notFound();
     }
 
-    const { success, data } = await fetchTournamentFromId(id)
-    if (!success || !data) {
+    const { success, tournament } = await fetchTournamentFromId(id)
+    if (!success || !tournament) {
         notFound()
     }
 
-    const tournament: Tournament = data;
     return (
         <main className="min-h-screen bg-white flex flex-col">
             <NavigationBar />

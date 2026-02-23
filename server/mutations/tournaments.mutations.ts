@@ -7,9 +7,8 @@ import * as z from "zod"
 import {DateToISOStr, LocationSchema} from "@/lib/types/zod.types";
 import {MutationResponse} from "@/lib/types/types";
 import {UNALLOWED_SLUGS} from "@/lib/constants";
-import {SupabaseClient} from "@supabase/supabase-js";
 
-const TournamentInsertSchema = z.object({
+const TournamentSchema = z.object({
     name: z.string().min(3).max(80),
     slug: z.optional(z.string().min(3).max(80).superRefine((slug, ctx) => {
         if (UNALLOWED_SLUGS.includes(slug)) {
@@ -42,6 +41,10 @@ const TournamentInsertSchema = z.object({
     }).refine(data => data.email || data.discord, {error: "Must provide at least one contact"}),
     is_public: z.boolean(),
 }).refine(data => data.is_online || data.location, {error: "Need location for offline tournament", path: ["location"],})
+
+const TournamentInsertSchema = TournamentSchema
+    .refine(data => data.slug ? isSlugUnique(data.slug) : true,{error: "This slug is taken", path: ["slug"],})
+
 
 export type TournamentInsertErrors = {
     name?: string[],
@@ -97,7 +100,7 @@ export async function insertTournament(name: string, startTime: Date, endTime: D
     const supabase = await createClient(cookieStore)
 
     // Validates data using Zod schema
-    const result = TournamentInsertSchema.safeParse({
+    const result = await TournamentInsertSchema.safeParseAsync({
         name: name,
         slug: slug,
         times: {
@@ -120,16 +123,6 @@ export async function insertTournament(name: string, startTime: Date, endTime: D
         }
     }
 
-    // Checks if provided slug already exists in the database. Returns an error if it does.
-    if (slug) {
-        const unique = await isSlugUnique(supabase, slug)
-        if (!unique) {
-            return {
-                success: false,
-                fieldErrors: {slug: ["This slug is taken"]}
-            }
-        }
-    }
 
     // Attempts to add row to database
     const {data, error} = await supabase.rpc('insert_tournament', {
@@ -162,11 +155,13 @@ export async function insertTournament(name: string, startTime: Date, endTime: D
 
 /**
  * Returns true if slug doesn't already exist in the database.
- * @param supabase
  * @param slug
  * @param id
  */
-async function isSlugUnique(supabase: SupabaseClient, slug: string, id?: number) {
+async function isSlugUnique(slug: string, id?: number) {
+    const cookieStore = await cookies()
+    const supabase = await createClient(cookieStore)
+
     const {data, error} = await supabase.from('tournaments').select('id').eq('slug', slug)
     if (error || !data) {
         throw new Error("DB error while querying tournaments: " + error.details + " " + error.message)
@@ -177,6 +172,7 @@ async function isSlugUnique(supabase: SupabaseClient, slug: string, id?: number)
 
 
 const TournamentUpdateSchema = TournamentInsertSchema.safeExtend({id: z.number()})
+    .refine(data => data.slug ? isSlugUnique(data.slug, data.id) : true,{error: "This slug is taken", path: ["slug"],})
 
 export type TournamentUpdateErrors = {
     id?: string[],
@@ -207,7 +203,7 @@ export type TournamentUpdateErrors = {
  * @param {number} location.longitute - Longitude coordinate of the given location.
  *
  * @returns Response from mutation.
- * @returns success - True if the DB mutation is successful. False if it fails.
+ * @returns success - True if the DB mutation is successful. False if there are invalid parameters.
  * @returns formErrors - Optional. Contains error messages that apply to the whole form.
  * @returns fieldErrors - Optional. Contains error messages that apply to specific parts of the form.
  * @returns data - Returns tournament id of updated tournament if success is true.
@@ -232,7 +228,7 @@ export async function updateTournament(id: number, name: string, startTime: Date
     const supabase = await createClient(cookieStore)
 
     // Validates data using Zod schema
-    const result = TournamentUpdateSchema.safeParse({
+    const result = await TournamentUpdateSchema.safeParseAsync({
         id: id,
         name: name,
         slug: slug,
@@ -256,16 +252,6 @@ export async function updateTournament(id: number, name: string, startTime: Date
         }
     }
 
-    // Checks if provided slug already exists in the database. Returns an error if it does.
-    if (slug) {
-        const unique = await isSlugUnique(supabase, slug, id)
-        if (!unique) {
-            return {
-                success: false,
-                fieldErrors: {slug: ["This slug is taken"]}
-            }
-        }
-    }
 
     // Attempts to update row in database
     const {data, error} = await supabase.rpc('update_tournament', {
@@ -302,7 +288,7 @@ export async function updateTournament(id: number, name: string, startTime: Date
  * @param id - ID of the tournament to be deleted
  *
  * @returns Response from mutation.
- * @returns success - True if the DB mutation is successful. False if it fails.
+ * @returns success - True if the DB mutation is successful. False if there are invalid parameters.
  *
  * @throws - Will throw an exception if an error occurs while entering data into the database.
  */

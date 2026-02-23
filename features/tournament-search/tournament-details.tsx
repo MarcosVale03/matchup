@@ -1,15 +1,15 @@
 'use client';
-import { Tournament } from "@/lib/types/types";
 import { formatTournamentDateTime } from "@/ui/format-time";
 import { useRouter } from "next/navigation";
+import {TournamentsQueryResponse} from "@/server/queries/tournaments.queries";
 
 // This page will change once we have events going
-export default function TournamentDetails({ tournament }: { tournament: Tournament }) {
+export default function TournamentDetails({ tournament }: { tournament: TournamentsQueryResponse }) {
 
     const router = useRouter();
 
     const handleEditClick = () => {
-        const url = `/tournaments/${tournament.id}/edit`;;
+        const url = `/tournaments/${tournament.id}/edit`;
         router.push(url);
     };
 

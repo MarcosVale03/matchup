@@ -19,7 +19,7 @@ export default function SignupPage() {
         event.preventDefault();
         setMessage("");
 
-        if (!email || !gamertag || !password || !firstName || !lastName || !gamertag || !prefix) {
+        if (!email || !gamertag || !password || !firstName || !lastName || !gamertag) {
             setMessage("All fields are required");
             return;
         }
@@ -30,14 +30,22 @@ export default function SignupPage() {
         }
 
         setLoading(true);
-        const result = await signUp(email, password, firstName, lastName, gamertag, prefix);
-        setLoading(false);
+        try {
+            const result = await signUp(email, password, firstName, lastName, gamertag, prefix);
+            setLoading(false);
 
-        if (!result.success) {
-            setMessage(result.error || "Signup failed due to an unknown error.");
-            return;
+            /**
+             * @todo Implement form and field error messages returned from signUp()
+             */
+            if (!result.success) {
+                setMessage(result.formErrors?.toString() || "Signup failed due to an unknown error.");
+                return;
+            }
+        } catch (error) {
+            setLoading(false);
+            console.log(error);
+            setMessage("Something went wrong. Please try again later.")
         }
-
     }
 
 return (
