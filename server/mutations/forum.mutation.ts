@@ -107,6 +107,7 @@ export async function insertPost(thread_id : string, content : string) : Promise
     // returning success
     return {
         success: true,
+        data: data 
     }
 }
 

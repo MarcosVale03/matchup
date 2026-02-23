@@ -1,9 +1,9 @@
 'use client'
-import { useCallback, useEffect, useState } from 'react';
-import { fetchTournaments } from '@/server/queries/tournaments.queries';
-import { SearchResults } from '@/features/tournament-search/search-results';
-import { Tournament } from '@/lib/types/types';
-import { sleep } from '@/features/sleep-function';
+import React, {useCallback, useEffect, useState} from 'react';
+import {fetchTournaments} from '@/server/queries/tournaments.queries';
+import {SearchResults} from '@/features/tournament-search/search-results';
+import {Tournament} from '@/lib/types/types';
+import {sleep} from '@/features/sleep-function';
 import SearchBar from '@/ui/search-bar';
 
 export default function TournamentSearchPage() {
@@ -18,12 +18,12 @@ export default function TournamentSearchPage() {
         setIsLoading(true);
         setError(null);
 
-        const response = await fetchTournaments(query, startAfter);
+        const tournaments = await fetchTournaments(query, startAfter);
 
-        if (response.success) {
-            setDisplayedTournaments(response.data ?? []);
+        if (tournaments.success) {
+            setDisplayedTournaments(tournaments.data ?? []);
         } else {
-            setError(response.message ?? "Error in searching tournaments");
+            setError(tournaments.message ?? "Error in searching tournaments");
             setDisplayedTournaments([]);
         }
 
@@ -32,15 +32,19 @@ export default function TournamentSearchPage() {
     }, []);
 
     // Load tournaments on initial render and whenever searchQuery or startDateFilter changes
-    const dateToSearch = startDateFilter ?? new Date(0);
     useEffect(() => {
-        const handler = setTimeout(() => {
-            loadTournaments(searchQuery, dateToSearch);
+
+        const handler = setTimeout(async () => {
+            const dateToSearch = startDateFilter ?? new Date(0);
+
+            try {
+                await loadTournaments(searchQuery, dateToSearch);
+            } catch (err) {
+                setError(err instanceof Error ? err.message : "Failed to load tournaments");
+            }
         }, 500);
 
-        return () => {
-            clearTimeout(handler);
-        }
+        return () => clearTimeout(handler);
     }, [searchQuery, loadTournaments, startDateFilter]);
 
 
@@ -54,19 +58,21 @@ export default function TournamentSearchPage() {
     }, []);
 
     return (
-        <main className="bg-white flex flex-col font-[Poppins] overflow-hidden">
-            <div className="px-4 sm:px-6 lg:px-8 py-5 sm:py-6 lg:py-8 mx-auto w-full max-w-7xl">
-                <h1 className="text-center font-bold text-primary mb-5 sm:mb-6 lg:mb-8 text-xl sm:text-2xl lg:text-3xl">
-                    The Arena Awaits: Find Your Competition
-                </h1>
+        <main className="bg-white flex-col font-[Poppins] justify-center items-center p-4 sm:p-6 lg:p-8">
+            <h1 className="text-center font-bold text-primary mb-5 sm:mb-6 lg:mb-8 text-xl sm:text-2xl lg:text-4xl">
+                The Arena Awaits: Find Your Competition
+            </h1>
+
+            <div className="w-full lg:px-8">
 
                 {/* Search form */}
-                <form onSubmit={handleSearchSubmit} className="flex flex-col gap-3 sm:flex-row sm:gap-0 bg-white mb-6 sm:mb-8">
-                    
-                    <SearchBar 
-                        searchQuery={searchQuery} 
+                <form onSubmit={handleSearchSubmit}
+                      className="flex flex-col gap-3 sm:flex-row sm:gap-0 bg-white mb-6 sm:mb-8">
+
+                    <SearchBar
+                        searchQuery={searchQuery}
                         handleInputChange={handleInputChange}
-                        searchPlaceholder="Search tournaments by name..." 
+                        searchPlaceholder="Search tournaments by name..."
                         inputClassName="w-full p-3 pl-10 sm:p-4 sm:pl-10 text-sm sm:text-base text-gray-800 border-2 
                                         border-gray-300 rounded-lg focus:outline-none focus:border-primary 
                                         transition duration-150 sm:rounded-r-none"
@@ -87,13 +93,12 @@ export default function TournamentSearchPage() {
                 </form>
 
                 {/* Search results window */}
-                <div className="flex flex-col gap-3 sm:gap-4 max-h-[60vh]">
-
+                <div className="flex flex-col max-h-[63vh] gap-1 ">
                     <h2 className="text-lg sm:text-xl font-semibold text-gray-700">
                         Found {displayedTournaments.length} Tournament(s):
                     </h2>
 
-                    <div className="min-h-[400px] max-h-[500px] sm:min-h-[35rem] sm:max-h-[35rem] lg:max-h-[40rem] 2xl:max-h-[80rem] overflow-y-auto">
+                    <div className="overflow-y-auto">
                         {isLoading && (
                             <div className="p-6 sm:p-8 text-center text-gray-500">
                                 Loading...
@@ -107,7 +112,7 @@ export default function TournamentSearchPage() {
                         )}
 
                         {!isLoading && !error && (
-                            <SearchResults tournaments={displayedTournaments} />
+                            <SearchResults tournaments={displayedTournaments}/>
                         )}
                     </div>
                 </div>

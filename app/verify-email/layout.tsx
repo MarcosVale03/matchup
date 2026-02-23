@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import React from "react";
 
 // adds name of page your on at the tab
 export const metadata: Metadata = {

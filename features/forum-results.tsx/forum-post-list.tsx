@@ -1,9 +1,11 @@
 import DeletePost from "../forum-crud/delete-post";
-import { Edit2, Trash2 } from "lucide-react";
-import { formatDateTime } from "@/ui/format-time";
-import { useState } from "react";
-import { Post, Thread } from "@/lib/types/types";
+import {Edit2, Trash2} from "lucide-react";
+import {formatDateTime} from "@/ui/format-time";
+import {useState} from "react";
+import {Post, Thread} from "@/lib/types/types";
 import EditPost from "../forum-crud/edit-post";
+import {User} from '@supabase/supabase-js';
+
 
 type ForumPostListProps = {
     isOpen: boolean;
@@ -11,17 +13,19 @@ type ForumPostListProps = {
     posts: Post[];
     onPostDelete: (postId: string) => void;
     onPostUpdate: (updatedPost: Post) => void;
+    user: User | null;
 };
 
 // onPostUpdate calls the function passed from forum-thread-single to update the post content in the posts state after successful edit
 // onPostDelete calls the function passed from forum-thread-single to remove the deleted post from the posts state after successful delete
 export default function ForumPostsList({
-    isOpen,
-    thread,
-    posts,
-    onPostDelete,
-    onPostUpdate
-}: ForumPostListProps) {
+                                           isOpen,
+                                           thread,
+                                           posts,
+                                           onPostDelete,
+                                           onPostUpdate,
+                                           user
+                                       }: ForumPostListProps) {
 
     const [editingPostId, setEditingPostId] = useState<string | null>(null);
     const [showDeleteConfirmId, setShowDeleteConfirmId] = useState<string | null>(null);
@@ -54,9 +58,10 @@ export default function ForumPostsList({
                                     >
                                         {/* Header */}
                                         <div className="flex flex-wrap items-center justify-between gap-2.5 sm:gap-3">
-                                            <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 text-sm text-gray-500">
+                                            <div
+                                                className="flex flex-wrap items-center gap-2.5 sm:gap-3 text-sm text-gray-500">
                                                 <span className="font-medium text-primary">
-                                                    Author Name
+                                                    Author
                                                 </span>
 
                                                 <span>•</span>
@@ -65,25 +70,27 @@ export default function ForumPostsList({
                                                     {formatDateTime(post.created_at)}
                                                 </span>
                                             </div>
-                                    
-                                            {/* Edit/Delete */}
-                                            <div className="flex items-center gap-2">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setEditingPostId(post.id)}
-                                                    className="p-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-lg transition-colors active:bg-gray-200"
-                                                >
-                                                    <Edit2 className="w-4 h-4" />
-                                                </button>
 
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setShowDeleteConfirmId(post.id)}
-                                                    className="p-2 text-gray-600 hover:text-red-600 hover:bg-gray-100 rounded-lg transition-colors active:bg-gray-200"
-                                                >
-                                                    <Trash2 className="w-4 h-4" />
-                                                </button>
-                                            </div>
+                                            {/* Edit/Delete */}
+                                            {user && post.author_id === user.id && (
+                                                <div className="flex items-center gap-2">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setEditingPostId(post.id)}
+                                                        className="p-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-lg transition-colors active:bg-gray-200"
+                                                    >
+                                                        <Edit2 className="w-4 h-4"/>
+                                                    </button>
+
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setShowDeleteConfirmId(post.id)}
+                                                        className="p-2 text-gray-600 hover:text-red-600 hover:bg-gray-100 rounded-lg transition-colors active:bg-gray-200"
+                                                    >
+                                                        <Trash2 className="w-4 h-4"/>
+                                                    </button>
+                                                </div>
+                                            )}
                                         </div>
 
                                         {/* Content */}

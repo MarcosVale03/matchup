@@ -20,9 +20,11 @@ export default async function ProfilePage() {
         )
     }
 
-    const displayName = user.user_metadata.display_name
-    const email = user.email
-    const name = user.user_metadata.first_name + " " + user.user_metadata.last_name
+    const displayName = user.user_metadata?.display_name ?? "Unknown"
+    const firstName = user.user_metadata?.first_name ?? ""
+    const lastName = user.user_metadata?.last_name ?? ""
+    const name = `${firstName} ${lastName}`.trim()
+    const email = user.user_metadata?.email ?? ""
 
     return (
         <div className="bg-white font-[Poppins] absolute inset-0 h-full flex justify-center items-center">

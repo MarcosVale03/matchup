@@ -13,11 +13,11 @@ const customDateTimeOptions: Intl.DateTimeFormatOptions = {
  * @param date The Date object to format.
  * @returns The formatted date and time string.
  */
-export function formatTournamentDateTime(date: Date | string): string {
+export function formatDateTime(date: Date | string): string {
     const newDate = typeof date === 'string' ? new Date(date) : date;
 
     // Check for invalid dates
-    if (!(newDate instanceof Date) || isNaN(newDate.getTime())) {
+    if (isNaN(newDate.getTime())) {
         return 'N/A';
     }
     

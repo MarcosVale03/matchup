@@ -1,8 +1,7 @@
 import { ConfirmButton } from "@/ui/confirm-button";
-import { deletePost, deleteThread } from "@/server/mutations/forum.mutation";
+import { deletePost } from "@/server/mutations/forum.mutation";
 import { useState } from "react";
 import { useRouter } from 'next/navigation';
-import { threadId } from "worker_threads";
 
 export default function DeletePost({ 
     postId, 
@@ -41,7 +40,7 @@ export default function DeletePost({
             onConfirm();
             router.refresh(); // Refresh the page to reflect the deleted post
         } catch (error) {
-            setError("Failed to delete the post. Please try again.");
+            setError(error instanceof Error ? error.message : "Failed to delete the post. Please try again.");
         } finally {
             setIsSubmitting(false);
         }
@@ -56,7 +55,7 @@ export default function DeletePost({
             error={error || undefined}
             isSubmitting={isSubmitting}
             onConfirm={handleConfirmDelete}
-            onCancel={handleCancel}
+            onCancelForm={handleCancel}
         />
     )
 }

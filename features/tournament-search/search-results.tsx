@@ -1,5 +1,6 @@
 import { Tournament } from "@/lib/types/types";
-import { formatTournamentDateTime } from "@/ui/format-time";
+import { formatDateTime } from "@/ui/format-time";
+import Image from "next/image";
 import Link from "next/link";
 
 
@@ -15,8 +16,7 @@ export const SearchResults = ({ tournaments }: { tournaments: Tournament[] }) =>
         )
     } else {
         return (
-            <div className="sm:pr-4 lg:pr-5">
-                <ul className="gap-4 sm:gap-6 pb-4 sm:pb-6">
+                <ul className="gap-4 sm:gap-6 pb-4 sm:pb-6 mr-2">
                     {tournaments.map((tournament) => (
                         <li
                             key={tournament.id}
@@ -34,19 +34,21 @@ export const SearchResults = ({ tournaments }: { tournaments: Tournament[] }) =>
                                 {/* Tournament Start and End Time */}
                                 <div className="space-y-1 place-self-center sm:place-self-start">
                                     <p className="text-sm text-gray-800 whitespace-pre">
-                                        <span className="font-bold text-black">Start Time: </span> {formatTournamentDateTime(tournament.start_time)}
+                                        <span className="font-bold text-black">Start Time: </span> {formatDateTime(tournament.start_time)}
                                     </p>
                                     <p className="text-sm text-gray-800 whitespace-pre">
-                                        <span className="font-bold text-black">End Time:  </span>  {formatTournamentDateTime(tournament.end_time)}
+                                        <span className="font-bold text-black">End Time:  </span>  {formatDateTime(tournament.end_time)}
                                     </p>
                                 </div>
 
                                 {/* Organizer Name */}
                                 <div className="flex flex-row mt-1 place-self-center sm:place-self-start">
-                                    <img
+                                    <Image
                                         src="/globe.svg"
                                         alt="Organizer PFP"
-                                        className="w-5 mr-1"
+                                        width={20}
+                                        height={20}
+                                        className="mr-1"
                                     />
                                     <p className="text-sm text-gray-800 font-bold">
                                         {tournament.owner}
@@ -66,7 +68,6 @@ export const SearchResults = ({ tournaments }: { tournaments: Tournament[] }) =>
                         </li>
                     ))}
                 </ul>
-            </div>
         )
     }
 };
