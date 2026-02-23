@@ -16,7 +16,7 @@ import {QueryResponse, Tournament} from "@/lib/types/types";
  * @returns success - True if the DB query is successful. (Error is thrown if it fails)
  * @returns data - Array of tournament objects
  *
- * @throws - Will throw an exception if an error occurs while entering data into the database.
+ * @throws - Will throw an exception if an error occurs while querying the database.
  */
 export async function fetchTournaments(searchQuery: string = "", startAfter: Date = new Date(0)): Promise<QueryResponse<Tournament[]>> {
     const cookieStore = await cookies()
@@ -87,7 +87,7 @@ export async function fetchTournamentIdFromSlug(slug: string): Promise<QueryResp
  * @returns success - True if the DB query is successful. (Error is thrown if it fails)
  * @returns data - Tournament objects
  *
- * @throws - Will throw an exception if an error occurs while entering data into the database.
+ * @throws - Will throw an exception if an error occurs while querying the database.
  */
 export async function fetchTournamentFromId(id: number): Promise<QueryResponse<Tournament>> {
     const cookieStore = await cookies()
