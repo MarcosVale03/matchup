@@ -3,9 +3,6 @@
 import {cookies} from "next/headers";
 import {createClient} from "@/server/db/server";
 
-/**
- * @todo Check out admin RLS in database for insert
- */
 
 /**
  * Checks if a given user is an admin for a given tournament
