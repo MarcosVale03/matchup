@@ -1,4 +1,5 @@
-import { formatTournamentDateTime } from "@/ui/format-time";
+import { formatDateTime } from "@/ui/format-time";
+import Image from "next/image";
 import Link from "next/link";
 import {TournamentsQueryResponse} from "@/server/queries/tournaments.queries";
 
@@ -15,8 +16,7 @@ export const SearchResults = ({ tournaments }: { tournaments: TournamentsQueryRe
         )
     } else {
         return (
-            <div className="sm:pr-4 lg:pr-5">
-                <ul className="gap-4 sm:gap-6 pb-4 sm:pb-6">
+                <ul className="gap-4 sm:gap-6 pb-4 sm:pb-6 mr-2">
                     {tournaments.map((tournament) => (
                         <li
                             key={tournament.id}
@@ -34,25 +34,27 @@ export const SearchResults = ({ tournaments }: { tournaments: TournamentsQueryRe
                                 {/* Tournament Start and End Time */}
                                 <div className="space-y-1 place-self-center sm:place-self-start">
                                     <p className="text-sm text-gray-800 whitespace-pre">
-                                        <span className="font-bold text-black">Start Time: </span> {formatTournamentDateTime(tournament.start_time)}
+                                        <span className="font-bold text-black">Start Time: </span> {formatDateTime(tournament.start_time)}
                                     </p>
                                     <p className="text-sm text-gray-800 whitespace-pre">
-                                        <span className="font-bold text-black">End Time:  </span>  {formatTournamentDateTime(tournament.end_time)}
+                                        <span className="font-bold text-black">End Time:  </span>  {formatDateTime(tournament.end_time)}
                                     </p>
                                 </div>
 
-                            {/* Organizer Name */}
-                            <div className="flex flex-row mt-1 place-self-center sm:place-self-start">
-                                <img 
-                                    src="/globe.svg" 
-                                    alt="Organizer PFP" 
-                                    className="w-5 mr-1" 
-                                />
-                                <p className="text-sm text-gray-800 font-bold">
-                                    {tournament.owner.prefix && tournament.owner.prefix + " | "}{tournament.owner.display_name}
-                                </p>
+                                {/* Organizer Name */}
+                                <div className="flex flex-row mt-1 place-self-center sm:place-self-start">
+                                    <Image
+                                        src="/globe.svg"
+                                        alt="Organizer PFP"
+                                        width={20}
+                                        height={20}
+                                        className="mr-1"
+                                    />
+                                    <p className="text-sm text-gray-800 font-bold">
+                                        {tournament.owner}
+                                    </p>
+                                </div>
                             </div>
-                        </div>
 
                             {/* View Details Button */}
                             <div className="mb-2 mt-2 place-self-center sm:mb-0 flex-shrink-0">
@@ -66,7 +68,6 @@ export const SearchResults = ({ tournaments }: { tournaments: TournamentsQueryRe
                         </li>
                     ))}
                 </ul>
-            </div>
         )
     }
 };

@@ -1,12 +1,15 @@
 'use client'
 import { Thread, Tournament } from '@/lib/types/types';
-import { useState } from "react";
-import { CheckCircle } from "lucide-react";
+import React, { useState } from "react";
+import { CheckCircle, CircleAlert } from "lucide-react";
 import ForumThreadSingle from "./forum-thread-single";
 import SearchBar from "@/ui/search-bar";
-import AddForumThread from '../forum-crud/add-forum-thread';
+import AddForumThread from '../forum-crud/add-thread';
+import { useAuth } from "@/app/client-layout";
 
-export default function ForumThreadList({ posts, tournamentData }: { posts: Thread[], tournamentData?: Tournament }) {
+export default function ForumThreadList({posts, tournamentData}: { posts: Thread[], tournamentData?: Tournament }) {
+    const {user, loading} = useAuth();
+
     const [searchQuery, setSearchQuery] = useState('');
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
@@ -15,11 +18,22 @@ export default function ForumThreadList({ posts, tournamentData }: { posts: Thre
         setTimeout(() => setSuccessMessage(null), 3000);
     };
 
+    const handleThreadAdded = () => {
+        setSuccessMessage("Thread created successfully!");
+        setTimeout(() => setSuccessMessage(null), 3000);
+    }
+
     const filteredThreads = posts
         .filter(thread =>
             thread.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
             thread.content.toLowerCase().includes(searchQuery.toLowerCase())
         );
+
+    const skeletonButton = (
+        <div className="w-full p-3 bg-primary text-center animate-pulse rounded-md">
+            Loading...
+        </div>
+    )
 
     return (
         <div className="space-y-6">
@@ -37,15 +51,39 @@ export default function ForumThreadList({ posts, tournamentData }: { posts: Thre
                                 placeholder:text-gray-400 text-gray-800"
             />
 
-            <AddForumThread/>
+            {loading ? (
+                <div className="w-full">
+                    {/* placeholder buttons */}
+                    {skeletonButton}
+                </div>
+            ) : (
+                <>
+                    {user ? (
+                        <>
+                            {/* Add post button | only show if logged in*/}
+                            <AddForumThread onAddAction={handleThreadAdded}/>
+                        </>
+                    ) : (
+                        <div
+                            className="w-full sm:flex-1 flex items-center justify-center gap-2 py-2.5 sm:py-3 px-4 border
+                                       border-transparent rounded-md shadow-sm text-sm sm:text-base font-medium
+                                       text-white bg-primary transition-colors"
+                        >
+                            <CircleAlert className="w-5 h-5"/>
+                            Log in or make an account to create a thread
+                        </div>
+                    )}
+                </>
+            )}
 
             {/* Forum Threads */}
             <div className="flex flex-col gap-4">
 
                 {/* Success Message */}
                 {successMessage && (
-                    <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">
-                        <CheckCircle className="w-5 h-5" />
+                    <div
+                        className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">
+                        <CheckCircle className="w-5 h-5"/>
                         {successMessage}
                     </div>
                 )}
@@ -73,7 +111,8 @@ export default function ForumThreadList({ posts, tournamentData }: { posts: Thre
                                     <ForumThreadSingle
                                         key={thread.id}
                                         thread={thread}
-                                        onDelete={handleThreadDeleted}
+                                        onThreadDeleteAction={handleThreadDeleted}
+                                        user={user}
                                     />
                                 ))}
                             </div>

@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Poppins } from "next/font/google";
-import { createClient } from "@/server/db/server";
-import { cookies } from "next/headers";
 import NavigationBar from "@/ui/navigation-bar";
+import { cookies } from "next/headers";
+import { createClient } from "@/server/db/server";
+import { ClientLayout } from "./client-layout";
 import "./globals.css";
+import React from "react";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -36,21 +38,26 @@ export default async function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    
+
     const cookieStore = await cookies();
     const supabase = await createClient(cookieStore);
-    const { data: { user }} = await supabase.auth.getUser();
+
+    const { data: { user } } = await supabase.auth.getUser();
 
     return (
         <html lang="en" className="bg-white h-screen">
         <head>
             <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+            <title></title>
         </head>
             <body
                 className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable} antialiased`}
             >
-                <NavigationBar user={user}/>
+            <ClientLayout initialUser={user}>
+                <NavigationBar />
                 {children}
+            </ClientLayout>
+
             </body>
         </html>
     );

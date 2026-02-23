@@ -1,5 +1,4 @@
 import { AlertTriangle } from 'lucide-react';
-import { is } from 'zod/locales';
 
 type ConfirmButtonProps = {
     isOpen: boolean;
@@ -8,11 +7,11 @@ type ConfirmButtonProps = {
     isSubmitting?: boolean;
     error?: string;
     onConfirm: () => void;
-    onCancel: () => void;
+    onCancelForm: () => void;
 }
 
 
-export function ConfirmButton({ isOpen, title, message, isSubmitting, error, onConfirm, onCancel }: ConfirmButtonProps) {
+export function ConfirmButton({ isOpen, title, message, isSubmitting, error, onConfirm, onCancelForm }: ConfirmButtonProps) {
     if (!isOpen) return null;
 
     return (
@@ -20,14 +19,14 @@ export function ConfirmButton({ isOpen, title, message, isSubmitting, error, onC
             {/* Backdrop */}
             <div
                 className="absolute inset-0 bg-black/50"
-                onClick={onCancel}
+                onClick={onCancelForm}
             />
 
             {/* Dialog */}
             <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
                 <div className="flex items-start gap-4">
-                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#BD2D2D]/10 flex items-center justify-center">
-                        <AlertTriangle className="w-5 h-5 text-[#BD2D2D]" />
+                    <div className="shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                        <AlertTriangle className="w-5 h-5 text-primary" />
                     </div>
                     <div className="flex-1">
                         <h3 className="mb-2 text-black font-semibold">{title}?</h3>
@@ -37,7 +36,7 @@ export function ConfirmButton({ isOpen, title, message, isSubmitting, error, onC
                 <div className="flex gap-3 justify-end mt-6 text-black">
                     {/* Cancel Button */}
                     <button
-                        onClick={onCancel}
+                        onClick={onCancelForm}
                         disabled={isSubmitting}
                         className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
 
@@ -48,7 +47,7 @@ export function ConfirmButton({ isOpen, title, message, isSubmitting, error, onC
                     <button
                         onClick={onConfirm}
                         disabled={isSubmitting}
-                        className="px-4 py-2 bg-[#BD2D2D] text-white rounded-lg hover:bg-[#a02525] transition-colors"
+                        className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-[#a02525] transition-colors"
                     >
                         Delete
                     </button>

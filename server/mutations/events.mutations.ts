@@ -92,7 +92,7 @@ export async function insertEvent(tournamentId: number, name: string, startTime:
         }
     }
 
-    if (!isGamePlatformValid(supabase, result.data.video_game, result.data.platform)) {
+    if (!await isGamePlatformValid(supabase, result.data.video_game, result.data.platform)) {
         throw new Error("Video game and platform combination not valid.")
     }
 

@@ -22,5 +22,4 @@ export default async function DetailsPage({ params }: { params: { id: string } }
             </div>
         </main>
     );
-
 }
