@@ -726,21 +726,21 @@ export type Database = {
           display_name: string
           first_name: string
           last_name: string
-          prefix: string
+          prefix: string | null
           user_id: string
         }
         Insert: {
           display_name: string
           first_name: string
           last_name: string
-          prefix: string
+          prefix?: string | null
           user_id: string
         }
         Update: {
           display_name?: string
           first_name?: string
           last_name?: string
-          prefix?: string
+          prefix?: string | null
           user_id?: string
         }
         Relationships: []
