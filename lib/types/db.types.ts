@@ -14,6 +14,46 @@ export type Database = {
   }
   public: {
     Tables: {
+      admins: {
+        Row: {
+          permission_level: number
+          tournament_id: number
+          user_id: string
+        }
+        Insert: {
+          permission_level: number
+          tournament_id: number
+          user_id: string
+        }
+        Update: {
+          permission_level?: number
+          tournament_id?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admins_permission_levels_fk_01"
+            columns: ["permission_level"]
+            isOneToOne: false
+            referencedRelation: "permission_levels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admins_tournaments_fk_01"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admins_users_fk_01"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       attendees: {
         Row: {
           tournament_id: number
@@ -504,6 +544,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      permission_levels: {
+        Row: {
+          description: string
+          id: number
+          name: string
+        }
+        Insert: {
+          description: string
+          id: number
+          name: string
+        }
+        Update: {
+          description?: string
+          id?: number
+          name?: string
+        }
+        Relationships: []
       }
       phase_groups: {
         Row: {
