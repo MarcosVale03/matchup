@@ -2,7 +2,7 @@ import DeletePost from "../forum-crud/delete-post";
 import {Edit2, Trash2} from "lucide-react";
 import {formatDateTime} from "@/ui/format-time";
 import {useState} from "react";
-import {Post, Thread} from "@/lib/types/types";
+import { Post, Thread } from "@/server/queries/forum.queries";
 import EditPost from "../forum-crud/edit-post";
 import {User} from '@supabase/supabase-js';
 

@@ -27,7 +27,7 @@ export const SearchResults = ({ tournaments }: { tournaments: TournamentsQueryRe
                         >
                             <div className="min-w-0 w-full">
                                 {/* Tournament Name */}
-                                <h1 className="font-bold text-lg text-primary text-center break-words sm:text-left">
+                                <h1 className="font-bold text-lg text-primary text-center wrap-break-word sm:text-left">
                                     {tournament.name}
                                 </h1>
 
@@ -51,13 +51,13 @@ export const SearchResults = ({ tournaments }: { tournaments: TournamentsQueryRe
                                         className="mr-1"
                                     />
                                     <p className="text-sm text-gray-800 font-bold">
-                                        {tournament.owner}
+                                        Owner: {tournament.owner.display_name}
                                     </p>
                                 </div>
                             </div>
 
                             {/* View Details Button */}
-                            <div className="mb-2 mt-2 place-self-center sm:mb-0 flex-shrink-0">
+                            <div className="mb-2 mt-2 place-self-center sm:mb-0 shrink-0">
                                 <Link
                                     href={`/tournaments/${tournament.id}`}
                                     className="bg-primary text-white p-3 rounded-lg hover:bg-red-800 hover:cursor-pointer"

@@ -38,9 +38,10 @@ export default function DeletePost({
             
             // If deletion was successful, hide the delete window
             onConfirm();
-            router.refresh(); // Refresh the page to reflect the deleted post
-        } catch (error) {
-            setError(error instanceof Error ? error.message : "Failed to delete the post. Please try again.");
+            router.refresh();
+        } catch (err) {
+            setError("Failed to delete the post. Please try again.");
+            console.error(err);
         } finally {
             setIsSubmitting(false);
         }

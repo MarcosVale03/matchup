@@ -13,7 +13,7 @@ export default async function TournamentForum({ params }: { params: { id: string
     }
 
     const posts = await fetchThreads();
-    const tournamentData = (await fetchTournamentFromId(id)).data;
+    const tournamentData = (await fetchTournamentFromId(id)).tournament;
 
     if (!posts.success || !posts.data) {
         return (

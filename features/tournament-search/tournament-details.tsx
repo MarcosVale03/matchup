@@ -1,5 +1,5 @@
 'use client';
-import { Tournament } from "@/lib/types/types";
+import { TournamentsQueryResponse } from "@/server/queries/tournaments.queries";
 import { formatDateTime } from "@/ui/format-time";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/client-layout";
@@ -14,8 +14,6 @@ import {
     MessageCircleMore,
     EyeOff, Eye
 } from "lucide-react";
-
-import {TournamentsQueryResponse} from "@/server/queries/tournaments.queries";
 
 // Reusable classes
 const cardContainer = "border-2 border-gray-200 shadow-lg rounded-2xl overflow-hidden flex";
@@ -33,7 +31,7 @@ export default function TournamentDetails({ tournament }: { tournament: Tourname
 
     const { user, loading } = useAuth();
 
-    const isOwner = user && user.id === tournament.owner;
+    const isOwner = user && user.id === tournament.owner.user_id;
     const canEdit = !loading && !!user && isOwner;
 
     const handleEditClick = () => {
@@ -91,7 +89,7 @@ export default function TournamentDetails({ tournament }: { tournament: Tourname
                                     Tournament Owner
                                 </h3>
                                 <p className={valueClass}>
-                                    {tournament.owner}
+                                    {tournament.owner.display_name}
                                 </p>
                             </div>
                         </div>

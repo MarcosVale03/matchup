@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { X, Send } from "lucide-react";
 import { insertPost } from '@/server/mutations/forum.mutation';
-import { Thread } from '@/lib/types/types';
+import { Thread } from "@/server/queries/forum.queries";
 
 export default function AddForumPost({
     thread,
@@ -29,7 +29,6 @@ export default function AddForumPost({
 
         try {
             const result = await insertPost(thread.id, content);
-            console.log("Insert post result:", result);
 
             if (!result.success) {
                 setError(result.formErrors?.[0] || "Failed to create post");
@@ -37,7 +36,8 @@ export default function AddForumPost({
             }
 
         } catch (err) {
-            setError(err instanceof Error ? err.message : "An error occurred");
+            setError("An error occurred");
+            console.error(err);
         } finally {
             setIsSubmitting(false);
         }

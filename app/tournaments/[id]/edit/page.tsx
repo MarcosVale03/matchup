@@ -21,7 +21,7 @@ export default async function EditTournamentPage({ params }: { params: { id: str
         return notFound();
     }
 
-    if (!user || user.id !== tournament.owner) {
+    if (!user || user.id !== tournament.owner.user_id) {
         redirect('/tournaments')
     }
 

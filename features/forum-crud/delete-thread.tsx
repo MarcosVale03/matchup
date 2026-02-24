@@ -44,7 +44,8 @@ export default function DeleteThread({
             setShowDeleteConfirm(false);
             router.refresh(); // Refresh the page to reflect the deleted thread
         } catch (err) {
-            setError(err instanceof Error ? err.message : "Failed to delete the thread. Please try again.");
+            setError("Failed to delete the thread. Please try again.");
+            console.error(err);
         } finally {
             setIsSubmitting(false);
         }

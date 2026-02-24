@@ -4,7 +4,7 @@ import { X, Plus, Send } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import { insertForumThread } from '@/server/mutations/forum.mutation';
 
-// onAdd calls handleThreadAdded in forum-thread-list to show success message after creating a thread
+// onAddAction calls handleThreadAdded in forum-thread-list to show success message after creating a thread
 export default function AddForumThread({ onAddAction }: { onAddAction: () => void }) {
     const router = useRouter();
 
@@ -32,7 +32,8 @@ export default function AddForumThread({ onAddAction }: { onAddAction: () => voi
             }
 
         } catch (err) {
-            setError(err instanceof Error ? err.message : "An error occurred");
+            setError("An error occurred");
+            console.log(err);
         } finally {
             setIsSubmitting(false);
         }

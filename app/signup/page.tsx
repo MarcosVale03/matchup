@@ -40,9 +40,9 @@ export default function SignupPage() {
                 setMessage(result.formErrors?.toString() || "Signup failed due to an unknown error.");
                 return;
             }
-        } catch (error) {
+        } catch (err) {
             setLoading(false);
-            console.log(error);
+            console.log(err);
             setMessage("Something went wrong. Please try again later.")
         }
     }

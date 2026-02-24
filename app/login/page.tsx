@@ -1,6 +1,6 @@
 'use client'
 import React, { useState } from 'react';
-import { signInWithEmail } from '@/lib/auth';
+import {signInWithEmail, signUp} from '@/lib/auth';
 import MatchupDescription from '@/features/account-creation/matchup-des';
 import AuthCard from '@/features/account-creation/auth-card';
 
@@ -20,12 +20,18 @@ export default function LoginPage() {
         }
 
         setLoading(true);
-        const result = await signInWithEmail(email, password);
-        setLoading(false);
+        try {
+            const result = await signInWithEmail(email, password);
+            setLoading(false);
 
-        if (!result.success) {
-            setMessage(result.error || "Login failed due to an unknown error.");
-            return;
+            if (!result.success) {
+                setMessage("Sign in failed due to an unknown error.");
+                return;
+            }
+        } catch (err) {
+            setLoading(false);
+            console.log(err);
+            setMessage("Something went wrong. Please try again later.")
         }
     }
 

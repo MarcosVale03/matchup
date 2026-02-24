@@ -1,16 +1,17 @@
 'use client'
 import {CheckCircle, ChevronDown, Plus } from "lucide-react";
-import {useState} from "react";
-import {Thread, Post} from "@/lib/types/types";
-import {formatDateTime} from "@/ui/format-time";
-import {fetchThreadWithPosts} from "@/server/queries/forum.queries";
+import { useState } from "react";
+import { formatDateTime } from "@/ui/format-time";
+import { fetchThreadWithPosts } from "@/server/queries/forum.queries";
 import AddForumPost from "../forum-crud/add-post";
 import ForumPostsList from "./forum-post-list";
 import DeleteThread from "../forum-crud/delete-thread";
-import {User} from '@supabase/supabase-js';
+import { User } from '@supabase/supabase-js';
+import { Post, Thread } from "@/server/queries/forum.queries";
 
 
-// onDelete calls handleThreadDeleted in forum-thread-list to show success message after deleting a thread
+
+// onDeleteAction calls handleThreadDeleted in forum-thread-list to show success message after deleting a thread
 // Post logic is handled here, with individual crud operations in their respective components.
 export default function ForumThreadSingle({thread, onThreadDeleteAction, user}: {
     thread: Thread,
@@ -47,9 +48,9 @@ export default function ForumThreadSingle({thread, onThreadDeleteAction, user}: 
         try {
             const response = await fetchThreadWithPosts(thread.id);
             setPosts(response.data ?? []);
-        } catch (error) {
+        } catch (err) {
             setError("Failed to fetch posts.");
-            console.error(error);
+            console.error(err);
         } finally {
             setIsLoadingPosts(false);
         }

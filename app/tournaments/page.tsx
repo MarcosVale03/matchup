@@ -39,7 +39,8 @@ export default function TournamentSearchPage() {
             try {
                 await loadTournaments(searchQuery, dateToSearch);
             } catch (err) {
-                setError(err instanceof Error ? err.message : "Failed to load tournaments");
+                setError("Failed to load tournaments");
+                console.error(err);
             }
         }, 500);
 

@@ -1,5 +1,6 @@
 'use client'
-import { Thread, Tournament } from '@/lib/types/types';
+import { Thread } from "@/server/queries/forum.queries";
+import { TournamentsQueryResponse } from "@/server/queries/tournaments.queries";
 import React, { useState } from "react";
 import { CheckCircle, CircleAlert } from "lucide-react";
 import ForumThreadSingle from "./forum-thread-single";
@@ -7,7 +8,7 @@ import SearchBar from "@/ui/search-bar";
 import AddForumThread from '../forum-crud/add-thread';
 import { useAuth } from "@/app/client-layout";
 
-export default function ForumThreadList({posts, tournamentData}: { posts: Thread[], tournamentData?: Tournament }) {
+export default function ForumThreadList({posts, tournamentData}: { posts: Thread[], tournamentData?: TournamentsQueryResponse }) {
     const {user, loading} = useAuth();
 
     const [searchQuery, setSearchQuery] = useState('');

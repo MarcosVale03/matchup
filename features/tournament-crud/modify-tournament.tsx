@@ -4,11 +4,11 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { updateTournament, TournamentUpdateErrors } from '@/server/mutations/tournaments.mutations';
 import { ArrowLeft, Save } from 'lucide-react';
-import { Tournament } from '@/lib/types/types';
+import { TournamentsQueryResponse } from "@/server/queries/tournaments.queries";
 import { toDateTimeLocalInput } from '@/ui/format-time';
 import { ErrorMessage } from "@/ui/error-message";
 
-export default function TournamentEditForm({initialData}: { initialData: Tournament }) {
+export default function TournamentEditForm({initialData}: { initialData: TournamentsQueryResponse }) {
     const router = useRouter();
 
     const [formData, setFormData] = useState({

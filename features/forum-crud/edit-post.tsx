@@ -1,7 +1,7 @@
 'use client'
 import { Save, X } from "lucide-react";
 import React, { useState } from "react";
-import { Post } from "@/lib/types/types";
+import { Post } from "@/server/queries/forum.queries";
 import { updatePost } from "@/server/mutations/forum.mutation";
 import { useRouter } from "next/navigation";
 
@@ -12,8 +12,8 @@ type EditPostProps = {
 };
 
 
-/*  onCancel calls setEditingPostId(null) in forum-post-list to close the edit form
-*   onUpdatePost calls setEditingPostId(null) and shows a success message in forum-post-list after successful edit; 
+/*  onCancelAction calls setEditingPostId(null) in forum-post-list to close the edit form
+*   onUpdatePostAction calls setEditingPostId(null) and shows a success message in forum-post-list after successful edit;
 *   it also sends the updated post back to forum-post-list to update the post content
 */
 export default function EditPost({
@@ -46,7 +46,9 @@ export default function EditPost({
             router.refresh(); // Refresh the page to show updated content
 
         } catch (err) {
-            setError(err instanceof Error ? err.message : "An error occurred");
+            setError("An error occurred editing post");
+            console.error(err);
+
         } finally {
             setIsSubmitting(false);
         }
