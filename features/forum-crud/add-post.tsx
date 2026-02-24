@@ -35,15 +35,15 @@ export default function AddForumPost({
                 return;
             }
 
+            onPostAddedAction();
+            setContent('');
+
         } catch (err) {
             setError("An error occurred");
             console.error(err);
         } finally {
             setIsSubmitting(false);
         }
-
-        onPostAddedAction();
-        setContent('');
     }
 
     return (

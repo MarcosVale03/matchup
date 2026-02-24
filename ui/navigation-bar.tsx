@@ -44,6 +44,7 @@ export default function NavigationBar() {
                             {skeletonButton}
                             {skeletonButton}
                             {skeletonButton}
+                            {skeletonButton}
                         </div>
                     ) : (
                         <>
