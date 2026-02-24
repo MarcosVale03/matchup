@@ -1,9 +1,8 @@
 'use client'
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { deleteTournament } from '@/server/mutations/tournaments.mutations'; // Adjust path as needed
-import { sleep } from '../sleep-function';
+import { deleteTournament } from '@/server/mutations/tournaments.mutations';
 
 interface DeleteButtonProps {
     tournamentId: number;
@@ -33,9 +32,9 @@ export default function DeleteTournamentButton({ tournamentId, tournamentName }:
                 } else {
                     setError("Failed to delete the tournament. Please check server logs."); 
                 }
-            } catch (e: any) {
-                console.error("Deletion Error:", e);
-                setError(e.message || "An unexpected error occurred during deletion.");
+            } catch (err) {
+                console.error(err);
+                setError("An unexpected error occurred during deletion.");
             } finally {
                 setIsDeleting(false);
             }

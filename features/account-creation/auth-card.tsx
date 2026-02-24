@@ -1,5 +1,6 @@
 import Link from "next/link";
 import BasicInputWithLabel from "@/ui/basic-input-with-label";
+import React from "react";
 
 type AuthCardProps = {
     email: string;
@@ -38,21 +39,39 @@ export default function AuthCard({
     onGamerTagChange,
     onPREChange
 }: AuthCardProps) {
-    const headerMessage = authType === 'Signup' ? 'Welcome!' : 'Welcome back!';
-    const subHeaderMessage = authType === 'Signup' ? 'Create a MatchUp account' : 'Sign in to your MatchUp account';
-    const footer = authType === 'Signup' ? 'Already have an account?' : "Don't have an account?";
-    const href = authType === 'Signup' ? '/login' : '/signup';
+    const headerMessage =
+        authType ===
+            'Signup' ? 'Welcome!' :
+            'Welcome back!';
+
+    const subHeaderMessage =
+        authType ===
+            'Signup' ? 'Create a MatchUp account' :
+            'Sign in to your MatchUp account';
+
+    const footer =
+        authType ===
+            'Signup' ? 'Already have an account?' :
+            "Don't have an account?";
+
+    const href =
+        authType ===
+            'Signup' ? '/login' :
+            '/signup';
 
 
-    const pageInputClass = `w-full rounded-md border border-gray-300 shadow-sm p-2 sm:p-2.5 
+    const pageInputClass =`w-full rounded-md border border-gray-300 shadow-sm p-2 sm:p-2.5 
                         focus:border-primary focus:ring-primary text-gray-500 focus:outline-none 
                         focus:border-primary text-sm sm:text-base`;
     const pageLabelClass = "text-left text-gray-500 text-sm sm:text-base";
 
 
     return (
-        <main className="flex flex-col place-content-center bg-white rounded-b-lg sm:rounded-r-lg 
-                     sm:rounded-bl-none p-6 sm:p-8 md:p-10 lg:p-12 gap-3 "
+        <main
+            className={`flex flex-col place-content-center bg-white rounded-b-lg sm:rounded-r-lg
+                        sm:rounded-bl-none p-6 sm:p-8 md:p-10 lg:p-12 gap-3 w-full
+                        ${authType === 'Login' ? 'my-10' : 'my-0'} 
+                       `}
         >
             <div className="space-y-1 sm:space-y-2">
                 <h1 className="text-2xl sm:text-3xl md:text-4xl text-primary text-center font-bold">
@@ -66,7 +85,7 @@ export default function AuthCard({
             <form
                 onSubmit={handleAuth}
                 id="auth-form-submit"
-                className="max-h-[50vh] sm:max-h-[45vh] md:max-h-[40vh] lg:max-h-[35vh] pr-1 sm:pr-2 overflow-auto space-y-2"
+                className="pr-1 sm:pr-2 pb-1 space-y-2"
             >
                 {/* Email */}
                 <BasicInputWithLabel
@@ -144,7 +163,7 @@ export default function AuthCard({
                         {/* Prefix */}
                         <BasicInputWithLabel
                             labelClassName={pageLabelClass}
-                            labelText="Prefix"
+                            labelText="Prefix (Optional)"
                             inputType="text"
                             inputName="prefixInput"
                             inputId="prefix"
@@ -157,7 +176,8 @@ export default function AuthCard({
                     </>
                 )}
             </form>
-
+            
+            {/* Submit Button */}
             <button
                 form="auth-form-submit"
                 type="submit"
@@ -183,6 +203,7 @@ export default function AuthCard({
                 </p>
             )}
 
+            {/* Footer to switch to login/signup */}
             <p className="text-xs sm:text-sm text-gray-500 text-center">
                 {footer}{' '}
                 <Link href={href} className="text-primary hover:underline font-medium">

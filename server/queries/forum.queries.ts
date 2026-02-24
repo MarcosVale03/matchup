@@ -7,8 +7,8 @@ import {Database} from "@/lib/types/db.types";
 
 
 // initializing out Thread and Post variables
-type Thread = Database['public']['Tables']['forum_thread']['Row']
-type Post = Database['public']['Tables']['forum_posts']['Row']
+export type Thread = Database['public']['Tables']['forum_thread']['Row']
+export type Post = Database['public']['Tables']['forum_posts']['Row']
 
 
 // function that will get all threads from our DB

@@ -1,43 +1,35 @@
 import { fetchTournamentFromId } from "@/server/queries/tournaments.queries";
-import { notFound, redirect } from "next/navigation";
-import TournamentEditForm from "@/features/tournament-modification/page";
-import NavigationBar from "@/ui/navigation-bar";
+import {notFound, redirect} from "next/navigation";
+import { createClient } from "@/server/db/server";
+import { cookies } from "next/headers";
+
+import TournamentEditForm from "@/features/tournament-crud/modify-tournament";
 
 export default async function EditTournamentPage({ params }: { params: { id: string } }) {
     const { id: idStr } = await params
     const id = Number(idStr);
-    // if (!currentUserIsOwner(id)) {
-    //     redirect('/unauthorized'); 
-    // }
+
+    const cookieStore = await cookies();
+    const supabase = await createClient(cookieStore);
+
+    const { data: { user } } = await supabase.auth.getUser();
+
 
     const { success, tournament } = await fetchTournamentFromId(id);
 
     if (!success || !tournament) {
-        console.log("HELLO")
         return notFound();
     }
 
+    if (!user || user.id !== tournament.owner.user_id) {
+        redirect('/tournaments')
+    }
+
     return (
-            <main className="bg-white flex flex-col min-h-screen">
-                <NavigationBar />
-                
+            <main className="bg-white flex flex-col font-[Poppins]">
                 <div className="flex place-content-center">
-                    <TournamentEditForm initialData={{
-                        name: tournament.name,
-                        start_time: new Date(tournament.start_time),
-                        end_time: new Date(tournament.end_time),
-                        slug: tournament.slug,
-                        id: tournament.id,
-
-                        is_online: false,
-                        contact: {
-                            email: tournament.email_contact,
-                            discord: tournament.discord_invite
-                        },
-                        location: null,
-                    }} />
+                    <TournamentEditForm initialData={{...tournament}} />
                 </div>
-
             </main>
     );
 }

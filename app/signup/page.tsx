@@ -1,9 +1,8 @@
 'use client'
-import { useState } from 'react';
 import { signUp } from '@/lib/auth';
+import React, { useState } from 'react';
 import MatchupDescription from '@/features/account-creation/matchup-des';
 import AuthCard from '@/features/account-creation/auth-card';
-import NavigationBar from '@/ui/navigation-bar';
 
 export default function SignupPage() {
     const [email, setEmail] = useState('');
@@ -19,7 +18,7 @@ export default function SignupPage() {
         event.preventDefault();
         setMessage("");
 
-        if (!email || !gamertag || !password || !firstName || !lastName || !gamertag) {
+        if (!email || !gamertag || !password || !firstName || !lastName || !prefix) {
             setMessage("All fields are required");
             return;
         }
@@ -41,24 +40,23 @@ export default function SignupPage() {
                 setMessage(result.formErrors?.toString() || "Signup failed due to an unknown error.");
                 return;
             }
-        } catch (error) {
+        } catch (err) {
             setLoading(false);
-            console.log(error);
+            console.log(err);
             setMessage("Something went wrong. Please try again later.")
         }
     }
 
-return (
-    <div className="bg-primary min-h-screen font-[Poppins] flex flex-col">
-        <NavigationBar />
-        <div className="flex-1 flex 2xl:items-center justify-center px-4 sm:px-6 lg:px-8 py-6 sm:py-0">
-            <div className="w-full max-w-md sm:max-w-2xl md:max-w-3xl lg:max-w-4xl 2xl:max-w-5xl mt-5">
-                <div className="grid grid-cols-1 sm:grid-cols-2 drop-shadow-xl/30 rounded-lg overflow-hidden">
-                    {/* left side of card */}
-                    <MatchupDescription />
+    return (
+        <div className="bg-primary font-[Poppins] absolute h-full inset-0 flex items-center justify-center p-4
+                          overflow-auto">
+            <div className="max-w-5xl flex flex-col sm:flex-row rounded-lg overflow-hidden shadow-md
+                            mt-50 xs:mt-30 sm:mt-20">
 
+                {/* Left side of card*/}
+                <MatchupDescription />
 
-                    {/* right side of card */}  
+                {/* Right side of card */}
                     <AuthCard
                         email={email}
                         password={password}
@@ -68,7 +66,7 @@ return (
                         prefix={prefix}
                         isLoading={loading}
                         message={message}
-                        authType='Signup'
+                        authType="Signup"
                         handleAuth={handleSignup}
                         onEmailChange={setEmail}
                         onPasswordChange={setPassword}
@@ -77,11 +75,7 @@ return (
                         onGamerTagChange={setGamertag}
                         onPREChange={setPrefix}
                     />
-                </div>
             </div>
         </div>
-    </div>
-);
-
-
+    );
 }
