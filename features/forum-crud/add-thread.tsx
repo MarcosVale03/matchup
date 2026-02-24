@@ -31,19 +31,19 @@ export default function AddForumThread({ onAddAction }: { onAddAction: () => voi
                 return;
             }
 
+            setTitle('');
+            setContent('');
+            setIsFormOpen(false);
+
+            router.refresh(); // re-fetch server data
+            onAddAction(); // Show success message in parent component
+
         } catch (err) {
             setError("An error occurred");
             console.log(err);
         } finally {
             setIsSubmitting(false);
         }
-
-        setTitle('');
-        setContent('');
-        setIsFormOpen(false);
-
-        router.refresh(); // re-fetch server data
-        onAddAction(); // Show success message in parent component
     }
 
     

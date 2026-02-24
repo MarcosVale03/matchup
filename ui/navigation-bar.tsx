@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/app/client-layout";
-import { CircleUser, MessageCircleMore, Plus } from "lucide-react";
+import { CircleUser, MessageCircleMore, Plus, Trophy } from "lucide-react";
 
 export default function NavigationBar() {
     const pathname = usePathname();
@@ -44,45 +44,10 @@ export default function NavigationBar() {
                             {skeletonButton}
                             {skeletonButton}
                             {skeletonButton}
+                            {skeletonButton}
                         </div>
                     ) : (
                         <>
-                            {/* Create Tournament | Only available if signed in */}
-                            {user && !isAuthPage && (
-                                <Link
-                                    href="/tournaments/create"
-                                    className={
-                                        `${pathname === "/tournaments/create" ? "bg-white text-primary" : ""} 
-                                         ${generalButtonClass}`}
-                                >
-                                    <Plus className="place-self-center size-5"/>
-                                    <p className="hidden sm:block">
-                                        Create Tournament
-                                    </p>
-                                </Link>
-                            )}
-
-                            {/* Signup if not logged in */}
-                            {!user && !isAuthPage && (
-                                <Link
-                                    href="/signup"
-                                    className={generalButtonClass}
-                                >
-                                    <CircleUser className="place-self-center size-5"/>
-                                    <p className="hidden sm:block">
-                                        Signup
-                                    </p>
-                                </Link>
-                            )}
-
-                            {/* Log In if not logged in */}
-                            {!user && !isAuthPage && (
-                                <Link href="/login" className={generalButtonClass}>
-                                    <CircleUser size={18} className="place-self-center" />
-                                    Log In
-                                </Link>
-                            )}
-
                             {/* Forums */}
                             {!isAuthPage && (
                                 <Link
@@ -96,11 +61,27 @@ export default function NavigationBar() {
                                 </Link>
                             )}
 
+                            {/* Tournaments | Available to anyone */}
+                            {!loading && !isAuthPage && (
+                            <Link href="/tournaments" className={generalButtonClass}>
+                                <Trophy size={18} className="place-self-center" />
+                                <p className="hidden sm:block">Tournaments</p>
+                            </Link>
+                            )}
+
+                            {/* Log In if not logged in */}
+                            {!user && !isAuthPage && (
+                                <Link href="/login" className={generalButtonClass}>
+                                    <CircleUser size={18} className="place-self-center" />
+                                    Log In
+                                </Link>
+                            )}
+
                             {/* Profile */}
                             {user && !isAuthPage && (
                                 <Link
-                                    href="/account"
-                                    className={`${pathname === "/account" ? "bg-white text-primary" : ""} ${generalButtonClass}`}
+                                    href="/profile"
+                                    className={`${pathname === "/profile" ? "bg-white text-primary" : ""} ${generalButtonClass}`}
                                 >
                                     <CircleUser className="place-self-center size-5"/>
                                     <p className="hidden sm:block">
@@ -111,6 +92,20 @@ export default function NavigationBar() {
                                     </p>
                                 </Link>
                             )}
+
+                            {/* Create Tournament | Only available if signed in */}
+                            {user && !isAuthPage && (
+                                <Link
+                                    href="/tournaments/create"
+                                    className={
+                                        `${pathname === "/tournaments/create" ? "bg-white text-primary" : ""} 
+                                         ${generalButtonClass}`}
+                                >
+                                    <Plus className="place-self-center size-5"/>
+                                    <p className="hidden sm:block"></p>
+                                </Link>
+                            )}
+
                         </>
                     )}
                 </div>
