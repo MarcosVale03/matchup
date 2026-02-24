@@ -8,8 +8,8 @@ import {dateToInputString} from "@/lib/utils";
 import {ArrowRight} from 'lucide-react';
 import {ErrorMessage} from "@/ui/error-message";
 
-// type for form state
-type FormState = {
+// Initial state for the form
+interface FormState {
     name: string;
     slug: string;
     startTime: Date;

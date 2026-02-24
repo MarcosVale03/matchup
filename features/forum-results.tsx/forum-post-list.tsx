@@ -18,7 +18,8 @@ type ForumPostListProps = {
 
 // onPostUpdate calls the function passed from forum-thread-single to update the post content in the posts state after successful edit
 // onPostDelete calls the function passed from forum-thread-single to remove the deleted post from the posts state after successful delete
-export default function ForumPostsList({    isOpen,
+export default function ForumPostsList({
+                                           isOpen,
                                            thread,
                                            posts,
                                            onPostDelete,
