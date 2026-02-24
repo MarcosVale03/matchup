@@ -1,6 +1,6 @@
 'use client'
 import React, { useState } from 'react';
-import {signInWithEmail, signUp} from '@/lib/auth';
+import { signInWithEmail } from '@/lib/auth';
 import MatchupDescription from '@/features/account-creation/matchup-des';
 import AuthCard from '@/features/account-creation/auth-card';
 
