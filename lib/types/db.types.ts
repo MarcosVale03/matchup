@@ -1,4 +1,4 @@
-﻿export type Json =
+export type Json =
   | string
   | number
   | boolean
@@ -7,6 +7,11 @@
   | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "13.0.5"
+  }
   public: {
     Tables: {
       admins: {
@@ -82,35 +87,38 @@ export type Database = {
       bracket_phases: {
         Row: {
           bracket_type_name: string
-          event_name: string
+          event_id: number
+          id: number
           name: string
-          next_phase_name: string | null
+          next_phase_id: number | null
           num_progressing_per_group: number
           tournament_id: number
         }
         Insert: {
           bracket_type_name: string
-          event_name: string
+          event_id: number
+          id?: number
           name: string
-          next_phase_name?: string | null
+          next_phase_id?: number | null
           num_progressing_per_group: number
           tournament_id: number
         }
         Update: {
           bracket_type_name?: string
-          event_name?: string
+          event_id?: number
+          id?: number
           name?: string
-          next_phase_name?: string | null
+          next_phase_id?: number | null
           num_progressing_per_group?: number
           tournament_id?: number
         }
         Relationships: [
           {
             foreignKeyName: "bracket_phases_bracket_phases_fk_01"
-            columns: ["next_phase_name", "tournament_id", "event_name"]
+            columns: ["tournament_id", "event_id", "next_phase_id"]
             isOneToOne: false
             referencedRelation: "bracket_phases"
-            referencedColumns: ["name", "tournament_id", "event_name"]
+            referencedColumns: ["tournament_id", "event_id", "id"]
           },
           {
             foreignKeyName: "bracket_phases_bracket_types_fk_01"
@@ -121,10 +129,10 @@ export type Database = {
           },
           {
             foreignKeyName: "bracket_phases_events_fk_01"
-            columns: ["tournament_id", "event_name"]
+            columns: ["tournament_id", "event_id"]
             isOneToOne: false
             referencedRelation: "events"
-            referencedColumns: ["tournament_id", "name"]
+            referencedColumns: ["tournament_id", "id"]
           },
         ]
       }
@@ -142,19 +150,22 @@ export type Database = {
       }
       entrants: {
         Row: {
-          event_name: string
+          event_id: number
+          placement: number | null
           team_name: string | null
           tournament_id: number
           user_id: string
         }
         Insert: {
-          event_name: string
+          event_id: number
+          placement?: number | null
           team_name?: string | null
           tournament_id: number
           user_id: string
         }
         Update: {
-          event_name?: string
+          event_id?: number
+          placement?: number | null
           team_name?: string | null
           tournament_id?: number
           user_id?: string
@@ -169,17 +180,17 @@ export type Database = {
           },
           {
             foreignKeyName: "entrants_events_fk_01"
-            columns: ["tournament_id", "event_name"]
+            columns: ["tournament_id", "event_id"]
             isOneToOne: false
             referencedRelation: "events"
-            referencedColumns: ["tournament_id", "name"]
+            referencedColumns: ["tournament_id", "id"]
           },
           {
             foreignKeyName: "entrants_teams_fk_01"
-            columns: ["team_name", "tournament_id", "event_name"]
+            columns: ["tournament_id", "event_id", "team_name"]
             isOneToOne: false
             referencedRelation: "teams"
-            referencedColumns: ["name", "tournament_id", "event_name"]
+            referencedColumns: ["tournament_id", "event_id", "name"]
           },
         ]
       }
@@ -217,6 +228,7 @@ export type Database = {
         Row: {
           end_time: string
           gaming_platform_name: string
+          id: number
           max_team_size: number | null
           name: string
           price: number
@@ -228,6 +240,7 @@ export type Database = {
         Insert: {
           end_time: string
           gaming_platform_name: string
+          id?: number
           max_team_size?: number | null
           name: string
           price: number
@@ -239,6 +252,7 @@ export type Database = {
         Update: {
           end_time?: string
           gaming_platform_name?: string
+          id?: number
           max_team_size?: number | null
           name?: string
           price?: number
@@ -373,7 +387,7 @@ export type Database = {
       }
       match_slots: {
         Row: {
-          event_name: string
+          event_id: number
           match_identifier: string
           phase_group_identifier: string
           seed_num: number | null
@@ -381,7 +395,7 @@ export type Database = {
           tournament_id: number
         }
         Insert: {
-          event_name: string
+          event_id: number
           match_identifier: string
           phase_group_identifier: string
           seed_num?: number | null
@@ -389,7 +403,7 @@ export type Database = {
           tournament_id: number
         }
         Update: {
-          event_name?: string
+          event_id?: number
           match_identifier?: string
           phase_group_identifier?: string
           seed_num?: number | null
@@ -400,26 +414,26 @@ export type Database = {
           {
             foreignKeyName: "match_slots_matches_fk_01"
             columns: [
-              "match_identifier",
               "tournament_id",
-              "event_name",
+              "event_id",
+              "match_identifier",
               "phase_group_identifier",
             ]
             isOneToOne: false
             referencedRelation: "matches"
             referencedColumns: [
-              "identifier",
               "tournament_id",
-              "event_name",
+              "event_id",
+              "identifier",
               "phase_group_identifier",
             ]
           },
           {
             foreignKeyName: "match_slots_seeds_fk_01"
-            columns: ["seed_num", "tournament_id", "event_name"]
+            columns: ["tournament_id", "event_id", "seed_num"]
             isOneToOne: false
             referencedRelation: "seeds"
-            referencedColumns: ["seed_num", "tournament_id", "event_name"]
+            referencedColumns: ["tournament_id", "event_id", "seed_num"]
           },
         ]
       }
@@ -427,7 +441,7 @@ export type Database = {
         Row: {
           advance_match_identifier: string | null
           advance_slot_num: number | null
-          event_name: string
+          event_id: number
           identifier: string
           phase_group_identifier: string
           tournament_id: number
@@ -435,7 +449,7 @@ export type Database = {
         Insert: {
           advance_match_identifier?: string | null
           advance_slot_num?: number | null
-          event_name: string
+          event_id: number
           identifier: string
           phase_group_identifier: string
           tournament_id: number
@@ -443,7 +457,7 @@ export type Database = {
         Update: {
           advance_match_identifier?: string | null
           advance_slot_num?: number | null
-          event_name?: string
+          event_id?: number
           identifier?: string
           phase_group_identifier?: string
           tournament_id?: number
@@ -452,91 +466,28 @@ export type Database = {
           {
             foreignKeyName: "matches_match_slots_fk_01"
             columns: [
-              "advance_match_identifier",
               "tournament_id",
-              "event_name",
+              "event_id",
               "phase_group_identifier",
+              "advance_match_identifier",
               "advance_slot_num",
             ]
             isOneToOne: false
             referencedRelation: "match_slots"
             referencedColumns: [
-              "match_identifier",
               "tournament_id",
-              "event_name",
+              "event_id",
               "phase_group_identifier",
+              "match_identifier",
               "slot_num",
             ]
           },
           {
             foreignKeyName: "matches_phase_groups_fk_01"
-            columns: ["phase_group_identifier", "tournament_id", "event_name"]
+            columns: ["tournament_id", "event_id", "phase_group_identifier"]
             isOneToOne: false
             referencedRelation: "phase_groups"
-            referencedColumns: ["identifier", "tournament_id", "event_name"]
-          },
-        ]
-      }
-      offline_events: {
-        Row: {
-          event_name: string
-          location_id: number
-          tournament_id: number
-        }
-        Insert: {
-          event_name: string
-          location_id: number
-          tournament_id: number
-        }
-        Update: {
-          event_name?: string
-          location_id?: number
-          tournament_id?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "offline_events_events_fk_01"
-            columns: ["tournament_id", "event_name"]
-            isOneToOne: true
-            referencedRelation: "events"
-            referencedColumns: ["tournament_id", "name"]
-          },
-          {
-            foreignKeyName: "offline_events_locations_fk_01"
-            columns: ["location_id"]
-            isOneToOne: false
-            referencedRelation: "locations"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      offline_tournaments: {
-        Row: {
-          location_id: number
-          tournament_id: number
-        }
-        Insert: {
-          location_id: number
-          tournament_id: number
-        }
-        Update: {
-          location_id?: number
-          tournament_id?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "offline_tournaments_locations_fk_01"
-            columns: ["location_id"]
-            isOneToOne: false
-            referencedRelation: "locations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "offline_tournaments_tournaments_fk_01"
-            columns: ["tournament_id"]
-            isOneToOne: true
-            referencedRelation: "tournaments"
-            referencedColumns: ["id"]
+            referencedColumns: ["tournament_id", "event_id", "identifier"]
           },
         ]
       }
@@ -560,22 +511,22 @@ export type Database = {
       }
       phase_groups: {
         Row: {
-          bracket_phase_name: string
-          event_name: string
+          bracket_phase_id: number
+          event_id: number
           identifier: string
           tournament_id: number
           wave_identifier: string | null
         }
         Insert: {
-          bracket_phase_name: string
-          event_name: string
+          bracket_phase_id: number
+          event_id: number
           identifier: string
           tournament_id: number
           wave_identifier?: string | null
         }
         Update: {
-          bracket_phase_name?: string
-          event_name?: string
+          bracket_phase_id?: number
+          event_id?: number
           identifier?: string
           tournament_id?: number
           wave_identifier?: string | null
@@ -583,10 +534,10 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "phase_groups_bracket_phases_fk_01"
-            columns: ["bracket_phase_name", "tournament_id", "event_name"]
+            columns: ["tournament_id", "event_id", "bracket_phase_id"]
             isOneToOne: false
             referencedRelation: "bracket_phases"
-            referencedColumns: ["name", "tournament_id", "event_name"]
+            referencedColumns: ["tournament_id", "event_id", "id"]
           },
           {
             foreignKeyName: "phase_groups_waves_fk_01"
@@ -600,21 +551,21 @@ export type Database = {
       seeds: {
         Row: {
           entrant_user_id: string | null
-          event_name: string
+          event_id: number
           seed_num: number
           team_name: string | null
           tournament_id: number
         }
         Insert: {
           entrant_user_id?: string | null
-          event_name: string
+          event_id: number
           seed_num: number
           team_name?: string | null
           tournament_id: number
         }
         Update: {
           entrant_user_id?: string | null
-          event_name?: string
+          event_id?: number
           seed_num?: number
           team_name?: string | null
           tournament_id?: number
@@ -622,50 +573,50 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "seeds_entrants_fk_01"
-            columns: ["tournament_id", "event_name", "entrant_user_id"]
+            columns: ["tournament_id", "event_id", "entrant_user_id"]
             isOneToOne: false
             referencedRelation: "entrants"
-            referencedColumns: ["tournament_id", "event_name", "user_id"]
+            referencedColumns: ["tournament_id", "event_id", "user_id"]
           },
           {
             foreignKeyName: "seeds_events_fk_01"
-            columns: ["tournament_id", "event_name"]
+            columns: ["tournament_id", "event_id"]
             isOneToOne: false
             referencedRelation: "events"
-            referencedColumns: ["tournament_id", "name"]
+            referencedColumns: ["tournament_id", "id"]
           },
           {
             foreignKeyName: "seeds_teams_fk_01"
-            columns: ["team_name", "tournament_id", "event_name"]
+            columns: ["tournament_id", "event_id", "team_name"]
             isOneToOne: false
             referencedRelation: "teams"
-            referencedColumns: ["name", "tournament_id", "event_name"]
+            referencedColumns: ["tournament_id", "event_id", "name"]
           },
         ]
       }
       teams: {
         Row: {
-          event_name: string
+          event_id: number
           name: string
           tournament_id: number
         }
         Insert: {
-          event_name: string
+          event_id: number
           name: string
           tournament_id: number
         }
         Update: {
-          event_name?: string
+          event_id?: number
           name?: string
           tournament_id?: number
         }
         Relationships: [
           {
             foreignKeyName: "teams_events_fk_01"
-            columns: ["tournament_id", "event_name"]
+            columns: ["tournament_id", "event_id"]
             isOneToOne: false
             referencedRelation: "events"
-            referencedColumns: ["tournament_id", "name"]
+            referencedColumns: ["tournament_id", "id"]
           },
         ]
       }
@@ -676,7 +627,9 @@ export type Database = {
           end_time: string
           home_page: string
           id: number
+          is_online: boolean
           is_public: boolean
+          location_id: number | null
           name: string
           owner: string
           slug: string | null
@@ -688,7 +641,9 @@ export type Database = {
           end_time: string
           home_page?: string
           id?: number
+          is_online: boolean
           is_public?: boolean
+          location_id?: number | null
           name: string
           owner: string
           slug?: string | null
@@ -700,13 +655,22 @@ export type Database = {
           end_time?: string
           home_page?: string
           id?: number
+          is_online?: boolean
           is_public?: boolean
+          location_id?: number | null
           name?: string
           owner?: string
           slug?: string | null
           start_time?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "tournaments_locations_fk_01"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "tournaments_users_fk_01"
             columns: ["owner"]
@@ -718,24 +682,36 @@ export type Database = {
       }
       users: {
         Row: {
+          country: string | null
           display_name: string
           first_name: string
           last_name: string
           prefix: string | null
+          show_results: boolean
+          state: string | null
+          time_joined: string
           user_id: string
         }
         Insert: {
+          country?: string | null
           display_name: string
           first_name: string
           last_name: string
           prefix?: string | null
+          show_results?: boolean
+          state?: string | null
+          time_joined: string
           user_id: string
         }
         Update: {
+          country?: string | null
           display_name?: string
           first_name?: string
           last_name?: string
           prefix?: string | null
+          show_results?: boolean
+          state?: string | null
+          time_joined?: string
           user_id?: string
         }
         Relationships: []
@@ -780,25 +756,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      insert_event: {
-        Args: {
-          address?: string
-          end_time: string
-          is_online: boolean
-          latitude?: number
-          longitude?: number
-          max_team_size?: number
-          name: string
-          place_id?: string
-          platform: string
-          price: number
-          start_time: string
-          teams_allowed: boolean
-          tournament_id: number
-          video_game: string
-        }
-        Returns: number
-      }
       insert_post: {
         Args: { p_content: string; p_thread_id: string }
         Returns: undefined
@@ -809,11 +766,11 @@ export type Database = {
       }
       insert_tournament: {
         Args: {
-          is_online: boolean
           t_address?: string
           t_discord?: string
           t_email?: string
           t_end_time: string
+          t_is_online: boolean
           t_is_public: boolean
           t_latitude?: number
           t_longitude?: number
@@ -834,12 +791,12 @@ export type Database = {
       }
       update_tournament: {
         Args: {
-          is_online: boolean
           t_address?: string
           t_discord?: string
           t_email?: string
           t_end_time: string
           t_id: number
+          t_is_online: boolean
           t_is_public: boolean
           t_latitude?: number
           t_longitude?: number
@@ -984,3 +941,9 @@ export type CompositeTypes<
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
+
+export const Constants = {
+  public: {
+    Enums: {},
+  },
+} as const

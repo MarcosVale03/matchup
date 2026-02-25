@@ -53,17 +53,24 @@ export type EventInsertErrors = {
     location?: string[],
 }
 
+/**
+ * @deprecated DO NOT USE! NOT FINISHED
+ * @param tournamentId
+ * @param name
+ * @param startTime
+ * @param endTime
+ * @param price
+ * @param videoGame
+ * @param platform
+ * @param teamsAllowed
+ * @param maxTeamSize
+ */
+/*
 export async function insertEvent(tournamentId: number, name: string, startTime: Date, endTime: Date, price: number,
-                                  videoGame: string, platform: string, teamsAllowed: boolean, isOnline: boolean, maxTeamSize?: number,
-                                  location?: {
-                                      maps_place_id: string,
-                                      address: string,
-                                      latitude: number,
-                                      longitude: number
-                                  }) {
-    /*
+                                  videoGame: string, platform: string, teamsAllowed: boolean, maxTeamSize?: number) {
+    /!*
      * FUNCTION NOT READY FOR USE
-     */
+     *!/
     const cookieStore = await cookies()
     const supabase = await createClient(cookieStore)
 
@@ -79,8 +86,6 @@ export async function insertEvent(tournamentId: number, name: string, startTime:
         platform: platform,
         teams_allowed: teamsAllowed,
         max_team_size: maxTeamSize,
-        is_online: isOnline,
-        location: location
     })
 
     if (!result.success) {
@@ -129,4 +134,4 @@ async function isGamePlatformValid(supabase: SupabaseClient, videoGame: string, 
         throw new Error("DB error while querying event_video_games: " + error.details + " " + error.message)
     }
     return data.length > 0
-}
+}*/

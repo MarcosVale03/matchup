@@ -8,14 +8,19 @@ import {generateSingleEliminationBracket, getByeWinner,} from "@/server/brackets
 // helper funct to gen seed order for single elim bracket
 export type BracketGenerationErrors = {
     tournament_id?: string[]
-    event_name?: string[]
+    event_id?: string[]
     general?: string[]
 }
 
 // gen seed order for single elim bracket w/ standard seeding pattern (first vs last, meet in middle, etc)
+/**
+ * @todo Update to use postgres functions for transaction safety
+ * @todo Update to utilize new db structure
+ */
+/*
 export async function generateBracket(
     tournamentId: number,
-    eventName: string,
+    eventId: number,
     phaseName: string = "Main Bracket"
 ): Promise<MutationResponse<null, BracketGenerationErrors>> {
     const cookieStore = await cookies()
@@ -26,7 +31,7 @@ export async function generateBracket(
         .from('entrants')
         .select('*')
         .eq('tournament_id', tournamentId)
-        .eq('event_name', eventName)
+        .eq('event_id', eventId)
 
     if (entrantsError) {
         return {
@@ -48,7 +53,7 @@ export async function generateBracket(
     const seedInserts = entrants.map((entrant, index) => ({
         seed_num: index + 1,
         tournament_id: tournamentId,
-        event_name: eventName,
+        event_id: eventId,
         entrant_user_id: entrant.user_id,
         team_name: entrant.team_name
     }))
@@ -71,7 +76,7 @@ export async function generateBracket(
         .insert({
             name: phaseName,
             tournament_id: tournamentId,
-            event_name: eventName,
+            event_id: eventId,
             bracket_type_name: 'Single Elimination',
             num_progressing_per_group: 1, 
             next_phase_name: null         
@@ -92,7 +97,7 @@ export async function generateBracket(
         .insert({
             identifier: phaseGroupId,
             tournament_id: tournamentId,
-            event_name: eventName,
+            event_id: eventId,
             bracket_phase_name: phaseName,
         })
 
@@ -109,7 +114,7 @@ export async function generateBracket(
     const matchInserts = generatedMatches.map(match => ({
         identifier: match.identifier,
         tournament_id: tournamentId,
-        event_name: eventName,
+        event_id: eventId,
         phase_group_identifier: phaseGroupId,
         advance_match_identifier: null as string | null,
         advance_slot_num: null as number | null,
@@ -131,7 +136,7 @@ export async function generateBracket(
         match.slots.map(slot => ({
             match_identifier: match.identifier,
             tournament_id: tournamentId,
-            event_name: eventName,
+            event_id: eventId,
             phase_group_identifier: phaseGroupId,
             slot_num: slot.slot_num,
             seed_num: slot.seed_num,
@@ -160,7 +165,7 @@ export async function generateBracket(
                 })
                 .eq('identifier', match.identifier)
                 .eq('tournament_id', tournamentId)
-                .eq('event_name', eventName)
+                .eq('event_id', eventId)
                 .eq('phase_group_identifier', phaseGroupId)
 
             if (updateError) {
@@ -182,7 +187,7 @@ export async function generateBracket(
                 .update({ seed_num: byeWinner })
                 .eq('match_identifier', match.advance_match_identifier)
                 .eq('tournament_id', tournamentId)
-                .eq('event_name', eventName)
+                .eq('event_id', eventId)
                 .eq('phase_group_identifier', phaseGroupId)
                 .eq('slot_num', match.advance_slot_num)
 
@@ -196,4 +201,4 @@ export async function generateBracket(
     }
 
     return { success: true }    
-}
+}*/

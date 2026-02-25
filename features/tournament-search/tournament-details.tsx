@@ -1,5 +1,5 @@
 'use client';
-import { TournamentsQueryResponse } from "@/server/queries/tournaments.queries";
+import { FetchTournamentFromIdResponse } from "@/server/queries/tournaments.queries";
 import { formatDateTime } from "@/ui/format-time";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/client-layout";
@@ -26,7 +26,7 @@ const buttonClass = `w-full flex items-center justify-center gap-2 py-2.5 sm:py-
                     focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 
                     transition-colors`;
 
-export default function TournamentDetails({ tournament }: { tournament: TournamentsQueryResponse }) {
+export default function TournamentDetails({ tournament }: { tournament: FetchTournamentFromIdResponse }) {
     const router = useRouter();
 
     const { user, loading } = useAuth();
