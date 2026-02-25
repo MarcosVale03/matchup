@@ -14,7 +14,7 @@ export type FetchTournamentsForSearchResponse = {
         id: number,
         maps_place_id: string,
         address: string,
-    }
+    } | null
     name: string,
     owner: {
         user_id: string,
@@ -27,7 +27,25 @@ export type FetchTournamentsForSearchResponse = {
     start_time: string
 }
 
-const tournamentsSelectQuery = `
+/**
+ * Returns all public tournaments in the database. If a search query is provided, the results are filtered by the query.
+ * If a startAfter date is provided, only tournaments that start after that date are included.
+ *
+ * @param {string} searchQuery - Query placed within the search bar. Used to perform a websearch of the table. Default = ""
+ * @param {string} startAfter - Will only return tournament in which start_time is after the date in startAfter. Default = new Date(0) (Unix epoch)
+ *
+ * @returns Response from query
+ * @returns success - True if the DB query is successful. (Error is thrown if it fails)
+ * @returns data - Array of tournament objects
+ *
+ * @throws - Will throw an exception if an error occurs while querying the database.
+ */
+export async function fetchTournamentsForSearch(searchQuery: string = "", startAfter: Date = new Date(0)): Promise<FetchTournamentsForSearchResponse[]> {
+    const cookieStore = await cookies()
+    const supabase = await createClient(cookieStore)
+
+    // Create db query
+    let query = supabase.from('tournaments').select(`
         id,
         name,
         start_time,
@@ -48,27 +66,7 @@ const tournamentsSelectQuery = `
             last_name,
             display_name,
             prefix
-        )`
-
-/**
- * Returns all public tournaments in the database. If a search query is provided, the results are filtered by the query.
- * If a startAfter date is provided, only tournaments that start after that date are included.
- *
- * @param {string} searchQuery - Query placed within the search bar. Used to perform a websearch of the table. Default = ""
- * @param {string} startAfter - Will only return tournament in which start_time is after the date in startAfter. Default = new Date(0) (Unix epoch)
- *
- * @returns Response from query
- * @returns success - True if the DB query is successful. (Error is thrown if it fails)
- * @returns data - Array of tournament objects
- *
- * @throws - Will throw an exception if an error occurs while querying the database.
- */
-export async function fetchTournamentsForSearch(searchQuery: string = "", startAfter: Date = new Date(0)): Promise<FetchTournamentsForSearchResponse[]> {
-    const cookieStore = await cookies()
-    const supabase = await createClient(cookieStore)
-
-    // Create db query
-    let query = supabase.from('tournaments').select(tournamentsSelectQuery)
+        )`)
         .eq('is_public', true).gt('start_time', startAfter.toISOString())
 
     // Appends text search to query if searchQuery param is given
@@ -132,7 +130,7 @@ export type FetchTournamentFromIdResponse = {
     discord_invite: string | null,
     email_contact: string | null,
     end_time: string,
-    home: string,
+    home_page: string,
     id: number
     is_public: boolean,
     is_online: boolean,
@@ -140,7 +138,7 @@ export type FetchTournamentFromIdResponse = {
         id: number,
         maps_place_id: string,
         address: string,
-    },
+    } | null,
     name: string,
     owner: {
         user_id: string,
@@ -171,7 +169,29 @@ export async function fetchTournamentFromId(id: number): Promise<{
     const cookieStore = await cookies()
     const supabase = await createClient(cookieStore)
 
-    const {data, error} = await supabase.from('tournaments').select(tournamentsSelectQuery + `, home_page`).eq('id', id).maybeSingle()
+    const {data, error} = await supabase.from('tournaments').select(`
+        id,
+        name,
+        start_time,
+        end_time,
+        slug,
+        home_page,
+        discord_invite,
+        email_contact,
+        is_public,
+        is_online,
+        locations (
+            id,
+            maps_place_id,
+            address
+        ),
+        owner:users!tournaments_users_fk_01 (
+            user_id,
+            first_name,
+            last_name,
+            display_name,
+            prefix
+        )`).eq('id', id).maybeSingle()
 
     // Throws error if something goes wrong
     if (error) {
@@ -183,7 +203,6 @@ export async function fetchTournamentFromId(id: number): Promise<{
             success: false
         }
     }
-
 
     return {
         success: true,
