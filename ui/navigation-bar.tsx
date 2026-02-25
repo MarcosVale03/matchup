@@ -93,6 +93,13 @@ export default function NavigationBar() {
                                 </Link>
                             )}
 
+                            {/* Sign Out | Only available if signed in */}
+                            {!loading && user && !isAuthPage && (
+                                <Link href="/signout" className={generalButtonClass}>
+                                    <p className="hidden sm:block">Sign Out</p>
+                                </Link>
+                            )}
+
                             {/* Create Tournament | Only available if signed in */}
                             {user && !isAuthPage && (
                                 <Link
