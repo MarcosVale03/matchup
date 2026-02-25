@@ -53,14 +53,20 @@ export type EventInsertErrors = {
     location?: string[],
 }
 
+/**
+ * @deprecated DO NOT USE! NOT FINISHED
+ * @param tournamentId
+ * @param name
+ * @param startTime
+ * @param endTime
+ * @param price
+ * @param videoGame
+ * @param platform
+ * @param teamsAllowed
+ * @param maxTeamSize
+ */
 export async function insertEvent(tournamentId: number, name: string, startTime: Date, endTime: Date, price: number,
-                                  videoGame: string, platform: string, teamsAllowed: boolean, isOnline: boolean, maxTeamSize?: number,
-                                  location?: {
-                                      maps_place_id: string,
-                                      address: string,
-                                      latitude: number,
-                                      longitude: number
-                                  }) {
+                                  videoGame: string, platform: string, teamsAllowed: boolean, maxTeamSize?: number) {
     /*
      * FUNCTION NOT READY FOR USE
      */

@@ -7,6 +7,10 @@ import {Database} from "@/lib/types/db.types";
 
 type Event = Database["public"]["Tables"]["events"]["Row"]
 
+/**
+ * @deprecated DO NOT USE! NOT FINISHED
+ * @param tournamentId
+ */
 export async function fetchEventsFromTournamentId(tournamentId: number): Promise<Event[]> {
     const cookieStore = await cookies()
     const supabase = await createClient(cookieStore)

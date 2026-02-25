@@ -129,7 +129,7 @@ export async function insertTournament(name: string, startTime: Date, endTime: D
         t_name: result.data.name,
         t_start_time: result.data.times.start_time,
         t_end_time: result.data.times.end_time,
-        is_online: result.data.is_online,
+        t_is_online: result.data.is_online,
         t_email: result.data.contact.email,
         t_discord: result.data.contact.discord,
         t_slug: result.data.slug,
@@ -162,17 +162,18 @@ async function isSlugUnique(slug: string, id?: number) {
     const cookieStore = await cookies()
     const supabase = await createClient(cookieStore)
 
-    const {data, error} = await supabase.from('tournaments').select('id').eq('slug', slug)
-    if (error || !data) {
+    const {data, error} = await supabase.from('tournaments').select('id').eq('slug', slug).maybeSingle()
+    if (error) {
         throw new Error("DB error while querying tournaments: " + error.details + " " + error.message)
     }
-    return data.length == 0 || (id ? id == data[0].id : false)
+
+    return !data || (id ? id === data.id : false)
 }
 
 
 
-const TournamentUpdateSchema = TournamentInsertSchema.safeExtend({id: z.number()})
-    .refine(data => data.slug ? isSlugUnique(data.slug, data.id) : true,{error: "This slug is taken", path: ["slug"],})
+const TournamentUpdateSchema = TournamentSchema.safeExtend({id: z.number()})
+    .refine(data => data.slug ? isSlugUnique(data.slug, data.id) : true, {error: "This slug is taken", path: ["slug"],})
 
 export type TournamentUpdateErrors = {
     id?: string[],
@@ -259,7 +260,7 @@ export async function updateTournament(id: number, name: string, startTime: Date
         t_name: result.data.name,
         t_start_time: result.data.times.start_time,
         t_end_time: result.data.times.end_time,
-        is_online: result.data.is_online,
+        t_is_online: result.data.is_online,
         t_email: result.data.contact.email,
         t_discord: result.data.contact.discord,
         t_slug: result.data.slug,

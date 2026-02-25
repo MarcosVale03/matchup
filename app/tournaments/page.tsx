@@ -1,13 +1,13 @@
 'use client'
 import React, { useCallback, useEffect, useState } from 'react';
-import { fetchTournaments, TournamentsQueryResponse } from '@/server/queries/tournaments.queries';
+import { fetchTournamentsForSearch, FetchTournamentsForSearchResponse } from '@/server/queries/tournaments.queries';
 import { SearchResults } from '@/features/tournament-search/search-results';
 import { sleep } from '@/features/sleep-function';
 import SearchBar from '@/ui/search-bar';
 
 export default function TournamentSearchPage() {
     const [searchQuery, setSearchQuery] = useState('');
-    const [displayedTournaments, setDisplayedTournaments] = useState<TournamentsQueryResponse[]>([]);
+    const [displayedTournaments, setDisplayedTournaments] = useState<FetchTournamentsForSearchResponse[]>([]);
     const [startDateFilter, setStartDateFilter] = useState<Date | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -18,7 +18,7 @@ export default function TournamentSearchPage() {
         setError(null);
 
         try {
-            const response = await fetchTournaments(query, startAfter);
+            const response = await fetchTournamentsForSearch(query, startAfter);
             setDisplayedTournaments(response ?? []);
         } catch (err) {
             console.error(err);

@@ -3,22 +3,27 @@
 import {createClient} from "@/server/db/server";
 import { cookies } from 'next/headers'
 
-export type TournamentsQueryResponse = {
-    discord_invite: string | null
-    email_contact: string | null
-    end_time: string
-    home_page: string
-    id: number
-    is_public: boolean
-    name: string
+export type FetchTournamentsForSearchResponse = {
+    discord_invite: string | null,
+    email_contact: string | null,
+    end_time: string,
+    id: number,
+    is_public: boolean,
+    is_online: boolean,
+    locations: {
+        id: number,
+        maps_place_id: string,
+        address: string,
+    }
+    name: string,
     owner: {
         user_id: string,
         first_name: string,
         last_name: string,
         display_name: string,
         prefix: string | null
-    }
-    slug: string | null
+    },
+    slug: string | null,
     start_time: string
 }
 
@@ -28,10 +33,15 @@ const tournamentsSelectQuery = `
         start_time,
         end_time,
         slug,
-        home_page,
         discord_invite,
         email_contact,
         is_public,
+        is_online,
+        locations (
+            id,
+            maps_place_id,
+            address
+        ),
         owner:users!tournaments_users_fk_01 (
             user_id,
             first_name,
@@ -53,7 +63,7 @@ const tournamentsSelectQuery = `
  *
  * @throws - Will throw an exception if an error occurs while querying the database.
  */
-export async function fetchTournaments(searchQuery: string = "", startAfter: Date = new Date(0)): Promise<TournamentsQueryResponse[]> {
+export async function fetchTournamentsForSearch(searchQuery: string = "", startAfter: Date = new Date(0)): Promise<FetchTournamentsForSearchResponse[]> {
     const cookieStore = await cookies()
     const supabase = await createClient(cookieStore)
 
@@ -118,6 +128,31 @@ export async function fetchTournamentIdFromSlug(slug: string): Promise<{
 }
 
 
+export type FetchTournamentFromIdResponse = {
+    discord_invite: string | null,
+    email_contact: string | null,
+    end_time: string,
+    home: string,
+    id: number
+    is_public: boolean,
+    is_online: boolean,
+    locations: {
+        id: number,
+        maps_place_id: string,
+        address: string,
+    },
+    name: string,
+    owner: {
+        user_id: string,
+        first_name: string,
+        last_name: string,
+        display_name: string,
+        prefix: string | null
+    },
+    slug: string | null,
+    start_time: string
+}
+
 /**
  * Given a tournament ID, returns the tournament object with the matching ID.
  *
@@ -125,18 +160,18 @@ export async function fetchTournamentIdFromSlug(slug: string): Promise<{
  *
  * @returns Response from query
  * @returns success - True if the DB query is successful. (Error is thrown if it fails)
- * @returns data - Tournament objects
+ * @returns data - Tournament object
  *
  * @throws - Will throw an exception if an error occurs while querying the database.
  */
 export async function fetchTournamentFromId(id: number): Promise<{
     success: boolean,
-    tournament?: TournamentsQueryResponse
+    tournament?: FetchTournamentFromIdResponse
 }> {
     const cookieStore = await cookies()
     const supabase = await createClient(cookieStore)
 
-    const {data, error} = await supabase.from('tournaments').select(tournamentsSelectQuery).eq('id', id).maybeSingle()
+    const {data, error} = await supabase.from('tournaments').select(tournamentsSelectQuery + `, home_page`).eq('id', id).maybeSingle()
 
     // Throws error if something goes wrong
     if (error) {
