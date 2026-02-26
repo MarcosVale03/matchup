@@ -4,7 +4,7 @@ import Link from "next/link";
 import {FetchTournamentsForSearchResponse} from "@/server/queries/tournaments.queries";
 
 
-export const SearchResults = ({ tournaments }: { tournaments: FetchTournamentsForSearchResponse[] }) => {
+export const SearchResults = ({ tournaments }: { tournaments: FetchTournamentsForSearchResponse }) => {
     // will have to limit the amount of shown results if too many are returned
 
     if (tournaments.length === 0) {

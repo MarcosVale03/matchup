@@ -7,7 +7,7 @@ import SearchBar from '@/ui/search-bar';
 
 export default function TournamentSearchPage() {
     const [searchQuery, setSearchQuery] = useState('');
-    const [displayedTournaments, setDisplayedTournaments] = useState<FetchTournamentsForSearchResponse[]>([]);
+    const [displayedTournaments, setDisplayedTournaments] = useState<FetchTournamentsForSearchResponse>([]);
     const [startDateFilter, setStartDateFilter] = useState<Date | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);

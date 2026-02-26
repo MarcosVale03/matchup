@@ -25,7 +25,7 @@ export type FetchTournamentsForSearchResponse = {
     },
     slug: string | null,
     start_time: string
-}
+}[]
 
 /**
  * Returns all public tournaments in the database. If a search query is provided, the results are filtered by the query.
@@ -40,7 +40,7 @@ export type FetchTournamentsForSearchResponse = {
  *
  * @throws - Will throw an exception if an error occurs while querying the database.
  */
-export async function fetchTournamentsForSearch(searchQuery: string = "", startAfter: Date = new Date(0)): Promise<FetchTournamentsForSearchResponse[]> {
+export async function fetchTournamentsForSearch(searchQuery: string = "", startAfter: Date = new Date(0)): Promise<FetchTournamentsForSearchResponse> {
     const cookieStore = await cookies()
     const supabase = await createClient(cookieStore)
 
