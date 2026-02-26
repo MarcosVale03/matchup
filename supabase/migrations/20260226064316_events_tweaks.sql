@@ -1,0 +1,1 @@
+alter table "public"."events" add constraint "events_team_max_size_check" CHECK ( (teams_allowed = false) OR (max_team_size IS NOT NULL) )
