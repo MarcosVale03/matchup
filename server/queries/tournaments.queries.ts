@@ -34,9 +34,7 @@ export type FetchTournamentsForSearchResponse = {
  * @param {string} searchQuery - Query placed within the search bar. Used to perform a websearch of the table. Default = ""
  * @param {string} startAfter - Will only return tournament in which start_time is after the date in startAfter. Default = new Date(0) (Unix epoch)
  *
- * @returns Response from query
- * @returns success - True if the DB query is successful. (Error is thrown if it fails)
- * @returns data - Array of tournament objects
+ * @returns Array of tournament objects
  *
  * @throws - Will throw an exception if an error occurs while querying the database.
  */
@@ -208,4 +206,24 @@ export async function fetchTournamentFromId(id: number): Promise<{
         success: true,
         tournament: data
     }
+}
+
+
+export async function doesTournamentExist(tournamentId: number): Promise<boolean> {
+    const cookieStore = await cookies()
+    const supabase = await createClient(cookieStore)
+
+    const {count, error} = await supabase.from('tournaments').select(`*`, {count: 'exact', head: true}).eq('id', tournamentId);
+
+    // Throws error if something goes wrong
+    if (error) {
+        throw new Error("Tournament Query Failed: " + error.details + " " + error.message)
+    }
+
+    if (count === null) {
+        throw new Error("An unknown error occurred while querying the database.")
+    }
+
+    // Returns if query returns a value.
+    return count > 0
 }
