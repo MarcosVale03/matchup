@@ -25,7 +25,7 @@ export async function isUserTournamentAdmin(userId: string, tournamentId: number
         throw new Error("Admin Query Failed: " + error.details + " " + error.message)
     }
 
-    if (!count) {
+    if (count === null) {
         throw new Error("An unknown error occurred while querying the database.")
     }
 
