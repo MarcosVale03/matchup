@@ -5,8 +5,8 @@ import { cookies } from "next/headers";
 
 import TournamentEditForm from "@/features/tournament-crud/modify-tournament";
 
-export default async function EditTournamentPage({ params }: { params: { id: string } }) {
-    const { id: idStr } = await params
+export default async function EditTournamentPage({ params }: { params: { tournamentId: string } }) {
+    const { tournamentId: idStr } = await params
     const id = Number(idStr);
 
     const cookieStore = await cookies();

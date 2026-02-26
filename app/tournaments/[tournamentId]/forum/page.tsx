@@ -4,8 +4,8 @@ import { fetchTournamentFromId } from "@/server/queries/tournaments.queries";
 import ForumPostList from "@/features/forum-results.tsx/forum-thread-list";
 
 
-export default async function TournamentForum({ params }: { params: { id: string } }) {
-    const { id: idStr } = await params
+export default async function TournamentForum({ params }: { params: { tournamentId: string } }) {
+    const { tournamentId: idStr } = await params
     const id = Number(idStr);
 
     if (isNaN(id) || id <= 0) {
