@@ -192,6 +192,13 @@ export type Database = {
             referencedRelation: "teams"
             referencedColumns: ["tournament_id", "event_id", "name"]
           },
+          {
+            foreignKeyName: "entrants_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
         ]
       }
       event_video_games: {
@@ -756,6 +763,24 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      has_permission_level: {
+        Args: { plevel: number; tid: number; uid: string }
+        Returns: boolean
+      }
+      insert_event: {
+        Args: {
+          e_end_time: string
+          e_gaming_platform_name: string
+          e_max_team_size?: number
+          e_name: string
+          e_price: number
+          e_start_time: string
+          e_teams_allowed: boolean
+          e_tournament_id: number
+          e_video_game_name: string
+        }
+        Returns: number
+      }
       insert_post: {
         Args: { p_content: string; p_thread_id: string }
         Returns: undefined
