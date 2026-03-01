@@ -175,7 +175,10 @@ INSERT INTO "public"."permission_levels" ("id", "name", "description") VALUES
 -- Data for Name: bracket_types; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-
+INSERT INTO "public"."bracket_types" ("name") VALUES
+    ('Single Elimination'),
+    ('Double Elimination'),
+    ('Round Robin');
 
 --
 -- Data for Name: gaming_platforms; Type: TABLE DATA; Schema: public; Owner: postgres

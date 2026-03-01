@@ -2,8 +2,8 @@ import { fetchTournamentFromId } from "@/server/queries/tournaments.queries";
 import { notFound } from "next/navigation";
 import TournamentDetails from "@/features/tournament-search/tournament-details";
 
-export default async function DetailsPage({ params }: { params: { id: string } }) {
-    const { id: idStr } = await params
+export default async function DetailsPage({ params }: { params: { tournamentId: string } }) {
+    const { tournamentId: idStr } = await params
     const id = Number(idStr);
 
     if (isNaN(id) || id <= 0) {
