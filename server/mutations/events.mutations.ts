@@ -5,9 +5,11 @@ import {DateToISOStr} from "@/lib/types/zod.types";
 import {cookies} from "next/headers";
 import {createClient} from "@/server/db/server";
 import {MutationResponse} from "@/lib/types/types";
+import {doesTournamentExist} from "@/server/queries/tournaments.queries";
+import {doesEventExist} from "@/server/queries/events.queries";
 
 const EventInsertSchema = z.object({
-    tournament_id: z.number(),
+    tournament_id: z.number().refine(data => doesTournamentExist(data), {error: "Tournament ID does not exist"}),
     name: z.string().min(3).max(80),
     times: z.object({
         start_time: DateToISOStr,
@@ -120,6 +122,7 @@ async function isGamePlatformValid(videoGame: string, platform: string) {
 }
 
 const EventUpdateSchema = EventInsertSchema.safeExtend({id: z.number()})
+    .refine(data => doesEventExist(data.tournament_id, data.id), {error: "Event ID doesn't exist", path: ["id"]})
 
 export type EventUpdateErrors = {
     tournament_id?: string[],
@@ -227,11 +230,17 @@ export async function deleteEvent(tournamentId: number, eventId: number) {
     const cookieStore = await cookies()
     const supabase = await createClient(cookieStore)
 
+    if (!(await doesEventExist(tournamentId, eventId))) {
+        return {
+            success: false
+        }
+    }
+
     const {error} = await supabase.from('events').delete().eq('tournament_id', tournamentId).eq('id', eventId)
     if (error) {
         throw new Error("DB error while trying to delete from tournaments: " + error.details + " " + error.message)
     }
     return {
-        success: true,
+        success: true
     }
 }

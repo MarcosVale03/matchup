@@ -50,3 +50,24 @@ export async function fetchEventsFromTournamentId(tournamentId: number): Promise
         events: data
     }
 }
+
+
+
+export async function doesEventExist(tournamentId: number, eventId: number): Promise<boolean> {
+    const cookieStore = await cookies()
+    const supabase = await createClient(cookieStore)
+
+    const {count, error} = await supabase.from('events').select(`*`, {count: 'exact', head: true}).eq('tournament_id', tournamentId).eq('id', eventId);
+
+    // Throws error if something goes wrong
+    if (error) {
+        throw new Error("Tournament Query Failed: " + error.details + " " + error.message)
+    }
+
+    if (count === null) {
+        throw new Error("An unknown error occurred while querying the database.")
+    }
+
+    // Returns if query returns a value.
+    return count > 0
+}
