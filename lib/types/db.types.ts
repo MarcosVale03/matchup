@@ -810,6 +810,21 @@ export type Database = {
         Args: { w_identifier: string; w_tournament_id: number }
         Returns: undefined
       }
+      update_event: {
+        Args: {
+          e_end_time: string
+          e_gaming_platform_name: string
+          e_id: number
+          e_max_team_size?: number
+          e_name: string
+          e_price: number
+          e_start_time: string
+          e_teams_allowed: boolean
+          e_tournament_id: number
+          e_video_game_name: string
+        }
+        Returns: number
+      }
       update_post: {
         Args: { p_new_content: string; p_post_id: string }
         Returns: undefined

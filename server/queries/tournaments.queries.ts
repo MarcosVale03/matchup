@@ -92,7 +92,7 @@ export async function fetchTournamentsForSearch(searchQuery: string = "", startA
         throw new Error("Tournament Query Failed: " + error.details + " " + error.message)
     }
 
-    console.log(data)
+    // console.log(data)
 
     return data
 }

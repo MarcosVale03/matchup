@@ -7,6 +7,7 @@ import * as z from "zod"
 import {DateToISOStr, LocationSchema} from "@/lib/types/zod.types";
 import {MutationResponse} from "@/lib/types/types";
 import {UNALLOWED_SLUGS} from "@/lib/constants";
+import {doesTournamentExist} from "@/server/queries/tournaments.queries";
 
 const TournamentSchema = z.object({
     name: z.string().min(3).max(80),
@@ -172,7 +173,7 @@ async function isSlugUnique(slug: string, id?: number) {
 
 
 
-const TournamentUpdateSchema = TournamentSchema.safeExtend({id: z.number()})
+const TournamentUpdateSchema = TournamentSchema.safeExtend({id: z.number().refine(data => doesTournamentExist(data), {error: "Tournament ID doesn't exist"})})
     .refine(data => data.slug ? isSlugUnique(data.slug, data.id) : true, {error: "This slug is taken", path: ["slug"],})
 
 export type TournamentUpdateErrors = {
@@ -297,11 +298,17 @@ export async function deleteTournament(id: number) {
     const cookieStore = await cookies()
     const supabase = await createClient(cookieStore)
 
+    if (!(await doesTournamentExist(id))) {
+        return {
+            success: false
+        }
+    }
+
     const {error} = await supabase.from('tournaments').delete().eq('id', id)
     if (error) {
         throw new Error("DB error while trying to delete from tournaments: " + error.details + " " + error.message)
     }
     return {
-        success: true,
+        success: true
     }
 }
