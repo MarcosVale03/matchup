@@ -1,5 +1,6 @@
 import {fetchEventsFromTournamentId} from "@/server/queries/events.queries";
 import {notFound} from "next/navigation";
+import Link from "next/link";
 
 export default async function Page({ params }: { params: { tournamentId: string } }) {
     const { tournamentId: idStr } = await params
@@ -19,7 +20,7 @@ export default async function Page({ params }: { params: { tournamentId: string 
     return (<div>
         {events.map((event) => {
             return (<li key={event.id}>
-                {event.name}
+                <Link href={`/tournaments/${tournamentId}/events/${event.id}`}>{event.name}</Link>
             </li>)
         })}
     </div>)
