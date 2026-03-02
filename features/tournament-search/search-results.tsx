@@ -1,10 +1,10 @@
 import { formatDateTime } from "@/ui/format-time";
 import Image from "next/image";
 import Link from "next/link";
-import {TournamentsQueryResponse} from "@/server/queries/tournaments.queries";
+import {FetchTournamentsForSearchResponse} from "@/server/queries/tournaments.queries";
 
 
-export const SearchResults = ({ tournaments }: { tournaments: TournamentsQueryResponse[] }) => {
+export const SearchResults = ({ tournaments }: { tournaments: FetchTournamentsForSearchResponse }) => {
     // will have to limit the amount of shown results if too many are returned
 
     if (tournaments.length === 0) {

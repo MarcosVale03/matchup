@@ -22,11 +22,11 @@ export async function isUserTournamentAdmin(userId: string, tournamentId: number
 
     // Throws error if something goes wrong
     if (error) {
-        throw new Error("Tournament Query Failed: " + error.details + " " + error.message)
+        throw new Error("Admin Query Failed: " + error.details + " " + error.message)
     }
 
-    if (!count) {
-        throw new Error("An error ocurred while querying the database.")
+    if (count === null) {
+        throw new Error("An unknown error occurred while querying the database.")
     }
 
     // Returns if query returns a value.
