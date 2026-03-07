@@ -3,6 +3,7 @@ import { signUp } from '@/lib/auth';
 import React, { useState } from 'react';
 import MatchupDescription from '@/features/account-creation/matchup-des';
 import AuthCard from '@/features/account-creation/auth-card';
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 
 export default function SignupPage() {
     const [email, setEmail] = useState('');
@@ -11,20 +12,22 @@ export default function SignupPage() {
     const [lastName, setLastName] = useState('');
     const [gamertag, setGamertag] = useState('');
     const [prefix, setPrefix] = useState('');
-    const [message, setMessage] = useState('');
+    const [formErrors, setFormErrors] = useState<string[]>([]);
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
     const [loading, setLoading] = useState(false);
 
     const handleSignup = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        setMessage("");
+        setFormErrors([]);
+        setFieldErrors({});
 
         if (!email || !gamertag || !password || !firstName || !lastName || !prefix) {
-            setMessage("All fields are required");
+            setFormErrors(["All fields are required"]);
             return;
         }
 
         if (password.length < 8) {
-            setMessage("Password must be at least 8 characters long");
+            setFormErrors(["Password must be at least 8 characters long"]);
             return;
         }
 
@@ -33,17 +36,17 @@ export default function SignupPage() {
             const result = await signUp(email, password, firstName, lastName, gamertag, prefix);
             setLoading(false);
 
-            /**
-             * @todo Implement form and field error messages returned from signUp()
-             */
             if (!result.success) {
-                setMessage(result.formErrors?.toString() || "Signup failed due to an unknown error.");
+                setFieldErrors(result.fieldErrors ?? {});
+                setFormErrors(result.formErrors ?? [])
                 return;
             }
         } catch (err) {
-            setLoading(false);
+            if (isRedirectError(err)) throw err;
             console.log(err);
-            setMessage("Something went wrong. Please try again later.")
+            setFormErrors(["Something went wrong. Please try again later."])
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -65,7 +68,8 @@ export default function SignupPage() {
                         gamertag={gamertag}
                         prefix={prefix}
                         isLoading={loading}
-                        message={message}
+                        fieldErrors={fieldErrors}
+                        formErrors={formErrors}
                         authType="Signup"
                         handleAuth={handleSignup}
                         onEmailChange={setEmail}

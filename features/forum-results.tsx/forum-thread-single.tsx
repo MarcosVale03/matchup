@@ -1,25 +1,32 @@
 'use client'
-import {CheckCircle, ChevronDown, Plus } from "lucide-react";
+import { ChevronDown, Plus } from "lucide-react";
 import { useState } from "react";
 import { formatDateTime } from "@/ui/format-time";
 import { fetchThreadWithPosts } from "@/server/queries/forum.queries";
 import AddForumPost from "../forum-crud/add-post";
 import ForumPostsList from "./forum-post-list";
 import DeleteThread from "../forum-crud/delete-thread";
-import { User } from '@supabase/supabase-js';
 import { Post, Thread } from "@/server/queries/forum.queries";
-
+import { useProfile } from "@/app/client-layout";
+import {useToast} from "@/ui/use-toast";
+import {Toast} from "@/ui/toast";
 
 
 // onDeleteAction calls handleThreadDeleted in forum-thread-list to show success message after deleting a thread
 // Post logic is handled here, with individual crud operations in their respective components.
-export default function ForumThreadSingle({thread, onThreadDeleteAction, user}: {
-    thread: Thread,
-    onThreadDeleteAction?: () => void,
-    user: User | null,
+export default function ForumThreadSingle({
+    thread,
+    onThreadDeleteAction
+}: {
+    thread: Thread;
+    onThreadDeleteAction?: () => void;
 }) {
+
+    const { user } = useProfile();
+    const toast = useToast();
+
     // used to show the add post form when clicking the plus button
-    const [isAddFormOpen, setIsAddFormOpen] = useState(false);
+    const [isAddPostOpen, setIsAddPostOpen] = useState(false);
 
     // used to show if the posts for this thread are open or not
     const [arePostsOpen, setArePostsOpen] = useState(false);
@@ -27,21 +34,13 @@ export default function ForumThreadSingle({thread, onThreadDeleteAction, user}: 
     const [error, setError] = useState<string | null>(null);
     const [posts, setPosts] = useState<Post[]>([]);
     const [isLoadingPosts, setIsLoadingPosts] = useState(false);
-    const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
     // Toggle posts visibility and fetch posts if opening
     const openPosts = async (opts?: { refresh?: boolean }) => {
         const refresh = opts?.refresh ?? true;
-
-        // if already open and refresh=false, do nothing
         if (arePostsOpen && !refresh) return;
 
-        // open the UI immediately
         setArePostsOpen(true);
-
-        // avoid overlapping requests
-        if (isLoadingPosts) return;
-
         setIsLoadingPosts(true);
         setError(null);
 
@@ -54,19 +53,17 @@ export default function ForumThreadSingle({thread, onThreadDeleteAction, user}: 
         } finally {
             setIsLoadingPosts(false);
         }
-    }
+    };
+
     // Handle post deletion, addition, and update to show success messages and update the posts list
     const handlePostDeleted = (postId: string) => {
         setPosts(prev => prev.filter(post => post.id !== postId));
-        setSuccessMessage("Post deleted successfully!");
-        setTimeout(() => setSuccessMessage(null), 3000);
+        toast.show("Post deleted successfully!")
     };
 
     const handlePostAdded = async () => {
-        setSuccessMessage("Post added successfully!");
-        setTimeout(() => setSuccessMessage(null), 3000);
-
-        setIsAddFormOpen(false);
+        toast.show("Post deleted successfully!")
+        setIsAddPostOpen(false);
 
         // force refresh so the new post shows up
         await openPosts({refresh: true});
@@ -78,8 +75,7 @@ export default function ForumThreadSingle({thread, onThreadDeleteAction, user}: 
                 post.id === updatedPost.id ? updatedPost : post
             )
         );
-        setSuccessMessage("Post updated successfully!");
-        setTimeout(() => setSuccessMessage(null), 3000);
+        toast.show("Post updated successfully!")
     };
 
     // Toggle posts visibility when clicking the button, if opening and posts are already fetched, don't re-fetch
@@ -141,7 +137,7 @@ export default function ForumThreadSingle({thread, onThreadDeleteAction, user}: 
                             {/* Add post button */}
                             <button
                                 type="button"
-                                onClick={() => setIsAddFormOpen(true)}
+                                onClick={() => setIsAddPostOpen(true)}
                                 className="p-2.5 sm:p-2 text-gray-600 hover:text-primary
                                                  hover:bg-gray-100 rounded-lg transition-colors
                                                  active:bg-gray-200 touch-manipulation"
@@ -172,11 +168,11 @@ export default function ForumThreadSingle({thread, onThreadDeleteAction, user}: 
             </p>
 
             {/* Add Post Form, expands when clicking the plus button*/}
-            {isAddFormOpen && (
+            {isAddPostOpen && (
                 <AddForumPost
                     thread={thread}
                     onPostAddedAction={handlePostAdded}
-                    onPostCancelAction={() => setIsAddFormOpen(false)}
+                    onPostCancelAction={() => setIsAddPostOpen(false)}
                 />
             )}
 
@@ -191,14 +187,8 @@ export default function ForumThreadSingle({thread, onThreadDeleteAction, user}: 
                     className={`size-4 place-self-center transition-transform ${arePostsOpen ? "rotate-180" : ""}`}/>
             </button>
 
-            {/* Success message for the posts*/}
-            {successMessage && (
-                <div
-                    className="flex items-center gap-2 p-3 mt-1 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">
-                    <CheckCircle className="w-5 h-5"/>
-                    {successMessage}
-                </div>
-            )}
+            {/* Success message for the posts */}
+            <Toast message={toast.message} />
 
             {/* Error message for the posts */}
             {error && (
@@ -207,15 +197,21 @@ export default function ForumThreadSingle({thread, onThreadDeleteAction, user}: 
                 </div>
             )}
 
+            {/* Loading state */}
+            {arePostsOpen && isLoadingPosts && (
+                <p className="text-sm text-gray-400 mt-2">Loading posts...</p>
+            )}
+
             {/* Forum Posts */}
-            <ForumPostsList
-                isOpen={arePostsOpen}
-                thread={thread}
-                posts={posts}
-                onPostDelete={handlePostDeleted}
-                onPostUpdate={handlePostUpdated}
-                user={user}
-            />
+            {arePostsOpen && !isLoadingPosts && (
+                <ForumPostsList
+                    thread={thread}
+                    posts={posts}
+                    onPostDelete={handlePostDeleted}
+                    onPostUpdate={handlePostUpdated}
+                />
+            )}
+
         </div>
     );
 }

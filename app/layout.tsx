@@ -53,7 +53,9 @@ export default async function RootLayout({
             <body
                 className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable} antialiased`}
             >
-            <ClientLayout initialUser={user}>
+            <ClientLayout
+                initialUser={user}
+            >
                 <NavigationBar />
                 {children}
             </ClientLayout>

@@ -46,7 +46,6 @@ export default function AddForumThread({ onAddAction }: { onAddAction: () => voi
         }
     }
 
-    
     return (
         <main className="">
             {/* Create Post Form | Expands when clicking the button */}

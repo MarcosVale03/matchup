@@ -2,7 +2,7 @@ import { TournamentUpdateErrors } from "@/server/mutations/tournaments.mutations
 import { X } from "lucide-react";
 import React from "react";
 
-export function ErrorMessage({ field, fieldErrors }: {
+export function ErrorMessageForTournament({ field, fieldErrors }: {
     field: keyof TournamentUpdateErrors;
     fieldErrors: TournamentUpdateErrors;
 }) {

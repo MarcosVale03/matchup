@@ -3,19 +3,20 @@ import React, { useState } from 'react';
 import { signInWithEmail } from '@/lib/auth';
 import MatchupDescription from '@/features/account-creation/matchup-des';
 import AuthCard from '@/features/account-creation/auth-card';
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [message, setMessage] = useState('');
+    const [formErrors, setFormErrors] = useState<string[]>([]);
     const [loading, setLoading] = useState(false)
 
     const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        setMessage("");
+        setFormErrors([]);
 
         if (!email || !password) {
-            setMessage("Please enter your email and password");
+            setFormErrors(["Please enter your email and password"]);
             return;
         }
 
@@ -25,13 +26,15 @@ export default function LoginPage() {
             setLoading(false);
 
             if (!result.success) {
-                setMessage("Sign in failed due to an unknown error.");
+                setFormErrors([result.error]);
                 return;
             }
         } catch (err) {
-            setLoading(false);
+            if (isRedirectError(err)) throw err;
             console.log(err);
-            setMessage("Something went wrong. Please try again later.")
+            setFormErrors(["Something went wrong. Please try again later."])
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -46,7 +49,7 @@ export default function LoginPage() {
                     email={email}
                     password={password}
                     isLoading={loading}
-                    message={message}
+                    formErrors={formErrors}
                     authType='Login'
                     handleAuth={handleLogin}
                     onEmailChange={setEmail}

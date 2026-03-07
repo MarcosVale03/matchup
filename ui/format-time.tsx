@@ -13,15 +13,16 @@ const customDateTimeOptions: Intl.DateTimeFormatOptions = {
  * @param date The Date object to format.
  * @returns The formatted date and time string.
  */
-export function formatDateTime(date: Date | string): string {
-    const newDate = typeof date === 'string' ? new Date(date) : date;
+export function formatDateTime(date?: Date | string): string {
+    if (!date) return "N/A";
 
-    // Check for invalid dates
+    const newDate = typeof date === "string" ? new Date(date) : date;
+
     if (isNaN(newDate.getTime())) {
-        return 'N/A';
+        return "N/A";
     }
-    
-    return newDate.toLocaleString('en-US', customDateTimeOptions);
+
+    return newDate.toLocaleString("en-US", customDateTimeOptions);
 }
 
 /**

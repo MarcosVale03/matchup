@@ -1,12 +1,12 @@
 'use client';
 
 import BasicInputWithLabel from '@/ui/basic-input-with-label';
-import React, {useState} from 'react';
-import {useRouter} from 'next/navigation';
-import {insertTournament, TournamentInsertErrors} from '@/server/mutations/tournaments.mutations';
-import {dateToInputString} from "@/lib/utils";
-import {ArrowRight} from 'lucide-react';
-import {ErrorMessage} from "@/ui/error-message";
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { insertTournament, TournamentInsertErrors } from '@/server/mutations/tournaments.mutations';
+import { dateToInputString } from "@/lib/utils";
+import { ArrowRight } from 'lucide-react';
+import { ErrorMessageForTournament } from "@/ui/error-message-tournament";
 
 // Initial state for the form
 interface FormState {
@@ -145,7 +145,7 @@ export default function TournamentInsertForm() {
                                 inputPlaceholder="Enter tournament name"
                                 inputClassName={pageInputClass}
                             />
-                            <ErrorMessage field='name' fieldErrors={fieldErrors}/>
+                            <ErrorMessageForTournament field='name' fieldErrors={fieldErrors}/>
                         </div>
 
                         {/* Slug */}
@@ -162,7 +162,7 @@ export default function TournamentInsertForm() {
                                 inputPlaceholder="e.g., mytourney2025"
                                 inputClassName={pageInputClass}
                             />
-                            <ErrorMessage field='slug' fieldErrors={fieldErrors}/>
+                            <ErrorMessageForTournament field='slug' fieldErrors={fieldErrors}/>
                         </div>
 
                         {/* Start Time */}
@@ -182,7 +182,7 @@ export default function TournamentInsertForm() {
                                 inputPlaceholder=""
                                 inputClassName={pageInputClass}
                             />
-                            <ErrorMessage field='times' fieldErrors={fieldErrors}/>
+                            <ErrorMessageForTournament field='times' fieldErrors={fieldErrors}/>
                         </div>
 
                         {/* End Time */}
@@ -242,7 +242,7 @@ export default function TournamentInsertForm() {
                                 inputPlaceholder="e.g., 123 Main St, Anytown"
                                 inputClassName={pageInputClass}
                             />
-                            <ErrorMessage field='location' fieldErrors={fieldErrors}/>
+                            <ErrorMessageForTournament field='location' fieldErrors={fieldErrors}/>
                         </>
                     )}
                 </fieldset>
@@ -289,10 +289,7 @@ export default function TournamentInsertForm() {
                             Private
                         </label>
                     </div>
-
-
                 </fieldset>
-
 
                 {/* Contact Information */}
                 <fieldset className="space-y-4 p-4 sm:p-5 border border-gray-300 rounded-md mb-6 w-full">
@@ -333,7 +330,7 @@ export default function TournamentInsertForm() {
                             />
                         </div>
                     </div>
-                    <ErrorMessage field='contact' fieldErrors={fieldErrors}/>
+                    <ErrorMessageForTournament field='contact' fieldErrors={fieldErrors}/>
                 </fieldset>
 
                 {/* Submit Button */}
@@ -341,11 +338,14 @@ export default function TournamentInsertForm() {
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="w-full flex items-center justify-center gap-2 py-2.5 sm:py-3 px-4 border border-transparent rounded-md shadow-sm text-sm sm:text-base font-medium
-                                       text-white bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 
-                                       focus:ring-primary disabled:opacity-50 transition-colors"
+                        className="w-full flex items-center justify-center gap-2 py-2.5 sm:py-3 px-4 border
+                        border-transparent rounded-md shadow-sm text-sm sm:text-base font-medium
+                        text-white bg-primary hover:bg-secondary focus:outline-none focus:ring-2
+                        focus:ring-offset-2 focus:ring-primary disabled:opacity-50 transition-colors"
                     >
-                        <span>{isSubmitting ? 'Going to events...' : 'Create events for this tournament'}</span>
+                        <span>
+                            {isSubmitting ? 'Going to events...' : 'Create events for this tournament'}
+                        </span>
                         <ArrowRight size={18} className='shrink-0'/>
                     </button>
                 </div>

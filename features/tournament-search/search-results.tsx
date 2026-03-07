@@ -51,7 +51,7 @@ export const SearchResults = ({ tournaments }: { tournaments: FetchTournamentsFo
                                         className="mr-1"
                                     />
                                     <p className="text-sm text-gray-800 font-bold">
-                                        Owner: {tournament.owner.display_name}
+                                        {tournament.owner.display_name}
                                     </p>
                                 </div>
                             </div>
@@ -60,7 +60,8 @@ export const SearchResults = ({ tournaments }: { tournaments: FetchTournamentsFo
                             <div className="mb-2 mt-2 place-self-center sm:mb-0 shrink-0">
                                 <Link
                                     href={`/tournaments/${tournament.id}`}
-                                    className="bg-primary text-white p-3 rounded-lg hover:bg-red-800 hover:cursor-pointer"
+                                    className="bg-primary text-white p-3 rounded-lg hover:bg-secondary
+                                    hover:cursor-pointer transition duration-200"
                                 >
                                     View Details
                                 </Link>

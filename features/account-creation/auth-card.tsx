@@ -10,7 +10,8 @@ type AuthCardProps = {
     gamertag?: string;
     prefix?: string;
     isLoading: boolean;
-    message: string;
+    formErrors:  string[] | undefined;
+    fieldErrors?:  Record<string, string[]> | undefined;
     authType: 'Signup' | 'Login';
     handleAuth: (event: React.FormEvent<HTMLFormElement>) => Promise<void>;
     onEmailChange: (value: string) => void;
@@ -29,7 +30,8 @@ export default function AuthCard({
     gamertag,
     prefix,
     isLoading,
-    message,
+    formErrors,
+    fieldErrors,
     authType,
     handleAuth,
     onEmailChange,
@@ -65,7 +67,6 @@ export default function AuthCard({
                         focus:border-primary text-sm sm:text-base`;
     const pageLabelClass = "text-left text-gray-500 text-sm sm:text-base";
 
-
     return (
         <main
             className={`flex flex-col place-content-center bg-white rounded-b-lg sm:rounded-r-lg
@@ -96,10 +97,13 @@ export default function AuthCard({
                     inputId="emailInput"
                     inputValue={email}
                     inputOnChange={(e) => onEmailChange(e.target.value)}
-                    required={true}
+                    required={false}
                     inputPlaceholder="Enter your email"
                     inputClassName={pageInputClass}
                 />
+                {fieldErrors?.email && (
+                    <p className="text-red-500 text-xs mt-1">{fieldErrors.email[0]}</p>
+                )}
 
                 {/* Password */}
                 <BasicInputWithLabel
@@ -110,10 +114,13 @@ export default function AuthCard({
                     inputId="password"
                     inputValue={password}
                     inputOnChange={(e) => onPasswordChange(e.target.value)}
-                    required={true}
+                    required={false}
                     inputPlaceholder={authType === "Signup" ? "At least 8 characters" : "Enter your password"}
                     inputClassName={pageInputClass}
                 />
+                {fieldErrors?.password && (
+                    <p className="text-red-500 text-xs mt-1">{fieldErrors.password[0]}</p>
+                )}
 
                 {/* For signup */}
                 {authType === 'Signup' && (
@@ -127,10 +134,13 @@ export default function AuthCard({
                             inputId="gamertag"
                             inputValue={gamertag}
                             inputOnChange={(e) => onGamerTagChange?.(e.target.value)}
-                            required={true}
+                            required={false}
                             inputPlaceholder={"Enter a gamertag"}
                             inputClassName={pageInputClass}
                         />
+                        {fieldErrors?.display_name && (
+                            <p className="text-red-500 text-xs mt-1">{fieldErrors.display_name[0]}</p>
+                        )}
 
                         {/* First Name */}
                         <BasicInputWithLabel
@@ -141,10 +151,13 @@ export default function AuthCard({
                             inputId="firstName"
                             inputValue={firstName}
                             inputOnChange={(e) => onFirstNameChange?.(e.target.value)}
-                            required={true}
+                            required={false}
                             inputPlaceholder={"Enter your first name"}
                             inputClassName={pageInputClass}
                         />
+                        {fieldErrors?.first_name && (
+                            <p className="text-red-500 text-xs mt-1">{fieldErrors.first_name[0]}</p>
+                        )}
 
                         {/* Last Name */}
                         <BasicInputWithLabel
@@ -155,10 +168,13 @@ export default function AuthCard({
                             inputId="lastName"
                             inputValue={lastName}
                             inputOnChange={(e) => onLastNameChange?.(e.target.value)}
-                            required={true}
+                            required={false}
                             inputPlaceholder={"Enter your last name"}
                             inputClassName={pageInputClass}
                         />
+                        {fieldErrors?.last_name && (
+                            <p className="text-red-500 text-xs mt-1">{fieldErrors.last_name[0]}</p>
+                        )}
 
                         {/* Prefix */}
                         <BasicInputWithLabel
@@ -173,6 +189,9 @@ export default function AuthCard({
                             inputPlaceholder={"Enter a prefix"}
                             inputClassName={pageInputClass}
                         />
+                        {fieldErrors?.prefix && (
+                            <p className="text-red-500 text-xs mt-1">{fieldErrors.prefix[0]}</p>
+                        )}
                     </>
                 )}
             </form>
@@ -191,16 +210,13 @@ export default function AuthCard({
                 {isLoading ? 'Loading...' : (authType === 'Signup' ? 'Create Account' : 'Login')}
             </button>
 
-            {/* Error/Email confirmation message */}
-            {message && (
-                <p
-                    className={`text-xs sm:text-sm text-center px-2 ${message === "Check your email for confirmation link"
-                            ? "text-blue-500"
-                            : "text-red-500"
-                        }`}
-                >
-                    {message}
+
+            {/* Error message */}
+            {formErrors && (!fieldErrors || Object.keys(fieldErrors).length === 0) && (
+                <p className="text-xs sm:text-sm text-center px-2 text-red-500">
+                    {formErrors.join(", ")}
                 </p>
+
             )}
 
             {/* Footer to switch to login/signup */}

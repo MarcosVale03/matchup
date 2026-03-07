@@ -1,4 +1,4 @@
-import ForumPostList from '@/features/forum-results.tsx/forum-thread-list';
+import ForumThreadList from '@/features/forum-results.tsx/forum-thread-list';
 import { fetchThreads } from '@/server/queries/forum.queries';
 
 export default async function ForumsPage() {
@@ -14,7 +14,7 @@ export default async function ForumsPage() {
                     <h1 className="text-center font-bold text-primary mb-5 sm:mb-6 lg:mb-8 text-xl sm:text-3xl lg:text-4xl">
                         Welcome to the Matchup Forums: Connect and Share!
                     </h1>
-                    <ForumPostList posts={[]} />
+                    <ForumThreadList posts={[]} />
                 </div>
             </main>
         );
@@ -29,7 +29,7 @@ export default async function ForumsPage() {
                     Welcome to the Matchup Forums: Connect and Share!
                 </h1>
                 
-                <ForumPostList posts={posts.data} />
+                <ForumThreadList posts={posts.data} />
             </div>
         </main>
     );

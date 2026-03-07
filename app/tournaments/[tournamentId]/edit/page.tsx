@@ -14,7 +14,6 @@ export default async function EditTournamentPage({ params }: { params: { tournam
 
     const { data: { user } } = await supabase.auth.getUser();
 
-
     const { success, tournament } = await fetchTournamentFromId(id);
 
     if (!success || !tournament) {

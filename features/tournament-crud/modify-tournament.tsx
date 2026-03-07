@@ -1,12 +1,12 @@
 'use client';
 import BasicInputWithLabel from '@/ui/basic-input-with-label';
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { updateTournament, TournamentUpdateErrors } from '@/server/mutations/tournaments.mutations';
-import { ArrowLeft, Save } from 'lucide-react';
-import { FetchTournamentFromIdResponse } from "@/server/queries/tournaments.queries";
-import { toDateTimeLocalInput } from '@/ui/format-time';
-import { ErrorMessage } from "@/ui/error-message";
+import React, {useState} from 'react';
+import {useRouter} from 'next/navigation';
+import {updateTournament, TournamentUpdateErrors} from '@/server/mutations/tournaments.mutations';
+import {ArrowLeft, Save} from 'lucide-react';
+import {FetchTournamentFromIdResponse} from "@/server/queries/tournaments.queries";
+import {toDateTimeLocalInput} from '@/ui/format-time';
+import {ErrorMessageForTournament} from "@/ui/error-message-tournament";
 
 export default function TournamentEditForm({initialData}: { initialData: FetchTournamentFromIdResponse }) {
     const router = useRouter();
@@ -127,7 +127,7 @@ export default function TournamentEditForm({initialData}: { initialData: FetchTo
                                 inputPlaceholder="Enter tournament name"
                                 inputClassName={pageInputClass}
                             />
-                            <ErrorMessage field='name' fieldErrors={fieldErrors}/>
+                            <ErrorMessageForTournament field='name' fieldErrors={fieldErrors}/>
                         </div>
 
                         {/* Slug */}
@@ -144,7 +144,7 @@ export default function TournamentEditForm({initialData}: { initialData: FetchTo
                                 inputPlaceholder="e.g., mytourney2025"
                                 inputClassName={pageInputClass}
                             />
-                            <ErrorMessage field='slug' fieldErrors={fieldErrors}/>
+                            <ErrorMessageForTournament field='slug' fieldErrors={fieldErrors}/>
                         </div>
 
                         {/* Start Time */}
@@ -161,7 +161,7 @@ export default function TournamentEditForm({initialData}: { initialData: FetchTo
                                 inputPlaceholder=""
                                 inputClassName={pageInputClass}
                             />
-                            <ErrorMessage field='times' fieldErrors={fieldErrors}/>
+                            <ErrorMessageForTournament field='times' fieldErrors={fieldErrors}/>
                         </div>
 
                         {/* End Time */}
@@ -178,7 +178,7 @@ export default function TournamentEditForm({initialData}: { initialData: FetchTo
                                 inputPlaceholder=""
                                 inputClassName={pageInputClass}
                             />
-                            <ErrorMessage field='times' fieldErrors={fieldErrors}/>
+                            <ErrorMessageForTournament field='times' fieldErrors={fieldErrors}/>
                         </div>
                     </div>
                 </fieldset>
@@ -219,7 +219,7 @@ export default function TournamentEditForm({initialData}: { initialData: FetchTo
                                 inputPlaceholder="e.g., 123 Main St, Anytown"
                                 inputClassName={pageInputClass}
                             />
-                            <ErrorMessage field='location' fieldErrors={fieldErrors}/>
+                            <ErrorMessageForTournament field='location' fieldErrors={fieldErrors}/>
                         </>
                     )}
                 </fieldset>
@@ -233,36 +233,36 @@ export default function TournamentEditForm({initialData}: { initialData: FetchTo
                     <div className="flex items-center">
                         <input
                             type="radio"
-                            id="tournament-private"
-                            name="visibility"
-                            value="private"
-                            className="h-4 w-4 accent-primary shrink-0"
-                            onChange={handleChange}
-                            onClick={() => setFormData({...formData, isPublic: false})}
-                        />
-                        <label
-                            htmlFor="tournament-private"
-                            className="ml-2 text-sm font-medium text-gray-700"
-                        >
-                            Private
-                        </label>
-                    </div>
-
-                    <div className="flex items-center">
-                        <input
-                            type="radio"
                             id="tournament-public"
                             name="visibility"
                             value="public"
+                            checked={formData.isOnline}
                             className="h-4 w-4 accent-primary shrink-0"
                             onChange={handleChange}
-                            onClick={() => setFormData({...formData, isPublic: true})}
                         />
                         <label
                             htmlFor="tournament-public"
                             className="ml-2 text-sm font-medium text-gray-700"
                         >
                             Public
+                        </label>
+                    </div>
+
+                    <div className="flex items-center">
+                        <input
+                            type="radio"
+                            id="tournament-private"
+                            name="visibility"
+                            value="private"
+                            checked={!formData.isOnline}
+                            className="h-4 w-4 accent-primary shrink-0"
+                            onChange={handleChange}
+                        />
+                        <label
+                            htmlFor="tournament-private"
+                            className="ml-2 text-sm font-medium text-gray-700"
+                        >
+                            Private
                         </label>
                     </div>
                 </fieldset>
@@ -306,7 +306,7 @@ export default function TournamentEditForm({initialData}: { initialData: FetchTo
                             />
                         </div>
                     </div>
-                    <ErrorMessage field='contact' fieldErrors={fieldErrors}/>
+                    <ErrorMessageForTournament field='contact' fieldErrors={fieldErrors}/>
                 </fieldset>
 
                 {/* Back/Submit Button */}
