@@ -49,6 +49,9 @@ export async function fetchTournamentsForSearch(searchQuery: string = "", startA
     const pageStart = page * perPage
     const pageEnd = pageStart + perPage - 1
 
+    const { data: { user } } = await supabase.auth.getUser()
+    const userId = user?.id
+
     // Create db query
     let query = supabase.from('tournaments').select(`
         id,
@@ -74,7 +77,7 @@ export async function fetchTournamentsForSearch(searchQuery: string = "", startA
         events!inner (
             video_game_name
         )`*/)
-        .range(pageStart, pageEnd).eq('is_public', true).gt('start_time', startAfter.toISOString()).order('start_time')
+        .range(pageStart, pageEnd).gt('start_time', startAfter.toISOString()).order('start_time')
 
     // query = videoGame ? query.eq('events.video_game_name', videoGame) : query
     

@@ -115,7 +115,7 @@ drop table "public"."offline_events";
 drop table "public"."offline_tournaments";
 
 /*Adding is_online and location_id columns to tournaments*/
-alter table "public"."tournaments" add column "is_online" boolean not null;
+alter table "public"."tournaments" add column "is_online" boolean not null default false;
 
 alter table "public"."tournaments" add column "location_id" bigint default NULL;
 
@@ -303,7 +303,7 @@ alter table "public"."users" add column "show_results" boolean not null default 
 
 alter table "public"."users" add column "state" character varying;
 
-alter table "public"."users" add column "time_joined" timestamp with time zone not null;
+alter table "public"."users" add column "time_joined" timestamp with time zone not null default now();
 
 /*Update hande_new_user function*/
 CREATE OR REPLACE FUNCTION public.handle_new_user()
