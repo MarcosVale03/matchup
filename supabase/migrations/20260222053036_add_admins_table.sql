@@ -93,3 +93,10 @@ VALUES (t_id, loc_id);
 RETURN t_id;
 END;$function$
 ;
+INSERT INTO "public"."permission_levels" ("id", "name", "description") VALUES
+    (0, 'Owner', 'Highest permission level. Usually the creator of the tournament.'),
+    (1, 'Admin', 'Can access all pages related to a tournament.'),
+    (2, 'Moderator', 'Can access all pages except Permissions, Publishing & Payments Setup.'),
+    (3, 'Bracket Manager', 'Can access all pages within the Events & Reporting sections.'),
+    (4, 'Reporter', 'Can access all pages within the Reporting section.');
+  
