@@ -21,6 +21,7 @@ export default async function ProfilePage() {
         fetchPastTournaments(user.id),
     ]);
 
+    // if there is no profile, assume there is no user and go to login
     if (!profileResult.success || !profileResult.data) {
         redirect("/login");
     }

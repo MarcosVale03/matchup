@@ -9,7 +9,7 @@ export default async function Page({ params }: { params: { tournamentId: string,
     if (isNaN(tournamentId) || tournamentId <= 0 || isNaN(eventId) || eventId <= 0) {
         notFound();
     }
-
+    console.log(tournamentId, eventId);
     const {success, event} = await fetchEventFromEventId(tournamentId, eventId);
 
     if (!success || event === undefined) {

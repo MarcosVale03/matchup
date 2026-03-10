@@ -77,7 +77,11 @@ export async function fetchFutureTournaments(user_id: string): Promise<QueryResp
     const curr_date = new Date().toISOString()
 
     // getting all tournaments that has the users id in it and are in the future
-    const {data, error} = await supabase.from('tournaments').select('*, users!tournaments_users_fk_01(display_name), attendees!inner(user_id)').eq('attendees.user_id', user_id).gt('start_time', curr_date)
+    const {data, error} = await supabase
+        .from('tournaments')
+        .select('*, users!tournaments_users_fk_01(display_name), attendees!inner(user_id)')
+        .eq('attendees.user_id', user_id)
+        .gt('start_time', curr_date)
 
     // error check
     if (error) {
@@ -94,7 +98,7 @@ export async function fetchFutureTournaments(user_id: string): Promise<QueryResp
     }
 }
 
-export async function fetchPastTournaments(user_id: string): Promise<QueryResponse<PastTournamentsResponse>> {
+export async function fetchPastTournaments(user_id : string): Promise<QueryResponse<PastTournamentsResponse>> {
 
     // creating client
     const cookieStore = await cookies()

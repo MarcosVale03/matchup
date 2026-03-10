@@ -3,10 +3,10 @@ import { SearchResults } from '@/features/tournament-search/search-results';
 import SearchControls from '@/features/tournament-search/search-controls';
 
 export default async function TournamentSearchPage({ searchParams }: {
-    searchParams: { query?: string; startDate?: string }
+    searchParams: { query?: string; start_date?: string }
 }) {
-    const { query = '', startDate } = await searchParams;
-    const dateToSearch = startDate ? new Date(startDate) : new Date(0);
+    const { query = '', start_date } = await searchParams;
+    const dateToSearch = start_date ? new Date(start_date) : new Date(0);
 
     const tournaments = await fetchTournamentsForSearch(query, dateToSearch) ?? [];
 

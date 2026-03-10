@@ -45,7 +45,7 @@ export default function SearchControls() {
                 searchPlaceholder="Search tournaments by name..."
                 inputClassName="w-full p-3 pl-10 sm:p-4 sm:pl-10 text-sm sm:text-base text-gray-800 border-2
                                 border-gray-300 rounded-lg focus:outline-none focus:border-primary
-                                transition duration-150 sm:rounded-r-none"
+                                transition duration-150 sm:rounded-r-none [&::-webkit-search-cancel-button]:hidden"
             />
 
             {/* Date Filter */}

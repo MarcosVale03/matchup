@@ -11,9 +11,9 @@ export type TournamentPermissions = {
 };
 
 export default function TournamentDetails({
-                                              tournament,
-                                              permissions
-                                          }: {
+    tournament,
+    permissions
+}: {
     tournament: FetchTournamentFromIdResponse;
     permissions: TournamentPermissions;
 }) {
@@ -30,16 +30,19 @@ export default function TournamentDetails({
 
                 <div
                     className="flex flex-col lg:flex-row items-start lg:items-center mb-5 gap-3 lg:gap-0 justify-between">
-                    <h1 className="text-3xl lg:text-5xl wrap-break-word">
+
+                    {/* Tournament Name */}
+                    <h1 className="text-3xl lg:text-5xl font-extrabold tracking-tight text-primary wrap-break-word">
                         {tournament.name}
                     </h1>
 
+                    {/* Shows edit option if user has permissions */}
                     {permissions.canEdit && (
                         <button
                             onClick={handleEditClick}
                             className="flex items-center justify-center gap-2 p-2 px-4 lg:mt-0 border border-transparent
                             rounded-md shadow-sm text-sm sm:text-base font-medium text-white bg-primary
-                            hover:bg-secondary disabled:opacity-50 transition-colors"
+                            hover:bg-secondary cursor-pointer disabled:opacity-50 transition-colors duration-200"
                         >
                             <Pencil size={19}/>
                             Edit Tournament
@@ -47,7 +50,7 @@ export default function TournamentDetails({
                     )}
                 </div>
 
-                <div className="flex flex-col sm:flex-row text-base sm:text-lg lg:text-xl">
+                <div className="flex flex-col sm:flex-row text-base sm:text-lg">
 
                     {/* Tournament Organizer */}
                     <div className="flex flex-col w-full p-3">
@@ -65,7 +68,7 @@ export default function TournamentDetails({
                         </div>
                     </div>
 
-                    {/* Date */}
+                    {/* Start date */}
                     <div className="flex flex-col w-full p-3">
                         <h2>
                             Starts
@@ -77,6 +80,7 @@ export default function TournamentDetails({
                         </div>
                     </div>
 
+                    {/* End date */}
                     <div className="flex flex-col w-full p-3">
                         <h2>
                             Ends
@@ -90,14 +94,13 @@ export default function TournamentDetails({
                 </div>
             </div>
 
-            <div
-                className="bg-primary text-white flex flex-col lg:flex-row tracking-wide text-lg
-                wrap-break-word"
-            >
+            <div className="bg-primary text-white flex flex-col lg:flex-row tracking-wide wrap-break-word text-lg">
 
                 {/* Visibility */}
                 <div
-                    className="border-b-2 border-b-secondary lg:border-b-0 lg:border-r-2 lg:border-r-secondary w-full p-4 lg:p-5">
+                    className="border-b-2 border-b-secondary lg:border-b-0 lg:border-r-2 lg:border-r-secondary
+                    w-full p-4 lg:p-5"
+                >
                     <h2 className="mb-2 text-lg">
                         Visibility
                     </h2>
@@ -198,13 +201,19 @@ export default function TournamentDetails({
                 {/* All events container */}
                 <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-4">
 
+                    {/* Making 4 event placeholders for now */}
                     {[...Array(4)].map((_, i) => (
                         <div key={i} className="border border-gray-300">
                             <div
-                                className="relative bg-gray-800 py-12 sm:py-16 lg:py-20 text-center text-3xl sm:text-4xl lg:text-5xl text-white">
+                                className="relative bg-gray-800 py-12 sm:py-16 lg:py-20 text-center text-3xl
+                                sm:text-4xl lg:text-5xl text-white">
+                                {/* image goes here */}
                                 IMG
+
+                                {/* Game name in the bottom left corner of image */}
                                 <div
-                                    className="absolute text-white left-3 bottom-3 sm:left-5 sm:bottom-5 bg-gray-900 px-2 py-1 sm:p-2 font-semibold text-xs sm:text-sm"
+                                    className="absolute text-white left-3 bottom-3 sm:left-5 sm:bottom-5
+                                    bg-gray-900 px-2 py-1 sm:p-2 font-semibold text-xs sm:text-sm"
                                 >
                                     Game Name
                                 </div>
@@ -215,7 +224,7 @@ export default function TournamentDetails({
                                 <div
                                     className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
                                     <div>
-                                        <p className="text-xl sm:text-2xl font-bold">
+                                        <p className="text-xl sm:text-2xl font-bold text-secondary">
                                             Event Name
                                         </p>
                                         <p className="text-sm">
@@ -235,6 +244,8 @@ export default function TournamentDetails({
                                 {/* Event Information */}
                                 <div
                                     className="grid grid-cols-1 xs:grid-cols-2 mt-3 border-y-2 border-y-gray-300 py-4 gap-y-3">
+
+                                    {/* Entry Fee */}
                                     <div>
                                         <h3 className="text-sm sm:text-base">
                                             Entry Fee
@@ -244,6 +255,7 @@ export default function TournamentDetails({
                                         </p>
                                     </div>
 
+                                    {/* Team size */}
                                     <div>
                                         <h3 className="text-sm sm:text-base">
                                             Team Size
@@ -253,6 +265,7 @@ export default function TournamentDetails({
                                         </p>
                                     </div>
 
+                                    {/* Amount of teams registered out of maximum allowed */}
                                     <div>
                                         <h3 className="text-sm sm:text-base">
                                             Registered
@@ -262,6 +275,7 @@ export default function TournamentDetails({
                                         </p>
                                     </div>
 
+                                    {/* Bracket type */}
                                     <div>
                                         <h3 className="text-sm sm:text-base">
                                             Bracket Type
@@ -273,7 +287,6 @@ export default function TournamentDetails({
                                 </div>
 
                                 {/* Event Details Button */}
-
                                 <button
                                     className="place-self-center mt-4 bg-primary w-full text-center text-white
                                     p-2.5 sm:p-3 hover:bg-secondary hover:cursor-pointer transition duration-250
