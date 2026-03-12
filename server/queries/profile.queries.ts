@@ -6,7 +6,7 @@ import {QueryResponse} from "@/lib/types/types";
 import {Database} from "@/lib/types/db.types";
 
 // tables we are working with
-type User = Database["public"]["Tables"]["users"]["Row"]
+export type User = Database["public"]["Tables"]["users"]["Row"]
 type Tournament = Database["public"]["Tables"]["tournaments"]["Row"]
 type Entrants = Database["public"]["Tables"]["attendees"]["Row"]
 
@@ -18,7 +18,7 @@ export async function fetchUserInfo(user_id: string): Promise<QueryResponse<User
     const supabase = await createClient(cookieStore)
 
     // grabbing information needed for user
-    const {data, error} = await supabase.from('users').select('*').eq(user_id, 'user_id').single()
+    const {data, error} = await supabase.from('users').select('*').eq('user_id', user_id).single()
 
     // error check
     if (error) {
