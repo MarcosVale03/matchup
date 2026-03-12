@@ -26,8 +26,13 @@ export default function BasicInputWithLabel({
     inputClassName,
 }: BasicInputProps) {
     return (
-        <div>
-            <label htmlFor={inputId} className={labelClassName} >{labelText}</label>
+        <div className="relative rounded-xl">
+            <label
+                htmlFor={inputId}
+                className={`${labelClassName} absolute -top-3 left-3 bg-secondary px-1`}
+            >
+                {labelText}
+            </label>
             <input 
                 type={inputType}
                 name={inputName}

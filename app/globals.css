@@ -13,8 +13,16 @@
 }
 
 @theme {
-  --color-primary:   #BD2D2D; /* main red color */
-  --color-secondary: #7A1C1C; /* darker red color */
+  --font-jersey-10: var(--font-jersey-10);
+  --font-jersey-25: var(--font-jersey-25);
+}
+
+@theme {
+  --color-primary:   #072E46; /* main blue background color */
+  --color-secondary: #21506D; /* lighter blue color */
+  --color-tertiary: #467A9F;  /* even lighter blue color */
+  --color-errors: #E46868;    /* error text color for input errors and background for form errors */
+  --color-errBorder: #881F1F /* error border color for form errors */
 }
 
 @theme {

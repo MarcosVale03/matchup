@@ -11,11 +11,17 @@ export function ErrorMessageForTournament({ field, fieldErrors }: {
     if (!errors?.length) return null;
 
     return (
-        <div className="text-red-500 text-sm mt-2 flex">
-            <X size={18}/>
+
+
+        <div className="text-errors text-xl mt-1 flex font-jersey-25">
+            <X size={18} className="shrink-0 mt-1"/>
             {errors.map((msg, i) => (
                 <p key={i}>
-                    {field !== 'name' ? msg : 'Tournament name should be longer than 3 characters'}
+                    {/*{field !== 'name' ? msg : 'Tournament name should be longer than 3 characters'}*/}
+                    {field === 'name' ? 'Tournament name should be longer than 3 characters'
+                        : (field === 'slug' && msg === 'Too small: expected string to have >=3 characters') ? "Slug name should be longer than 3 characters"
+                        : msg
+                    }
                 </p>
             ))}
         </div>

@@ -8,8 +8,8 @@ import ForumPostsList from "./forum-post-list";
 import DeleteThread from "../forum-crud/delete-thread";
 import { Post, Thread } from "@/server/queries/forum.queries";
 import { useProfile } from "@/app/client-layout";
-import {useToast} from "@/ui/use-toast";
-import {Toast} from "@/ui/toast";
+import { useToast } from "@/ui/toast/use-toast";
+import { Toast } from "@/ui/toast/toast";
 
 
 // onDeleteAction calls handleThreadDeleted in forum-thread-list to show success message after deleting a thread
@@ -85,7 +85,6 @@ export default function ForumThreadSingle({
             return;
         }
 
-        // when opening via the button you can choose whether to refresh every time
         await openPosts({refresh: false});
     };
 
@@ -211,7 +210,6 @@ export default function ForumThreadSingle({
                     onPostUpdate={handlePostUpdated}
                 />
             )}
-
         </div>
     );
 }

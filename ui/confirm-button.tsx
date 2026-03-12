@@ -1,17 +1,33 @@
 import { AlertTriangle } from 'lucide-react';
 
 type ConfirmButtonProps = {
+    /** Whether the dialog is visible */
     isOpen: boolean;
+    /** Heading text displayed at the top of the dialog (a `?` is appended automatically) */
     title: string;
+    /** Body text describing the action the user is confirming */
     message: string;
+    /** When `true`, both buttons are disabled to prevent duplicate submissions */
     isSubmitting?: boolean;
+    /** Error message displayed at the bottom of the dialog */
     error?: string;
+    /** Called when the user clicks the confirm (Delete) button */
     onConfirm: () => void;
+    /** Called when the user clicks Cancel or the backdrop */
     onCancelForm: () => void;
 }
 
 
-export function ConfirmButton({ isOpen, title, message, isSubmitting, error, onConfirm, onCancelForm }: ConfirmButtonProps) {
+export function ConfirmButton({
+    isOpen,
+    title,
+    message,
+    isSubmitting,
+    error,
+    onConfirm,
+    onCancelForm
+}: ConfirmButtonProps) {
+
     if (!isOpen) return null;
 
     return (
@@ -47,7 +63,7 @@ export function ConfirmButton({ isOpen, title, message, isSubmitting, error, onC
                     <button
                         onClick={onConfirm}
                         disabled={isSubmitting}
-                        className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-[#a02525] transition-colors"
+                        className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-colors"
                     >
                         Delete
                     </button>

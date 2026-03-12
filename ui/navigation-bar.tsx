@@ -23,73 +23,84 @@ export default function NavigationBar() {
         }
     }
 
+    const iconClassName = "size-5"
+
     // for screens that show the buttons on the nav bar
-    const generalButtonClass = `flex flex-row items-center justify-center rounded-md hover:bg-white 
-                                hover:text-primary transition duration-200 p-2 gap-1`;
+    const generalButtonClass = `flex flex-row items-center justify-center rounded-2xl hover:bg-white 
+                                hover:text-primary transition duration-200 p-1 px-2 gap-2`;
 
     // for screens that show the button on the side panel when expanded
     const sidebarButtonClass = `flex flex-row items-center gap-3 w-full px-4 py-3 rounded-md 
-                                hover:bg-white hover:text-primary transition duration-200 font-semibold`;
+                                hover:bg-white hover:text-primary transition duration-200`;
 
     const closeMenu = () => setMenuOpen(false);
 
     return (
         <>
-            <nav className="bg-primary p-3 sticky w-full top-0 z-10 font-[Poppins] font-semibold">
+            <nav className="bg-primary p-3 sticky w-full top-0 z-10 font-jersey-25 text-xl lg:text-3xl">
                 <ul className="flex justify-between items-center list-none">
 
                     {/* Left: Logo */}
-                    <Link href='/tournaments' className="shrink-0">
-                        <Image
-                            src="/matchup-logo-2.png"
-                            alt="Matchup Logo"
-                            width={168}
-                            height={52}
-                            className="w-30 lg:w-36"
-                            style={{ height: 'auto' }}
-                            priority
-                        />
-                    </Link>
+                    {/*<Link href='/tournaments' className="shrink-0">*/}
+                    {/*    <Image*/}
+                    {/*        src="/matchup-logo-2.png"*/}
+                    {/*        alt="Matchup Logo"*/}
+                    {/*        width={168}*/}
+                    {/*        height={52}*/}
+                    {/*        className="w-30 lg:w-36"*/}
+                    {/*        style={{ height: 'auto' }}*/}
+                    {/*        priority*/}
+                    {/*    />*/}
+                    {/*</Link>*/}
+
+                    <h1 className="text-4xl lg:text-6xl">
+                        Matchup
+                    </h1>
 
                     {/* Desktop: Navigation Buttons (hidden on small screens) */}
                     {!isAuthPage && (
-                        <div className="hidden sm:flex flex-row gap-1 sm:gap-2 shrink-0">
+                        <div className="hidden md:flex flex-row gap-1 md:gap-2 shrink-0">
+
+                            {/* Forums */}
                             <Link
                                 href="/forums"
                                 className={`${pathname === "/forums" ? "bg-white text-primary" : "text-white"} ${generalButtonClass}`}
                             >
-                                <MessageCircleMore className="size-5"/>
+                                <MessageCircleMore className={iconClassName} />
                                 <p>Forums</p>
                             </Link>
 
+                            {/* Tournaments */}
                             <Link
                                 href="/tournaments"
                                 className={`${pathname === "/tournaments" ? "bg-white text-primary" : "text-white"} ${generalButtonClass}`}
                             >
-                                <Trophy size={18}/>
+                                <Trophy className={iconClassName} />
                                 <p>Tournaments</p>
                             </Link>
 
+                            {/* Login */}
                             {!user && (
                                 <Link href="/login" className={`text-white ${generalButtonClass}`}>
-                                    <CircleUser size={18}/>
-                                    Log In
+                                    <CircleUser className={iconClassName} />
+                                    <p>Log in</p>
                                 </Link>
                             )}
 
+                            {/* User Profile */}
                             {user && (
                                 <Link
                                     href="/profile"
                                     className={`${pathname === "/profile" ? "bg-white text-primary" : "text-white"} ${generalButtonClass}`}
                                 >
-                                    <CircleUser className="size-5"/>
+                                    <CircleUser className={iconClassName} />
                                     <p>{user.user_metadata?.display_name || user.email}</p>
                                 </Link>
                             )}
 
                             {user && (
                                 <button onClick={handleSignOut} className={`text-white ${generalButtonClass}`}>
-                                    <LogOut className="size-5"/>
+                                    <LogOut className={iconClassName} />
                                     <p>Sign Out</p>
                                 </button>
                             )}
@@ -99,7 +110,8 @@ export default function NavigationBar() {
                                     href="/tournaments/create"
                                     className={`${pathname === "/tournaments/create" ? "bg-white text-primary" : "text-white"} ${generalButtonClass}`}
                                 >
-                                    <Plus className="size-5"/>
+                                    <Plus className={iconClassName} />
+                                    <p>Create</p>
                                 </Link>
                             )}
                         </div>
@@ -108,11 +120,11 @@ export default function NavigationBar() {
                     {/* Mobile: Hamburger button (visible only on small screens) */}
                     {!isAuthPage && (
                         <button
-                            className="sm:hidden text-white p-2"
+                            className="md:hidden text-white p-2"
                             onClick={() => setMenuOpen(true)}
                             aria-label="Open menu"
                         >
-                            <Menu className="size-6"/>
+                            <Menu className={iconClassName} />
                         </button>
                     )}
                 </ul>
@@ -128,16 +140,16 @@ export default function NavigationBar() {
 
             {/* Side Panel */}
             <div className={`fixed top-0 right-0 h-full w-64 bg-primary z-30 sm:hidden shadow-2xl
-                            transform transition-transform duration-300 ease-in-out
+                            transform transition-transform duration-300 ease-in-out font-jersey-10 text-2xl
                             ${menuOpen ? 'translate-x-0' : 'translate-x-full'}`}
             >
                 {/* Panel Header */}
-                <div className="flex justify-between items-center p-4 border-b border-white/20">
-                    <span className="text-white font-semibold text-lg font-[Poppins]">
+                <div className="flex justify-between items-center p-4 border-b border-tertiary">
+                    <span className="text-4xl">
                         Menu
                     </span>
-                    <button onClick={closeMenu} className="text-white p-1 hover:bg-white/10 rounded-md">
-                        <X className="size-6"/>
+                    <button onClick={closeMenu} className="p-1 hover:bg-white/10 rounded-md">
+                        <X className={iconClassName} />
                     </button>
                 </div>
 
@@ -147,21 +159,21 @@ export default function NavigationBar() {
                     {/* Forum button */}
                     <Link href="/forums" onClick={closeMenu}
                           className={`${pathname === "/forums" ? "bg-white text-primary" : ""} ${sidebarButtonClass}`}>
-                        <MessageCircleMore className="size-5"/>
+                        <MessageCircleMore className={iconClassName} />
                         Forums
                     </Link>
 
                     {/* Tournaments button */}
                     <Link href="/tournaments" onClick={closeMenu}
                           className={`${pathname === "/tournaments" ? "bg-white text-primary" : ""} ${sidebarButtonClass}`}>
-                        <Trophy className="size-5"/>
+                        <Trophy className={iconClassName} />
                         Tournaments
                     </Link>
 
                     {/* Login button, only available if not logged in */}
                     {!user && (
                         <Link href="/login" onClick={closeMenu} className={sidebarButtonClass}>
-                            <CircleUser className="size-5"/>
+                            <CircleUser className={iconClassName} />
                             Log In
                         </Link>
                     )}
@@ -170,7 +182,7 @@ export default function NavigationBar() {
                     {user && (
                         <Link href="/profile" onClick={closeMenu}
                               className={`${pathname === "/profile" ? "bg-white text-primary" : ""} ${sidebarButtonClass}`}>
-                            <CircleUser className="size-5"/>
+                            <CircleUser className={iconClassName} />
                             <span className="truncate">
                                 {user.user_metadata?.display_name || user.email}
                             </span>
@@ -181,7 +193,7 @@ export default function NavigationBar() {
                     {user && (
                         <Link href="/tournaments/create" onClick={closeMenu}
                               className={`${pathname === "/tournaments/create" ? "bg-white text-primary" : ""} ${sidebarButtonClass}`}>
-                            <Plus className="size-5"/>
+                            <Plus className={iconClassName} />
                             Create Tournament
                         </Link>
                     )}
@@ -189,7 +201,7 @@ export default function NavigationBar() {
                     {/* Sign out button */}
                     {user && (
                         <button onClick={() => { handleSignOut(); closeMenu(); }} className={sidebarButtonClass}>
-                            <LogOut className="size-5"/>
+                            <LogOut className={iconClassName}/>
                             Sign Out
                         </button>
                     )}

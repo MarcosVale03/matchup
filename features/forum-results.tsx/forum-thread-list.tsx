@@ -7,8 +7,8 @@ import ForumThreadSingle from "./forum-thread-single";
 import SearchBar from "@/ui/search-bar";
 import AddForumThread from '../forum-crud/add-thread';
 import { useProfile } from "@/app/client-layout";
-import {useToast} from "@/ui/use-toast";
-import {Toast} from "@/ui/toast";
+import { useToast } from "@/ui/toast/use-toast";
+import { Toast } from "@/ui/toast/toast";
 
 export default function ForumThreadList({posts, tournamentData}: {
     posts: Thread[],
