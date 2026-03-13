@@ -1,8 +1,9 @@
 'use client'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import React, {useCallback, useState} from 'react';
+import React, { useCallback, useState } from 'react';
 import SearchBar from '@/ui/search-bar';
 import { useDebouncedCallback } from 'use-debounce';
+import BasicInputWithLabel from '@/ui/basic-input-with-label';
 
 export default function SearchControls() {
     const router = useRouter();
@@ -38,27 +39,35 @@ export default function SearchControls() {
     }, [updateParams]);
 
     return (
-        <form className="flex flex-col gap-3 sm:flex-row sm:gap-0 bg-white mb-6 sm:mb-8">
+        <form className="flex flex-col gap-2 sm:flex-row mb-6">
             <SearchBar
                 searchQuery={searchQuery}
                 handleInputChange={handleInputChange}
                 searchPlaceholder="Search tournaments by name..."
-                inputClassName="w-full p-3 pl-10 sm:p-4 sm:pl-10 text-sm sm:text-base text-gray-800 border-2
-                                border-gray-300 rounded-lg focus:outline-none focus:border-primary
-                                transition duration-150 sm:rounded-r-none [&::-webkit-search-cancel-button]:hidden"
+                inputClassName="mt-1 block font-jersey-25 bg-white w-full rounded-xl border-2 
+                border-tertiary text-black text-md lg:text-xl p-3 shadow-md focus:outline-primary 
+                [&::-webkit-search-cancel-button]:hidden pl-10"
             />
 
             {/* Date Filter */}
-            <input
-                id="startDateFilterInput"
-                type="date"
-                max="9999-12-31"
-                defaultValue={searchParams.get('startDate') ?? ''}
-                onChange={handleDateChange}
-                className="w-full sm:w-auto p-3 sm:p-4 text-sm sm:text-base text-gray-800 border-2 border-gray-300
-                           rounded-lg focus:outline-none focus:border-primary transition duration-150 cursor-pointer
-                           sm:rounded-l-none sm:min-w-[180px]"
-            />
+            <div className="relative w-1/4">
+                <label 
+                    htmlFor="startDateFilterInput"
+                    className="absolute -top-3 left-3 bg-secondary px-1 block text-sm lg:text-lg bg-white 
+                    text-tertiary rounded-md"
+                >
+                    Start Date Filter
+                </label>
+                <input
+                    id="startDateFilterInput"
+                    type="date"
+                    max="9999-12-31"
+                    defaultValue={searchParams.get('startDate') ?? ''}
+                    onChange={handleDateChange}
+                    className="mt-1 block font-jersey-25 bg-white w-full rounded-xl border-2 border-tertiary 
+                    text-black text-md lg:text-xl p-3 shadow-md focus:outline-primary"
+                />
+            </div>
         </form>
     );
 }

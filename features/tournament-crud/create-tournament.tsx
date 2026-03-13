@@ -176,8 +176,8 @@ export default function TournamentInsertForm() {
                                 labelClassName={pageLabelClass}
                                 labelText="Start Date (Required)"
                                 inputType="datetime-local"
-                                inputName="startTime"
-                                inputId="startTime"
+                                inputName="startTimeCreate"
+                                inputId="startTimeCreate"
                                 inputValue={dateToInputString(formData.startTime)}
                                 inputOnChange={(e) => {
                                     if (!e.target.validity.valid) return;
@@ -196,8 +196,8 @@ export default function TournamentInsertForm() {
                                 labelClassName={pageLabelClass}
                                 labelText="End Date (Required)"
                                 inputType="datetime-local"
-                                inputName="endTime"
-                                inputId="endTime"
+                                inputName="endTimeCreate"
+                                inputId="endTimeCreate"
                                 inputValue={dateToInputString(formData.endTime)}
                                 inputOnChange={(e) => {
                                     if (!e.target.validity.valid) return;
@@ -212,8 +212,8 @@ export default function TournamentInsertForm() {
                 </fieldset>
 
                 {/* Location Type */}
-                <fieldset className="p-4 sm:p-5 bg-secondary border-2 rounded-3xl mb-6 w-full">
-                    <legend className="text-2xl lg:text-4xl bg-secondary rounded-xl px-2">
+                <fieldset className="p-4 sm:p-5 bg-tertiary border-2 rounded-3xl mb-6 w-full">
+                    <legend className="text-2xl lg:text-4xl bg-tertiary rounded-xl px-2">
                         Location Type
                     </legend>
 
@@ -261,8 +261,8 @@ export default function TournamentInsertForm() {
                 </fieldset>
 
                 {/* Tournament Visibility */}
-                <fieldset className="p-4 sm:p-5 bg-secondary border-2 rounded-3xl mb-6 w-full">
-                    <legend className="text-2xl lg:text-4xl bg-secondary rounded-xl px-2 -mb-3">
+                <fieldset className="p-4 sm:p-5 bg-tertiary border-2 rounded-3xl mb-6 w-full">
+                    <legend className="text-2xl lg:text-4xl bg-tertiary rounded-xl px-2 -mb-3">
                         Tournament Visibility
                     </legend>
 
@@ -305,8 +305,8 @@ export default function TournamentInsertForm() {
                 </fieldset>
 
                 {/* Contact Information */}
-                <fieldset className="p-4 sm:p-5 bg-secondary border-2 rounded-3xl mb-6 w-full">
-                    <legend className="text-2xl lg:text-4xl bg-secondary rounded-xl px-2 -mb-3">
+                <fieldset className="p-4 sm:p-5 bg-tertiary border-2 rounded-3xl mb-6 w-full">
+                    <legend className="text-2xl lg:text-4xl bg-tertiary rounded-xl px-2 -mb-3">
                         Contact Information (At least one required)
                     </legend>
 
@@ -354,11 +354,10 @@ export default function TournamentInsertForm() {
                         className="w-full flex items-center justify-center gap-2 py-2.5 sm:py-3 px-4 border
                         border-transparent rounded-md shadow-sm text-sm sm:text-base font-medium
                         text-white bg-secondary hover:bg-tertiary focus:outline-none focus:ring-2
-                        focus:ring-offset-2 focus:ring-primary disabled:opacity-50 transition-colors"
+                        focus:ring-offset-2 focus:ring-primary disabled:opacity-50 transition-colors
+                        text-xl lg:text-3xl"
                     >
-                        <span className="text-xl lg:text-3xl">
-                            {isSubmitting ? 'Going to events...' : 'Create events for this tournament'}
-                        </span>
+                        {isSubmitting ? 'Going to events...' : 'Create events for this tournament'}
                         <ArrowRight size={18} className='shrink-0'/>
                     </button>
                 </div>

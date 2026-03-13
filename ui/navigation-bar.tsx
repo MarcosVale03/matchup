@@ -37,7 +37,7 @@ export default function NavigationBar() {
 
     return (
         <>
-            <nav className="bg-primary p-3 sticky w-full top-0 z-10 font-jersey-25 text-xl lg:text-3xl">
+            <nav className="bg-primary p-3 sticky w-full top-0 z-10 font-jersey-25 text-lg lg:text-2xl">
                 <ul className="flex justify-between items-center list-none">
 
                     {/* Left: Logo */}
@@ -53,7 +53,7 @@ export default function NavigationBar() {
                     {/*    />*/}
                     {/*</Link>*/}
 
-                    <h1 className="text-4xl lg:text-6xl">
+                    <h1 className="text-3xl lg:text-5xl">
                         Matchup
                     </h1>
 

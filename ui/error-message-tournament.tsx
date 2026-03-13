@@ -13,7 +13,7 @@ export function ErrorMessageForTournament({ field, fieldErrors }: {
     return (
 
 
-        <div className="text-errors text-xl mt-1 flex font-jersey-25">
+        <div className="text-errors text-sm lg:text-lg mt-1 flex font-jersey-25">
             <X size={18} className="shrink-0 mt-1"/>
             {errors.map((msg, i) => (
                 <p key={i}>

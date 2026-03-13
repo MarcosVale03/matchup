@@ -1,14 +1,15 @@
 'use client';
 import BasicInputWithLabel from '@/ui/basic-input-with-label';
-import React, {useState} from 'react';
-import {useRouter} from 'next/navigation';
-import {updateTournament, TournamentUpdateErrors} from '@/server/mutations/tournaments.mutations';
-import {ArrowLeft, Save} from 'lucide-react';
-import {FetchTournamentFromIdResponse} from "@/server/queries/tournaments.queries";
-import {toDateTimeLocalInput} from '@/ui/format-time';
-import {ErrorMessageForTournament} from "@/ui/error-message-tournament";
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { updateTournament, TournamentUpdateErrors } from '@/server/mutations/tournaments.mutations';
+import { ArrowLeft, Save } from 'lucide-react';
+import { FetchTournamentFromIdResponse } from "@/server/queries/tournaments.queries";
+import { toDateTimeLocalInput } from '@/ui/format-time';
+import { ErrorMessageForTournament } from "@/ui/error-message-tournament";
+import Checkbox from '@/ui/checkbox';
 
-export default function TournamentEditForm({initialData}: { initialData: FetchTournamentFromIdResponse }) {
+export default function TournamentEditForm({ initialData }: { initialData: FetchTournamentFromIdResponse }) {
     const router = useRouter();
 
     const [formData, setFormData] = useState({
@@ -30,7 +31,8 @@ export default function TournamentEditForm({initialData}: { initialData: FetchTo
 
     // handler for text, email, datetime-local, checkbox
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const {name, value, type, checked} = e.target;
+        const { name, value, type, checked } = e.target;
+
         setFormData(prev => ({
             ...prev,
             [name]: type === 'checkbox' ? checked : value,
@@ -80,13 +82,14 @@ export default function TournamentEditForm({initialData}: { initialData: FetchTo
 
 
     // general classNames used in most of the inputs on this page
-    const pageLabelClass = "block text-sm font-medium text-gray-700 w-full"
-    const pageInputClass = "mt-1 block w-full rounded border border-gray-200 shadow-sm p-2 hover:shadow-md focus:outline-primary text-gray-500"
+    const pageLabelClass = "block text-sm lg:text-lg bg-white text-tertiary rounded-md"
+    const pageInputClass = `mt-1 block font-jersey-25 bg-white w-full rounded-xl border-2 border-tertiary 
+                            text-black text-base lg:text-xl p-3 shadow-md focus:outline-primary`
 
     return (
-        <div className="mt-6 sm:mt-10 w-full px-4 sm:px-6 lg:px-8 sm:mx-8 md:mx-16 font-[Poppins]">
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-6 border-b border-gray-300 pb-2">
-                Updating Tournament: <span className="text-primary">{formData.name}</span>
+        <div className="mt-4 w-full px-4 sm:px-6 lg:px-8 mx-4 text-2xl lg:text-4xl">
+            <h1 className="mb-2 border-b-2 border-tertiary font-jersey-25">
+                Updating Tournament: {initialData.name}
             </h1>
 
             <form
@@ -97,16 +100,16 @@ export default function TournamentEditForm({initialData}: { initialData: FetchTo
                 {formError && (
                     <div
                         role="alert"
-                        className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 sm:px-4 sm:py-3 
-                                   rounded mb-4 text-sm sm:text-base"
+                        className="bg-errors border-2 border-errBorder text-lg lg:text-2xl
+                        px-3 py-2 sm:px-4 sm:py-3 rounded-xl mb-2 font-jersey-25"
                     >
                         {formError}
                     </div>
                 )}
 
-                <h2 className="text-lg sm:text-xl font-semibold text-gray-700 mb-4 sm:flex justify-between">
+                <h2 className="text-lg lg:text-2xl mb-4 sm:flex justify-between">
                     <p>
-                        Tournament ID: <span className="text-primary">{formData.id}</span>
+                        Tournament ID: <span className="">{formData.id}</span>
                     </p>
                 </h2>
 
@@ -114,10 +117,10 @@ export default function TournamentEditForm({initialData}: { initialData: FetchTo
                 <fieldset className="space-y-4 mb-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* Name */}
-                        <div className="md:col-span-2">
+                        <div className="mb-2">
                             <BasicInputWithLabel
                                 labelClassName={pageLabelClass}
-                                labelText="Name *"
+                                labelText="Tournament Name (Required)"
                                 inputType='text'
                                 inputName="name"
                                 inputId="name"
@@ -127,11 +130,11 @@ export default function TournamentEditForm({initialData}: { initialData: FetchTo
                                 inputPlaceholder="Enter tournament name"
                                 inputClassName={pageInputClass}
                             />
-                            <ErrorMessageForTournament field='name' fieldErrors={fieldErrors}/>
+                            <ErrorMessageForTournament field='name' fieldErrors={fieldErrors} />
                         </div>
 
                         {/* Slug */}
-                        <div className="md:col-span-2">
+                        <div className="">
                             <BasicInputWithLabel
                                 labelClassName={pageLabelClass}
                                 labelText="Slug (Optional, for URL)"
@@ -144,14 +147,14 @@ export default function TournamentEditForm({initialData}: { initialData: FetchTo
                                 inputPlaceholder="e.g., mytourney2025"
                                 inputClassName={pageInputClass}
                             />
-                            <ErrorMessageForTournament field='slug' fieldErrors={fieldErrors}/>
+                            <ErrorMessageForTournament field='slug' fieldErrors={fieldErrors} />
                         </div>
 
                         {/* Start Time */}
-                        <div>
+                        <div className="mb-2">
                             <BasicInputWithLabel
                                 labelClassName={pageLabelClass}
-                                labelText="Start Time *"
+                                labelText="Start Time (Required)"
                                 inputType="datetime-local"
                                 inputName="startTime"
                                 inputId="startTime"
@@ -161,14 +164,14 @@ export default function TournamentEditForm({initialData}: { initialData: FetchTo
                                 inputPlaceholder=""
                                 inputClassName={pageInputClass}
                             />
-                            <ErrorMessageForTournament field='times' fieldErrors={fieldErrors}/>
+                            <ErrorMessageForTournament field='times' fieldErrors={fieldErrors} />
                         </div>
 
                         {/* End Time */}
                         <div>
                             <BasicInputWithLabel
                                 labelClassName={pageLabelClass}
-                                labelText="End Time *"
+                                labelText="End Time (Required)"
                                 inputType="datetime-local"
                                 inputName="endTime"
                                 inputId="endTime"
@@ -178,38 +181,47 @@ export default function TournamentEditForm({initialData}: { initialData: FetchTo
                                 inputPlaceholder=""
                                 inputClassName={pageInputClass}
                             />
-                            <ErrorMessageForTournament field='times' fieldErrors={fieldErrors}/>
+                            <ErrorMessageForTournament field='times' fieldErrors={fieldErrors} />
                         </div>
                     </div>
                 </fieldset>
 
                 {/* Type and Location */}
-                <fieldset className="space-y-4 p-4 sm:p-5 border rounded-md mb-6">
-                    <h2 className="text-lg sm:text-xl font-semibold text-primary">
+                <fieldset className="p-2 px-5 bg-tertiary border-2 rounded-2xl mb-6 w-full">
+                    <legend className="text-xl lg:text-3xl bg-tertiary rounded-xl px-2">
                         Location Type
-                    </h2>
+                    </legend>
 
                     {/* isOnline Checkbox */}
-                    <div className="flex items-center">
-                        <input
-                            type="checkbox"
-                            name="isOnline"
-                            id="isOnline"
-                            checked={formData.isOnline}
-                            onChange={handleChange}
-                            className="h-4 w-4 accent-primary shrink-0"
-                        />
-                        <label htmlFor="isOnline" className="ml-2 block text-sm font-medium text-gray-700">
-                            Online tournament?
-                        </label>
-                    </div>
+                    <Checkbox
+                        id="isOnline"
+                        name="isOnline"
+                        checked={formData.isOnline}
+                        onChange={handleChange}
+                        label="Online tournament?"
+                        boxClassName="group h-5 w-5 rounded-md border-2 border-primary flex items-center
+                                        justify-center transition-all duration-200 hover:bg-white"
+                        checkedBoxClassName="bg-primary text-black"
+                        iconSize={18}
+                        iconClassName="group-hover:text-primary text-white"
+                        labelClassName="text-2xl font-jersey-25"
+                    />
+
 
                     {/* Location Address (Appears only if offline) */}
-                    {!formData.isOnline && (
-                        <>
+                    <div
+                        className={
+                            `grid transition-all duration-500 
+                            ${!formData.isOnline ?
+                                'grid-rows-[1fr] mt-6 opacity-100' :
+                                'grid-rows-[0fr] opacity-0'
+                            }
+                        `}
+                    >
+                        <div className="p-2 overflow-hidden">
                             <BasicInputWithLabel
                                 labelClassName={pageLabelClass}
-                                labelText="Physical Location Address *"
+                                labelText="Physical Location Address (Required)"
                                 inputType="text"
                                 inputName="locationAddress"
                                 inputId="locationAddress"
@@ -217,50 +229,51 @@ export default function TournamentEditForm({initialData}: { initialData: FetchTo
                                 inputOnChange={handleChange}
                                 required={!formData.isOnline}
                                 inputPlaceholder="e.g., 123 Main St, Anytown"
-                                inputClassName={pageInputClass}
+                                inputClassName={`${pageInputClass}`}
                             />
-                            <ErrorMessageForTournament field='location' fieldErrors={fieldErrors}/>
-                        </>
-                    )}
+                            <ErrorMessageForTournament field='location' fieldErrors={fieldErrors} />
+                        </div>
+                    </div>
                 </fieldset>
 
                 {/* Tournament Visibility */}
-                <fieldset className="space-y-4 p-4 sm:p-5 border rounded-md mb-6 w-full">
-                    <h2 className="text-lg sm:text-xl font-semibold text-primary">
+                <fieldset className="p-4 px-5 bg-tertiary border-2 rounded-2xl mb-6 w-full">
+                    <legend className="text-xl lg:text-3xl bg-tertiary rounded-xl px-2 -mb-3">
                         Tournament Visibility
-                    </h2>
+                    </legend>
 
-                    <div className="flex items-center">
+                    {/* Public */}
+                    <div className="flex items-center mb-2">
                         <input
                             type="radio"
                             id="tournament-public"
                             name="visibility"
                             value="public"
-                            checked={formData.isOnline}
-                            className="h-4 w-4 accent-primary shrink-0"
-                            onChange={handleChange}
+                            checked={formData.isPublic}
+                            className="h-4 lg:h-4.5 w-4 lg:w-4.5 accent-primary shrink-0"
+                            onChange={() => setFormData({ ...formData, isPublic: true })}
                         />
                         <label
                             htmlFor="tournament-public"
-                            className="ml-2 text-sm font-medium text-gray-700"
+                            className="ml-2 text-lg lg:text-2xl font-jersey-25"
                         >
                             Public
                         </label>
                     </div>
 
+                    {/* Private */}
                     <div className="flex items-center">
                         <input
                             type="radio"
                             id="tournament-private"
                             name="visibility"
                             value="private"
-                            checked={!formData.isOnline}
-                            className="h-4 w-4 accent-primary shrink-0"
-                            onChange={handleChange}
+                            className="h-4 lg:h-4.5 w-4 lg:w-4.5 accent-primary shrink-0"
+                            onChange={() => setFormData({ ...formData, isPublic: false })}
                         />
                         <label
                             htmlFor="tournament-private"
-                            className="ml-2 text-sm font-medium text-gray-700"
+                            className="ml-2 text-lg lg:text-2xl font-jersey-25"
                         >
                             Private
                         </label>
@@ -268,16 +281,16 @@ export default function TournamentEditForm({initialData}: { initialData: FetchTo
                 </fieldset>
 
                 {/* Contact Information */}
-                <fieldset className="space-y-4 p-4 sm:p-5 border rounded-md mb-6">
-                    <h2 className="text-lg sm:text-xl font-semibold text-primary mb-4">
+                <fieldset className="p-4 px-5 bg-tertiary border-2 rounded-2xl mb-6 w-full">
+                    <legend className="text-xl lg:text-3xl bg-tertiary rounded-xl px-2 -mb-3">
                         Contact Information (At least one required)
-                    </h2>
+                    </legend>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* Email */}
-                        <div>
+                        <div className="mt-2">
                             <BasicInputWithLabel
-                                labelClassName='block text-sm font-medium text-gray-700'
+                                labelClassName={pageLabelClass}
                                 labelText='Email (Optional)'
                                 inputType='email'
                                 inputName='email'
@@ -291,14 +304,14 @@ export default function TournamentEditForm({initialData}: { initialData: FetchTo
                         </div>
 
                         {/* Discord */}
-                        <div>
+                        <div className="mt-2">
                             <BasicInputWithLabel
-                                labelClassName='block text-sm font-medium text-gray-700'
+                                labelClassName={pageLabelClass}
                                 labelText='Discord Link (Optional)'
                                 inputType='text'
                                 inputName='discord'
                                 inputId='discord'
-                                inputValue={formData.discord}
+                                inputValue={`https://discord.gg/${formData.discord}`}
                                 inputOnChange={handleChange}
                                 required={false}
                                 inputPlaceholder='e.g., https://discord.gg/xxxxxxxx'
@@ -306,7 +319,7 @@ export default function TournamentEditForm({initialData}: { initialData: FetchTo
                             />
                         </div>
                     </div>
-                    <ErrorMessageForTournament field='contact' fieldErrors={fieldErrors}/>
+                    <ErrorMessageForTournament field='contact' fieldErrors={fieldErrors} />
                 </fieldset>
 
                 {/* Back/Submit Button */}
@@ -314,11 +327,11 @@ export default function TournamentEditForm({initialData}: { initialData: FetchTo
                     <button
                         type="button"
                         onClick={() => router.back()}
-                        className="w-full flex items-center justify-center gap-2 py-2.5 sm:py-3 px-4 border border-transparent rounded-md shadow-sm text-sm sm:text-base font-medium 
-                                       text-white bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 
-                                       focus:ring-primary disabled:opacity-50 transition-colors"
+                        className="w-full flex items-center justify-center gap-2 py-2.5 sm:py-3 px-4 border 
+                        border-transparent rounded-md shadow-sm text-sm sm:text-base font-medium 
+                        text-white bg-primary hover:bg-secondary disabled:opacity-50 transition-colors"
                     >
-                        <ArrowLeft className="size-8 sm:size-4"/>
+                        <ArrowLeft className="size-8 sm:size-4" />
                         Back to details
                     </button>
                     <button
@@ -329,7 +342,7 @@ export default function TournamentEditForm({initialData}: { initialData: FetchTo
                                        focus:ring-primary disabled:opacity-50 transition-colors"
                     >
                         <span>{isSubmitting ? 'Saving...' : 'Save Changes'}</span>
-                        <Save className="size-6 sm:size-4"/>
+                        <Save className="size-6 sm:size-4" />
                     </button>
                 </div>
             </form>

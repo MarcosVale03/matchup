@@ -28,7 +28,7 @@ export default async function DetailsPage({ params }: { params: { tournamentId: 
     };
 
     return (
-        <main className="bg-white flex flex-col font-[Poppins]">
+        <main className="bg-primary flex flex-col font-jersey-10">
             <TournamentDetails tournament={tournament} permissions={permissions} />
         </main>
     );

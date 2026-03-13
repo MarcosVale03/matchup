@@ -11,8 +11,8 @@ export default async function TournamentSearchPage({ searchParams }: {
     const tournaments = await fetchTournamentsForSearch(query, dateToSearch) ?? [];
 
     return (
-        <main className="bg-white flex-col font-[Poppins] justify-center items-center p-4 sm:p-6 lg:p-8">
-            <h1 className="text-center font-bold text-primary mb-5 sm:mb-6 lg:mb-8 text-xl sm:text-2xl lg:text-4xl">
+        <main className="bg-primary flex-col font-jersey-10 justify-center items-center p-4 sm:p-6 lg:pt-4 ">
+            <h1 className="text-center text-3xl lg:text-5xl mb-4">
                 The Arena Awaits: Find Your Competition
             </h1>
 
@@ -21,10 +21,19 @@ export default async function TournamentSearchPage({ searchParams }: {
                 <SearchControls />
 
                 {/* Results */}
-                <div className="flex flex-col max-h-[63vh] gap-1">
-                    <h2 className="text-lg sm:text-xl font-semibold text-gray-700">
-                        Found {tournaments.length} Tournament(s):
-                    </h2>
+                <div className="flex flex-col gap-1">
+                    {tournaments.length > 1 && (
+                        <h2 className="text-xl lg:text-3xl">
+                            Found {tournaments.length} Tournaments:
+                        </h2>
+                    )}
+
+                    {tournaments.length === 1 && (
+                        <h2 className="text-xl lg:text-3xl">
+                            Found 1 Tournament:
+                        </h2>
+                    )}
+
                     <div className="overflow-y-auto">
                         <SearchResults tournaments={tournaments} />
                     </div>
