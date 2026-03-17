@@ -13,7 +13,7 @@ type VideoGame = Database["public"]["Tables"]["video_games"]["Row"]
  * @param page -
  * @param perPage
  */
-export async function fetchVideoGames(searchQuery: string = "", page: number = 0, perPage: number = 10): Promise<VideoGame[]> {
+export async function fetchVideoGames(searchQuery: string = "", page: number = 0, perPage: number = 5): Promise<VideoGame[]> {
     const cookieStore = await cookies()
     const supabase = await createClient(cookieStore)
 

@@ -23,11 +23,8 @@ interface FormState {
     startTime: Date;
     endTime: Date;
     teams: boolean;
-    isOnline: boolean;
     platform: string,
     price: number;
-    // Location is simplified for the form input
-    locationAddress: string;
     teamSize: number;
 }
 
@@ -39,10 +36,8 @@ const initialFormState: FormState = {
     startTime: new Date(),
     endTime: getDefaultFutureDate(2),
     teams: false,
-    isOnline: false,
     platform: '',
     price: 0,
-    locationAddress: '',
     teamSize: 0,
 };
 
@@ -53,14 +48,6 @@ export default function TournamentEventForm() {
     const [formError, setFormError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // Placeholder for location data (we would integrate Google Maps API here)
-    // For now, we only use the address input
-    const mockLocationData = {
-        maps_place_id: 'mock_place_id',
-        address: formData.locationAddress,
-        latitude: 34.0522, // Mock data for LA
-        longitude: -118.2437, // Mock data for LA
-    };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
@@ -76,8 +63,6 @@ export default function TournamentEventForm() {
         setIsSubmitting(true);
         setFieldErrors({});
         setFormError(null);
-
-        const locationArg = formData.isOnline ? undefined : mockLocationData;
 
         const startTimeArg = new Date(formData.startTime);
         const endTimeArg = new Date(formData.endTime);
@@ -147,7 +132,7 @@ export default function TournamentEventForm() {
 
                     {/* General Details */}
                     <fieldset className="mb-6 space-y-4">
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        <div className="flex flex-col space-y-4 w-full">
                             {/* Event Name */}
                             <div className="md:col-span-2">
                                 <BasicInputWithLabel
@@ -166,31 +151,33 @@ export default function TournamentEventForm() {
                             </div>
 
                             {/* Video Game */}
-                            <div className="md:col-span-2">
-                                <BasicInputWithLabel
-                                    labelClassName={pageLabelClass}
-                                    labelText="Event Game *"
-                                    inputType="text"
-                                    inputName="slug"
-                                    inputId="slug"
-                                    inputValue={formData.video_game}
-                                    inputOnChange={handleChange}
-                                    required={true}
-                                    inputPlaceholder="e.g., GGST"
-                                    inputClassName={pageInputClass}
-                                />
-                                <ErrorMessage field='video_game' />
-                            </div>
+                            <div className="flex w-full space-x-4">
+                                <div className="md:col-span-2 w-full">
+                                    <BasicInputWithLabel
+                                        labelClassName={pageLabelClass}
+                                        labelText="Event Game *"
+                                        inputType="text"
+                                        inputName="slug"
+                                        inputId="slug"
+                                        inputValue={formData.video_game}
+                                        inputOnChange={handleChange}
+                                        required={true}
+                                        inputPlaceholder="e.g., GGST"
+                                        inputClassName={pageInputClass}
+                                    />
+                                </div>
 
-                            {/* Platform (simple select option for now) */}
-                            <div>
-                                <h1 className="w-full p-2.5 text-gray-700">Platform</h1>
-                                <select className="w-full p-2.5 text-gray-700">
-                                    <option>PlayStation 5</option>
-                                    <option>PC</option>
-                                    <option>XBox</option>
-                                    <option>Switch</option>
-                                </select>
+                                {/* Platform (simple select option for now) */}
+                                <div className="w-full">
+                                    <h1 className="w-full p-2.5 text-gray-700">Platform</h1>
+                                    <select className="w-full p-2.5 text-gray-700">
+                                        <option>PlayStation 5</option>
+                                        <option>PC</option>
+                                        <option>XBox</option>
+                                        <option>Switch</option>
+                                    </select>
+                                </div>
+                                <ErrorMessage field='game_and_platform' />
                             </div>
 
                             {/* Price */}
@@ -209,43 +196,45 @@ export default function TournamentEventForm() {
                                 />
                             </div>
 
-                            {/* Start Time */}
-                            <div>
-                                <BasicInputWithLabel
-                                    labelClassName={pageLabelClass}
-                                    labelText="Start Time *"
-                                    inputType="datetime-local"
-                                    inputName="startTime"
-                                    inputId="startTime"
-                                    inputValue={dateToInputString(formData.startTime)}
-                                    inputOnChange={(e) => {
-                                        if (!e.target.validity.valid) return;
-                                        setFormData({ ...formData, startTime: new Date(e.target.value) });
-                                    }}
-                                    required={true}
-                                    inputPlaceholder=""
-                                    inputClassName={pageInputClass}
-                                />
-                                <ErrorMessage field='times' />
-                            </div>
+                            <div className="flex w-full space-x-4">
+                                {/* Start Time */}
+                                <div className="w-full">
+                                    <BasicInputWithLabel
+                                        labelClassName={pageLabelClass}
+                                        labelText="Start Time *"
+                                        inputType="datetime-local"
+                                        inputName="startTime"
+                                        inputId="startTime"
+                                        inputValue={dateToInputString(formData.startTime)}
+                                        inputOnChange={(e) => {
+                                            if (!e.target.validity.valid) return;
+                                            setFormData({ ...formData, startTime: new Date(e.target.value) });
+                                        }}
+                                        required={true}
+                                        inputPlaceholder=""
+                                        inputClassName={pageInputClass}
+                                    />
+                                    <ErrorMessage field='times' />
+                                </div>
 
-                            {/* End Time */}
-                            <div>
-                                <BasicInputWithLabel
-                                    labelClassName={pageLabelClass}
-                                    labelText="End Time *"
-                                    inputType="datetime-local"
-                                    inputName="endTime"
-                                    inputId="endTime"
-                                    inputValue={dateToInputString(formData.endTime)}
-                                    inputOnChange={(e) => {
-                                        if (!e.target.validity.valid) return;
-                                        setFormData({ ...formData, endTime: new Date(e.target.value) });
-                                    }}
-                                    required={true}
-                                    inputPlaceholder=""
-                                    inputClassName={pageInputClass}
-                                />
+                                {/* End Time */}
+                                <div className="w-full">
+                                    <BasicInputWithLabel
+                                        labelClassName={pageLabelClass}
+                                        labelText="End Time *"
+                                        inputType="datetime-local"
+                                        inputName="endTime"
+                                        inputId="endTime"
+                                        inputValue={dateToInputString(formData.endTime)}
+                                        inputOnChange={(e) => {
+                                            if (!e.target.validity.valid) return;
+                                            setFormData({ ...formData, endTime: new Date(e.target.value) });
+                                        }}
+                                        required={true}
+                                        inputPlaceholder=""
+                                        inputClassName={pageInputClass}
+                                    />
+                                </div>
                             </div>
                         </div>
                     </fieldset>
@@ -256,7 +245,7 @@ export default function TournamentEventForm() {
                             Team Event
                         </h2>
 
-                        {/* isOnline Checkbox */}
+                        {/* Teams Checkbox */}
                         <div className="flex items-center">
                             <input
                                 type="checkbox"
@@ -264,7 +253,7 @@ export default function TournamentEventForm() {
                                 id="teams"
                                 checked={formData.teams}
                                 onChange={handleChange}
-                                className="h-4 w-4 flex-shrink-0 accent-primary"
+                                className="h-4 w-4 shrink-0 accent-primary"
                             />
                             <label htmlFor="teams" className="ml-2 block text-sm font-medium text-gray-700">
                                 Is the event played in teams?
@@ -280,7 +269,7 @@ export default function TournamentEventForm() {
                                     inputType="text"
                                     inputName="teamSize"
                                     inputId="teamSize"
-                                    inputValue={formData.locationAddress}
+                                    inputValue={formData.teamSize}
                                     inputOnChange={handleChange}
                                     required={!formData.teams}
                                     inputPlaceholder="e.g. 5"
@@ -291,27 +280,6 @@ export default function TournamentEventForm() {
                         )}
                     </fieldset>
 
-                    {/* Type and Location (if offline) */}
-                    <fieldset className="mb-6 space-y-4 rounded-md border p-4 sm:p-5">
-                        <h2 className="text-lg font-semibold text-primary sm:text-xl">
-                            Event Type
-                        </h2>
-
-                        {/* isOnline Checkbox */}
-                        <div className="flex items-center">
-                            <input
-                                type="checkbox"
-                                name="isOnline"
-                                id="isOnline"
-                                checked={formData.isOnline}
-                                onChange={handleChange}
-                                className="h-4 w-4 flex-shrink-0 accent-primary"
-                            />
-                            <label htmlFor="isOnline" className="ml-2 block text-sm font-medium text-gray-700">
-                                Online event?
-                            </label>
-                        </div>
-                    </fieldset>
 
                     {/* Submit Button */}
                     <div className="mt-4 border-t border-t-gray-300 pt-4 sm:pt-6">
