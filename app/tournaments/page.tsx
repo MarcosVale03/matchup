@@ -1,42 +1,47 @@
-import { fetchTournamentsForSearch } from '@/server/queries/tournaments.queries';
-import { SearchResults } from '@/features/tournament-search/search-results';
+import {fetchTournamentsForSearch} from '@/server/queries/tournaments.queries';
+import {SearchResults} from '@/features/tournament-search/search-results';
 import SearchControls from '@/features/tournament-search/search-controls';
 
-export default async function TournamentSearchPage({ searchParams }: {
-    searchParams: { query?: string; start_date?: string }
+export default async function TournamentSearchPage({searchParams}: {
+    searchParams: { query?: string; startDate?: string }
 }) {
-    const { query = '', start_date } = await searchParams;
-    const dateToSearch = start_date ? new Date(start_date) : new Date(0);
+    const {query = '', startDate} = await searchParams;
+    const dateToSearch = startDate ? new Date(startDate) : new Date(0);
 
     const tournaments = await fetchTournamentsForSearch(query, dateToSearch) ?? [];
 
     return (
-        <main className="bg-primary flex-col font-jersey-10 justify-center items-center p-4 sm:p-6 lg:pt-4 ">
-            <h1 className="text-center text-3xl lg:text-5xl mb-4">
-                The Arena Awaits: Find Your Competition
-            </h1>
+        <main className="flex-col bg-main-bg font-[Poppins] font-semibold text-black justify-center items-center p-4 md:px-8 3xl:px-16">
 
-            <div className="w-full lg:px-8">
-                {/* Search Bar and query logic */}
+            {/* Header */}
+            <div className="text-center mb-6 mt-4 w-fit place-self-center">
+                <h1 className="text-3xl md:text-4xl 3xl:text-5xl font-jersey-25 tracking-wide font-normal">
+                    The Arena Awaits: Find Your Competition
+                </h1>
+                <div className="flex items-center gap-3 mt-2">
+                    <div className="flex-1 h-0.5 bg-primary"/>
+                    <p className="text-sm 3xl:text-base text-zinc-500 text-center min-w-0">
+                        Browse upcoming tournaments and register to compete
+                    </p>
+                    <div className="flex-1 h-0.5 bg-primary"/>
+                </div>
+            </div>
+
+            {/* Search bar and results */}
+            <div className="w-full rounded-2xl 3xl:px-16">
                 <SearchControls />
-
-                {/* Results */}
                 <div className="flex flex-col gap-1">
                     {tournaments.length > 1 && (
-                        <h2 className="text-xl lg:text-3xl">
+                        <h2 className="text-base md:text-lg font-[Poppins]">
                             Found {tournaments.length} Tournaments:
                         </h2>
                     )}
-
                     {tournaments.length === 1 && (
-                        <h2 className="text-xl lg:text-3xl">
+                        <h2 className="text-base md:text-lg font-[Poppins]">
                             Found 1 Tournament:
                         </h2>
                     )}
-
-                    <div className="overflow-y-auto">
-                        <SearchResults tournaments={tournaments} />
-                    </div>
+                    <SearchResults tournaments={tournaments}/>
                 </div>
             </div>
         </main>

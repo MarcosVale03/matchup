@@ -11,6 +11,7 @@ type BasicInputProps = {
     required: boolean,
     inputPlaceholder?: string,
     inputClassName: string
+    maxDateTime?: string;
 }
 
 export default function BasicInputWithLabel({ 
@@ -24,15 +25,10 @@ export default function BasicInputWithLabel({
     required,
     inputPlaceholder, 
     inputClassName,
+    maxDateTime,
 }: BasicInputProps) {
     return (
-        <div className="relative rounded-xl">
-            <label
-                htmlFor={inputId}
-                className={`${labelClassName} absolute -top-3 left-3 bg-secondary px-1`}
-            >
-                {labelText}
-            </label>
+        <div className="rounded-xl flex flex-col-reverse">
             <input 
                 type={inputType}
                 name={inputName}
@@ -42,7 +38,14 @@ export default function BasicInputWithLabel({
                 required={required}
                 placeholder={inputPlaceholder}
                 className={inputClassName}
+                max={maxDateTime}
             />
+            <label
+                htmlFor={inputId}
+                className={labelClassName}
+            >
+                {labelText}
+            </label>
         </div>
     )
 }

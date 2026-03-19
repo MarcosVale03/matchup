@@ -1,9 +1,10 @@
 'use client'
-import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import React, { useCallback, useState } from 'react';
+import {useRouter, useSearchParams, usePathname} from 'next/navigation';
+import React, {useCallback, useState} from 'react';
+import DatePicker from 'react-datepicker';
 import SearchBar from '@/ui/search-bar';
-import { useDebouncedCallback } from 'use-debounce';
-import BasicInputWithLabel from '@/ui/basic-input-with-label';
+import {useDebouncedCallback} from 'use-debounce';
+import {X} from "lucide-react";
 
 export default function SearchControls() {
     const router = useRouter();
@@ -11,6 +12,11 @@ export default function SearchControls() {
     const searchParams = useSearchParams();
 
     const [searchQuery, setSearchQuery] = useState(searchParams.get('query') ?? '');
+    const [selectedDate, setSelectedDate] = useState<Date | null>(
+        searchParams.get('startDate')
+            ? new Date(searchParams.get('startDate') + 'T00:00:00')
+            : null
+    );
 
     const updateParams = useCallback((key: string, value: string) => {
         const params = new URLSearchParams(searchParams.toString());
@@ -19,24 +25,30 @@ export default function SearchControls() {
         } else {
             params.delete(key);
         }
-        // updates the URL
         router.push(`${pathname}?${params.toString()}`);
     }, [router, pathname, searchParams]);
 
-    // debounce the query so it doesn't run on every keystroke
     const debouncedUpdateParams = useDebouncedCallback((value: string) => {
         updateParams('query', value);
     }, 500)
 
-    // for the search bar to update immediately
     const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchQuery(e.target.value);          // updates input immediately
-        debouncedUpdateParams(e.target.value);   // updates URL after 500ms
+        setSearchQuery(e.target.value);
+        debouncedUpdateParams(e.target.value);
     }, [debouncedUpdateParams]);
 
-    const handleDateChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        updateParams('startDate', e.target.value);
+    const handleDateChange = useCallback((date: Date | null) => {
+        setSelectedDate(date); // updates input immediately
+        const value = date
+            ? `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+            : '';
+        updateParams('startDate', value); // updates URL
     }, [updateParams]);
+
+    // Parse the URL param back into a Date object for the picker
+    const currentDate = searchParams.get('startDate')
+        ? new Date(searchParams.get('startDate') + 'T00:00:00')
+        : null;
 
     return (
         <form className="flex flex-col gap-2 sm:flex-row mb-6">
@@ -44,29 +56,43 @@ export default function SearchControls() {
                 searchQuery={searchQuery}
                 handleInputChange={handleInputChange}
                 searchPlaceholder="Search tournaments by name..."
-                inputClassName="mt-1 block font-jersey-25 bg-white w-full rounded-xl border-2 
-                border-tertiary text-black text-md lg:text-xl p-3 shadow-md focus:outline-primary 
-                [&::-webkit-search-cancel-button]:hidden pl-10"
+                inputClassName="block bg-white w-full rounded-xl text-black text-sm md:text-base
+                                p-2.5 pl-9 focus:outline-none focus:border-primary shadow-sm transition
+                                duration-400 border-2 border-white"
             />
-
-            {/* Date Filter */}
-            <div className="relative w-1/4">
-                <label 
-                    htmlFor="startDateFilterInput"
-                    className="absolute -top-3 left-3 bg-secondary px-1 block text-sm lg:text-lg bg-white 
-                    text-tertiary rounded-md"
+            <div className="relative mt-6 sm:mt-0 sm:w-1/4">
+                <label
+                    htmlFor="startDateFilter"
+                    className="block bg-transparent text-zinc-600 rounded-md
+                             peer-focus:text-primary transition duration-400
+                             absolute -top-5 px-1 text-sm font-[Poppins] font-semibold"
                 >
                     Start Date Filter
                 </label>
-                <input
-                    id="startDateFilterInput"
-                    type="date"
-                    max="9999-12-31"
-                    defaultValue={searchParams.get('startDate') ?? ''}
-                    onChange={handleDateChange}
-                    className="mt-1 block font-jersey-25 bg-white w-full rounded-xl border-2 border-tertiary 
-                    text-black text-md lg:text-xl p-3 shadow-md focus:outline-primary"
-                />
+                <div className="relative">
+                    <DatePicker
+                        id="startDateFilter"
+                        selected={selectedDate}
+                        onChange={handleDateChange}
+                        placeholderText="mm/dd/yyyy"
+                        dateFormat="MM/dd/yyyy"
+                        wrapperClassName="w-full"
+                        className="peer block bg-white rounded-xl w-full text-black text-sm md:text-base
+                               p-2.5 border-2 border-white focus:outline-none focus:border-primary
+                               shadow-sm transition duration-400"
+                    />
+                    {currentDate && (
+                        <button
+                            type="button"
+                            onClick={() => handleDateChange(null)}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-400
+                                       hover:text-secondary cursor-pointer transition duration-200"
+                        >
+                            <X className="size-4"/>
+                        </button>
+                    )}
+                </div>
+
             </div>
         </form>
     );

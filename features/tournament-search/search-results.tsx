@@ -1,67 +1,99 @@
-import { formatDateTime } from "@/ui/format-time";
-import { CircleUser } from "lucide-react";
+import {formatDateTime} from "@/ui/format-time";
+import {CircleUser} from "lucide-react";
 import Link from "next/link";
 import {FetchTournamentsForSearchResponse} from "@/server/queries/tournaments.queries";
+import {getTimeUntilStart} from "@/lib/utils/time-until-start";
+import React from "react";
 
-
-export const SearchResults = ({ tournaments }: { tournaments: FetchTournamentsForSearchResponse }) => {
+export const SearchResults = ({tournaments}: { tournaments: FetchTournamentsForSearchResponse }) => {
     // will have to limit the amount of shown results if too many are returned
 
     if (tournaments.length === 0) {
         return (
             // Display a centered message if no results are found
-            <div className="p-4 text-center text-3xl">
+            <div className="p-4 text-center text-zinc-600 text-base md:text-lg">
                 No tournaments found.
             </div>
         )
     } else {
         return (
-                <ul className="gap-4 sm:gap-6 pb-4 sm:pb-6">
-                    {tournaments.map((tournament) => (
-                        <li
-                            key={tournament.id}
-                            className="flex flex-col p-3 gap-4 my-3 rounded-3xl shadow-md sm:my-3.5
-                                   sm:flex-row sm:justify-between sm:items-center 
-                                   sm:p-5 sm:hover:shadow-xl/20 transition duration-150 bg-tertiary"
-                        >
-                            <div className="min-w-0 w-full">
+            <ul className="gap-4 sm:gap-6">
+                {tournaments.map((tournament) => (
+                    <li
+                        key={tournament.id}
+                        className="relative flex flex-col my-2 rounded-3xl shadow-sm
+                            xs:flex-row xs:justify-between xs:items-center
+                            p-4 bg-white hover:shadow-md transition duration-200"
+                    >
+                        <div className="min-w-0 w-full">
+                            <div className="flex flex-col gap-2">
+                                {/* Badges for upcoming, in progress, or ended */}
+                                {(() => {
+                                    const now = new Date();
+                                    const started = new Date(tournament.start_time) <= now;
+                                    const ended = new Date(tournament.end_time) <= now;
+
+                                    const colorClass = ended
+                                        ? "bg-zinc-100 text-zinc-500"      // Ended
+                                        : "bg-zinc-600 text-white"         // Upcoming / Started
+
+                                    return (
+                                        <span
+                                            className={`shrink-0 w-fit flex items-center gap-1.5 text-xs px-2 py-0.5 rounded-md ${colorClass}`}>
+                                                {started && !ended && (
+                                                    <span className="relative flex h-2.5 w-2.5 shrink-0">
+                                                        <span
+                                                            className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"/>
+                                                        <span
+                                                            className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"/>
+                                                    </span>
+                                                )}
+                                            {getTimeUntilStart(new Date(tournament.start_time), new Date(tournament.end_time))}
+                                            </span>
+                                    );
+                                })()}
+
                                 {/* Tournament Name */}
-                                <h1 className="text-lg lg:text-2xl text-center wrap-break-word sm:text-left">
+                                <h1 className="text-primary font-jersey-25 font-normal text-lg lg:text-2xl wrap-break-word text-left min-w-0">
+
                                     {tournament.name}
                                 </h1>
-
-                                {/* Tournament Start and End Time */}
-                                <div className="space-y-0.5 place-self-center sm:place-self-start text-base lg:text-lg">
-                                    <p className="font-jersey-25">
-                                        <span className="">Start Time: </span> {formatDateTime(tournament.start_time)}
-                                    </p>
-                                    <p className="font-jersey-25">
-                                        <span className="">End Time:  </span>  {formatDateTime(tournament.end_time)}
-                                    </p>
-                                </div>
-
-                                {/* Organizer Name */}
-                                <div className="flex flex-row mt-1 place-self-center sm:place-self-start">
-                                    <CircleUser className="size-7 mr-2 place-self-center" />
-                                    <p className="text-base lg:text-lg">
-                                        {tournament.owner.display_name}
-                                    </p>
-                                </div>
                             </div>
 
-                            {/* View Details Button */}
-                            <div className="mb-2 mt-2 place-self-center sm:mb-0 shrink-0">
-                                <Link
-                                    href={`/tournaments/${tournament.id}`}
-                                    className="bg-primary text-base lg:text-xl font-jersey-25 p-3 rounded-lg hover:bg-secondary
-                                    hover:cursor-pointer transition duration-200"
-                                >
-                                    View Details
-                                </Link>
+                            {/* Tournament Start and End Time */}
+                            <div className="space-y-0.5 place-self-start text-xs md:text-sm">
+                                <p className="">
+                                    <span
+                                        className="text-zinc-600">Starts: </span> {formatDateTime(tournament.start_time)}
+                                </p>
+                                <p className=" whitespace-pre">
+                                    <span className="text-zinc-600">Ends: </span> {formatDateTime(tournament.end_time)}
+                                </p>
                             </div>
-                        </li>
-                    ))}
-                </ul>
+
+                            {/* Organizer Name */}
+                            <div className="flex flex-row mt-1 place-self-start">
+                                <CircleUser className="size-5 mr-1.5 place-self-center"/>
+                                <p className="text-sm md:text-base font-[Poppins] font-normal">
+                                    {tournament.owner.display_name}
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* View Details Button */}
+                        <div className="mb-2 mt-2 xs:mb-0 shrink-0">
+                            <Link
+                                href={`/tournaments/${tournament.id}`}
+                                className="block w-full xs:w-auto text-center bg-primary text-sm md:text-base
+                                           font-jersey-25 font-normal tracking-wide p-2 px-6 rounded-lg
+                                           hover:bg-secondary text-white hover:cursor-pointer transition duration-200"
+                            >
+                                View Details
+                            </Link>
+                        </div>
+                    </li>
+                ))}
+            </ul>
         )
     }
 };

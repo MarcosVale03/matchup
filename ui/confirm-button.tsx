@@ -35,7 +35,7 @@ export function ConfirmButton({
             {/* Backdrop */}
             <div
                 className="absolute inset-0 bg-black/50"
-                onClick={onCancelForm}
+                onClick={!isSubmitting ? onCancelForm : undefined}
             />
 
             {/* Dialog */}
@@ -44,9 +44,13 @@ export function ConfirmButton({
                     <div className="shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                         <AlertTriangle className="w-5 h-5 text-primary" />
                     </div>
-                    <div className="flex-1">
-                        <h3 className="mb-2 text-black font-semibold">{title}?</h3>
-                        <p className="text-gray-600">{message}</p>
+                    <div className="flex-1 min-w-0">
+                        <h3 className="mb-2 text-black font-semibold wrap-break-word">
+                            {title}?
+                        </h3>
+                        <p className="text-gray-600 wrap-break-word">
+                            {message}
+                        </p>
                     </div>
                 </div>
                 <div className="flex gap-3 justify-end mt-6 text-black">
@@ -54,8 +58,8 @@ export function ConfirmButton({
                     <button
                         onClick={onCancelForm}
                         disabled={isSubmitting}
-                        className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-
+                        className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50
+                                   transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         Cancel
                     </button>
@@ -63,9 +67,10 @@ export function ConfirmButton({
                     <button
                         onClick={onConfirm}
                         disabled={isSubmitting}
-                        className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-colors"
+                        className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary
+                                   transition-colors disabled:opacity-50"
                     >
-                        Delete
+                        {isSubmitting ? 'Deleting...' : 'Delete'}
                     </button>
                 </div>
                 {/* Error message */}

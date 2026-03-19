@@ -1,9 +1,9 @@
 import TournamentInsertForm from '@/features/tournament-crud/create-tournament';
 
-export default function CreateTournamentPage() {
+export default async function CreateTournamentPage() {
     return (
-        <div className="bg-primary">
-            <div className="flex place-content-center">
+        <div className="bg-main-bg flex flex-col text-black font-[Poppins]">
+            <div className="flex justify-center">
                 <TournamentInsertForm />
             </div>
         </div>

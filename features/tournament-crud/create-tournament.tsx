@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { insertTournament, TournamentInsertErrors } from '@/server/mutations/tournaments.mutations';
 import { dateToInputString } from "@/lib/utils";
 import { ArrowRight } from 'lucide-react';
-import { ErrorMessageForTournament } from "@/ui/error-message-tournament";
+import { ErrorMessageForTournament } from "@/features/tournament-crud/error-message-tournament";
 import Checkbox from "@/ui/checkbox";
 
 // Initial state for the form
@@ -28,7 +28,7 @@ const initialFormState: FormState = {
     name: '',
     slug: '',
     startTime: new Date(),
-    endTime: new Date(),
+    endTime: new Date(Date.now() + 24 * 60 * 60 * 1000),
     isOnline: true,
     email: '',
     discord: '',
@@ -104,13 +104,18 @@ export default function TournamentInsertForm() {
     };
 
     // general classNames used in most of the inputs on this page
-    const pageLabelClass = "block text-base lg:text-xl bg-white text-tertiary rounded-md"
-    const pageInputClass = `mt-1 block font-jersey-25 bg-white w-full rounded-xl border-2 border-tertiary 
-                            text-black text-lg lg:text-2xl p-3 shadow-md focus:outline-primary`
+    const pageLabelClass = `block text-xs sm:text-base text-zinc-600 rounded-md peer-focus:text-primary transition
+                            duration-400 font-[Poppins] font-semibold`
+
+    const pageInputClass = `peer block bg-white w-full rounded-xl border-2 border-white 
+                            text-black text-sm lg:text-base p-2.5 focus:outline-none 
+                            focus:border-primary shadow-sm transition duration-400 font-[Poppins]`
+
+    const legendClass = "text-base lg:text-lg font-jersey-25 text-primary px-2 -mb-3"
 
     return (
-        <div className="mt-4 w-full px-4 sm:px-6 lg:px-8 sm:mx-4 md:mx-8 lg:mx-16 font-jersey-10 text-3xl lg:text-5xl">
-            <h1 className="mb-4 border-b-2 border-tertiary">
+        <div className="mt-4 mx-4 xs:mx-auto xs:max-w-xs sm:max-w-lg md:max-w-2xl lg:max-w-4xl 2xl:max-w-6xl w-full">
+            <h1 className="text-xl md:text-2xl lg:text-3xl font-jersey-25 mb-4 border-b-2 border-gray-400">
                 Create a New Tournament
             </h1>
 
@@ -122,14 +127,15 @@ export default function TournamentInsertForm() {
                 {formError && (
                     <div
                         role="alert"
-                        className="bg-errors border-2 border-errBorder text-xl lg:text-3xl
-                        px-3 py-2 sm:px-4 sm:py-3 rounded-xl mb-4 font-jersey-25"
+                        className="bg-errors/20 text-sm lg:text-base px-3 py-2 rounded-xl mb-4 text-primary
+                                   font-[Poppins] font-semibold"
                     >
                         {formError}
                     </div>
                 )}
 
-                <h2 className="text-2xl lg:text-4xl mb-4">
+                {/* Section Heading */}
+                <h2 className="text-base md:text-lg lg:text-xl font-jersey-25 mb-4">
                     Basic Information
                 </h2>
 
@@ -186,6 +192,7 @@ export default function TournamentInsertForm() {
                                 required={true}
                                 inputPlaceholder=""
                                 inputClassName={`${pageInputClass} appearance-none`}
+                                maxDateTime="9999-12-31T23:59"
                             />
                             <ErrorMessageForTournament field='times' fieldErrors={fieldErrors}/>
                         </div>
@@ -206,14 +213,15 @@ export default function TournamentInsertForm() {
                                 required={true}
                                 inputPlaceholder=""
                                 inputClassName={pageInputClass}
+                                maxDateTime="9999-12-31T23:59"
                             />
                         </div>
                     </div>
                 </fieldset>
 
                 {/* Location Type */}
-                <fieldset className="p-4 sm:p-5 bg-tertiary border-2 rounded-3xl mb-6 w-full">
-                    <legend className="text-2xl lg:text-4xl bg-tertiary rounded-xl px-2">
+                <fieldset className="p-2 px-5 border-2 border-zinc-600 rounded-2xl mb-6 w-full">
+                    <legend className={`${legendClass} mb-0`}>
                         Location Type
                     </legend>
 
@@ -223,13 +231,13 @@ export default function TournamentInsertForm() {
                         name="isOnline"
                         checked={formData.isOnline}
                         onChange={handleChange}
-                        label="Online tournament?"
-                        boxClassName="group h-6 w-6 rounded-md border-2 border-primary flex items-center
-                        justify-center transition-all duration-200 hover:bg-white"
+                        label="Online tournament"
+                        boxClassName="group h-4 w-4 rounded-sm border-2 border-primary flex items-center
+                                      justify-center transition-all duration-200 hover:bg-white"
                         checkedBoxClassName="bg-primary text-black"
                         iconSize={18}
                         iconClassName="group-hover:text-primary text-white"
-                        labelClassName="text-3xl font-jersey-25"
+                        labelClassName="text-sm md:text-base lg:text-lg font-jersey-25"
                     />
                     
 
@@ -237,7 +245,7 @@ export default function TournamentInsertForm() {
                     <div
                         className={`grid transition-all duration-500 
                             ${!formData.isOnline ? 
-                                'grid-rows-[1fr] mt-6 opacity-100' : 
+                                'grid-rows-[1fr] opacity-100' : 
                                 'grid-rows-[0fr] opacity-0'
                             }
                         `}
@@ -261,8 +269,8 @@ export default function TournamentInsertForm() {
                 </fieldset>
 
                 {/* Tournament Visibility */}
-                <fieldset className="p-4 sm:p-5 bg-tertiary border-2 rounded-3xl mb-6 w-full">
-                    <legend className="text-2xl lg:text-4xl bg-tertiary rounded-xl px-2 -mb-3">
+                <fieldset className="p-4 px-5 border-2 border-zinc-600 rounded-2xl mb-6 w-full">
+                    <legend className={legendClass}>
                         Tournament Visibility
                     </legend>
 
@@ -273,13 +281,13 @@ export default function TournamentInsertForm() {
                             id="tournament-public"
                             name="visibility"
                             value="public"
-                            checked={formData.isPublic}
-                            className="h-4 lg:h-4.5 w-4 lg:w-4.5 accent-primary shrink-0"
+                            checked={formData.isPublic === true}
+                            className="h-4 w-4 accent-primary shrink-0"
                             onChange={() => setFormData({...formData, isPublic: true})}
                         />
                         <label
                             htmlFor="tournament-public"
-                            className="ml-2 text-xl lg:text-3xl font-jersey-25"
+                            className="ml-2 text-sm md:text-base lg:text-lg font-jersey-25"
                         >
                             Public
                         </label>
@@ -292,12 +300,13 @@ export default function TournamentInsertForm() {
                             id="tournament-private"
                             name="visibility"
                             value="private"
-                            className="h-4 lg:h-4.5 w-4 lg:w-4.5 accent-primary shrink-0"
+                            checked={formData.isPublic === false}
+                            className="h-4 w-4 accent-primary shrink-0"
                             onChange={() => setFormData({...formData, isPublic: false})}
                         />
                         <label
                             htmlFor="tournament-private"
-                            className="ml-2 text-xl lg:text-3xl font-jersey-25"
+                            className="ml-2 text-sm md:text-base lg:text-lg font-jersey-25"
                         >
                             Private
                         </label>
@@ -305,8 +314,8 @@ export default function TournamentInsertForm() {
                 </fieldset>
 
                 {/* Contact Information */}
-                <fieldset className="p-4 sm:p-5 bg-tertiary border-2 rounded-3xl mb-6 w-full">
-                    <legend className="text-2xl lg:text-4xl bg-tertiary rounded-xl px-2 -mb-3">
+                <fieldset className="p-4 px-5 border-2 border-zinc-600 rounded-2xl mb-6 w-full">
+                    <legend className={legendClass}>
                         Contact Information (At least one required)
                     </legend>
 
@@ -347,18 +356,17 @@ export default function TournamentInsertForm() {
                 </fieldset>
 
                 {/* Submit Button */}
-                <div className="pt-4 sm:pt-6 mt-4 border-t-2 border-t-tertiary">
+                <div className="pt-4 sm:pt-6 mt-4 border-t-2 border-gray-400 flex gap-2">
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="w-full flex items-center justify-center gap-2 py-2.5 sm:py-3 px-4 border
-                        border-transparent rounded-md shadow-sm text-sm sm:text-base font-medium
-                        text-white bg-secondary hover:bg-tertiary focus:outline-none focus:ring-2
-                        focus:ring-offset-2 focus:ring-primary disabled:opacity-50 transition-colors
-                        text-xl lg:text-3xl"
+                        className="w-full flex items-center justify-center gap-2 py-2.5 px-4
+                                   rounded-md shadow-sm text-base md:text-lg lg:text-xl font-jersey-25
+                                   text-white bg-primary hover:bg-secondary disabled:opacity-50
+                                   transition-colors"
                     >
                         {isSubmitting ? 'Going to events...' : 'Create events for this tournament'}
-                        <ArrowRight size={18} className='shrink-0'/>
+                        <ArrowRight size={16} className='shrink-0'/>
                     </button>
                 </div>
             </form>

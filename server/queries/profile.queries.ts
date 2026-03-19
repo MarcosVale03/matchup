@@ -36,10 +36,14 @@ export type PastTournamentsResponse = {
     team_name: string | null
     tournament_id: number
     user_id: string
-    tournaments: {
-        name: string
-        users: {
-            display_name: string
+    events: {
+        tournament_id: number
+        tournaments: {
+            name: string
+            end_time: string
+            users: {
+                display_name: string
+            }
         }
     }
 }[]
@@ -108,8 +112,14 @@ export async function fetchPastTournaments(user_id : string): Promise<QueryRespo
     const curr_date = new Date().toISOString()
 
     // getting all tournaments plus users placement that happened before current date
-    const {data, error} = await supabase.from('entrants').select('*, tournaments!tournament_id(name, users!owner(display_name))').eq('user_id', user_id).lt('tournaments.end_time', curr_date)
+    const { data, error } = await supabase
+        .from('entrants')
+        .select('*, events!inner(tournament_id, tournaments!inner(name, end_time, users!owner(display_name)))')
+        .eq('user_id', user_id)
+        .lt('events.tournaments.end_time', curr_date)
 
+    console.log(error)
+    console.log(data)
     // error check
     if (error) {
         return {

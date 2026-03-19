@@ -1,35 +1,45 @@
 'use client'
 
 import Image from "next/image";
-import { CircleUser, Calendar, MapPin, Clock, ChevronRight, Trophy, Pencil } from "lucide-react";
-import { formatDateTime } from "@/ui/format-time";
-import { FutureTournamentsResponse, PastTournamentsResponse, User } from "@/server/queries/profile.queries";
-import { MouseEventHandler } from "react";
-import { useRouter } from "next/navigation";
+import {CircleUser, Calendar, MapPin, Clock, ChevronRight, Trophy, Pencil} from "lucide-react";
+import {formatDateTime} from "@/ui/format-time";
+import {FutureTournamentsResponse, PastTournamentsResponse, User} from "@/server/queries/profile.queries";
+import {MouseEventHandler} from "react";
+import {useRouter} from "next/navigation";
+
+// for placements
+function getOrdinal(n: number): string {
+    const s = ['th', 'st', 'nd', 'rd'];
+    const v = n % 100;
+    return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
 
 // tournament cards that appear for future and past tournaments
 function EventCard({
-    tournamentName,
-    organizerName,
-    startTime,
-    endTime,
-    onClickTournament,
-}: {
+                       tournamentName,
+                       organizerName,
+                       startTime,
+                       endTime,
+                       onClickTournament,
+                       placement,
+                   }: {
     tournamentName: string;
     organizerName: string;
     startTime?: string;
     endTime?: string;
-    onClickTournament?: MouseEventHandler<HTMLDivElement> | undefined
+    onClickTournament?: MouseEventHandler<HTMLDivElement> | undefined;
+    placement?: number | null
 }) {
 
     return (
         <div
             className="group flex items-center gap-3 sm:gap-4 p-3 sm:p-4 border-2 border-gray-200 rounded-xl
-            hover:border-primary/40 hover:shadow-sm transition-all duration-200 cursor-pointer"
+                     hover:border-primary/40 hover:shadow-sm transition-all duration-200 cursor-pointer"
             onClick={onClickTournament}
         >
             {/* Tournament icon / thumbnail placeholder */}
-            <div className="shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+            <div
+                className="shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-primary/10 flex items-center justify-center">
                 <Trophy size={20} className="text-primary"/>
             </div>
 
@@ -37,20 +47,20 @@ function EventCard({
             <div className="min-w-0 flex-1">
 
                 {/* Tournament name */}
-                <h3 className="font-bold text-primary truncate text-sm sm:text-base">
+                <h3 className="font-jersey-25 text-primary truncate text-base sm:text-lg">
                     {tournamentName}
                 </h3>
 
                 {/* Organizer */}
                 <div className="flex items-center gap-1.5 mt-0.5">
                     <Image
-                        src="/globe.svg"
-                        alt="Organizer PFP"
-                        className="w-4 h-4 shrink-0"
-                        width={50}
-                        height={50}
+                        src="/random-pfp.png"
+                        alt="random pfp"
+                        className="w-5 h-5 shrink-0 rounded-full"
+                        width={65}
+                        height={65}
                     />
-                    <p className="text-xs sm:text-sm text-gray-500 font-semibold truncate">
+                    <p className="text-xs sm:text-sm text-black font-semibold truncate">
                         {organizerName}
                     </p>
                 </div>
@@ -68,6 +78,13 @@ function EventCard({
                         Ended: <span className="font-semibold text-gray-700">{formatDateTime(endTime)}</span>
                     </p>
                 )}
+
+                {/* Placement for mobile */}
+                {placement && (
+                    <p className="text-xs text-gray-500 mt-0.5 sm:hidden">
+                        Placed: <span className="font-semibold text-gray-700">{getOrdinal(placement)}</span>
+                    </p>
+                )}
             </div>
 
             {/* For Desktop */}
@@ -81,10 +98,15 @@ function EventCard({
 
             {/* For Desktop */}
             {endTime && !startTime && (
-                <div className="hidden sm:block shrink-0 text-right">
-                    <p className="text-sm text-gray-700">
-                        Ended: <span className="font-semibold">{formatDateTime(endTime)}</span>
+                <div className="hidden sm:block shrink-0 text-right text-black">
+                    <p className="text-sm text-gray-500">
+                        Ended: <span className="font-semibold text-gray-700">{formatDateTime(endTime)}</span>
                     </p>
+                    {placement && (
+                        <p className="text-sm text-gray-500">
+                            Placed: <span className="font-semibold text-gray-700">{getOrdinal(placement)}</span>
+                        </p>
+                    )}
                 </div>
             )}
 
@@ -95,10 +117,10 @@ function EventCard({
 }
 
 export default function UserInformation({
-    profile,
-    futureTournaments,
-    pastTournaments
-}: {
+                                            profile,
+                                            futureTournaments,
+                                            pastTournaments
+                                        }: {
     profile: User;
     futureTournaments: FutureTournamentsResponse;
     pastTournaments: PastTournamentsResponse;
@@ -107,19 +129,18 @@ export default function UserInformation({
     const router = useRouter();
 
     return (
-        <main className="bg-white flex flex-col min-h-screen font-[Poppins]">
+        <main className="bg-zinc-100 flex flex-col min-h-screen font-[Poppins]">
             <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10 mx-auto w-full max-w-4xl">
 
                 {/* Profile Card */}
                 <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden mb-8">
 
-                    {/* Subtle header band */}
+                    {/* Header band */}
                     <div className="h-24 sm:h-40 bg-primary/20"/>
 
                     <div className="px-4 sm:px-8 pb-5 sm:pb-8">
-                        {/* Avatar + Name Row */}
                         <div className="flex flex-col -mt-10 sm:-mt-12 gap-3 sm:gap-4">
-                            <div className="bg-white rounded-full flex w-fit border border-black">
+                            <div className="bg-white rounded-full flex w-fit border-2 border-white shadow-sm">
                                 <CircleUser
                                     size={80}
                                     strokeWidth={1}
@@ -130,41 +151,36 @@ export default function UserInformation({
                             <div className="flex-1 sm:pb-1">
                                 <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
                                     <div className="flex gap-2 items-center min-w-0">
-                                        {/* Profile tag */}
                                         {profile?.prefix && (
-                                            <span className="text-base sm:text-lg text-primary/50 font-semibold shrink-0">
+                                            <span
+                                                className="text-base sm:text-lg text-primary/50 font-jersey-25 shrink-0">
                                                 {profile.prefix}
                                             </span>
                                         )}
-
-                                        {/* Profile display name */}
-                                        <h1 className="text-xl sm:text-3xl font-bold text-primary truncate">
+                                        <h1 className="text-2xl sm:text-4xl font-jersey-25 text-primary break-words">
                                             {profile?.display_name}
                                         </h1>
                                     </div>
 
-                                    {/* Button to edit profile */}
-                                    <button
-                                        className="shrink-0 bg-primary text-white py-1.5 px-3 rounded-lg text-sm
-                                        font-medium hover:bg-red-800 transition-colors duration-150
-                                        disabled:cursor-not-allowed flex items-center gap-2"
-                                    >
+                                    <button className="shrink-0 bg-primary text-white py-1.5 px-3 rounded-lg
+                                        text-sm font-jersey-25 hover:bg-secondary transition-colors duration-150
+                                        flex items-center gap-2">
                                         <Pencil size={14}/>
                                         Edit Profile
                                     </button>
                                 </div>
 
-                                {/* Meta info -> Name, time joined, and location (placeholder) */}
-                                <div className="flex flex-col sm:flex-row sm:items-center gap-1 text-xs sm:text-sm text-gray-500">
-                                    <span className="font-medium text-primary/80">
+                                <div
+                                    className="flex flex-col sm:flex-row sm:items-center gap-1 text-xs sm:text-sm text-gray-500">
+                                    <span className="font-semibold text-gray-700">
                                         {profile?.first_name} {profile?.last_name}
                                     </span>
-                                    <span className="hidden sm:inline text-gray-800">·</span>
+                                    <span className="hidden sm:inline text-gray-400">·</span>
                                     <span className="flex items-center gap-1">
                                         <Clock size={12}/>
                                         Joined {formatDateTime(profile?.time_joined)}
                                     </span>
-                                    <span className="hidden sm:inline text-gray-800">·</span>
+                                    <span className="hidden sm:inline text-gray-400">·</span>
                                     <span className="flex items-center gap-1">
                                         <MapPin size={12}/>
                                         Los Angeles, CA
@@ -178,7 +194,7 @@ export default function UserInformation({
                 {/* Upcoming Events */}
                 <section className="mb-8">
                     <div className="flex items-center justify-between mb-3">
-                        <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                        <h2 className="text-xl font-jersey-25 text-gray-800 flex items-center gap-2">
                             <Calendar size={18}/>
                             Upcoming Events
                         </h2>
@@ -186,7 +202,6 @@ export default function UserInformation({
                             {futureTournaments.length} {futureTournaments.length === 1 ? 'event' : 'events'}
                         </span>
                     </div>
-                    {/* Tournament card with details */}
                     <div className="flex flex-col gap-3">
                         {futureTournaments.length > 0 ? (
                             futureTournaments.map((tournament) => (
@@ -199,7 +214,7 @@ export default function UserInformation({
                                 />
                             ))
                         ) : (
-                            <p className="text-sm text-gray-400 text-center py-8 border-2 border-dashed border-gray-200 rounded-xl">
+                            <p className="text-sm text-gray-400 text-center py-8 border-2 border-dashed border-gray-300 rounded-xl">
                                 No upcoming events — join a tournament!
                             </p>
                         )}
@@ -209,7 +224,7 @@ export default function UserInformation({
                 {/* Past Events */}
                 <section>
                     <div className="flex items-center justify-between mb-3">
-                        <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                        <h2 className="text-xl font-jersey-25 text-gray-800 flex items-center gap-2">
                             <Calendar size={18}/>
                             Past Events
                         </h2>
@@ -217,21 +232,20 @@ export default function UserInformation({
                             {pastTournaments?.length} {pastTournaments?.length === 1 ? 'event' : 'events'}
                         </span>
                     </div>
-
-                    {/* Tournament card with details */}
                     <div className="flex flex-col gap-3">
                         {pastTournaments.length > 0 ? (
                             pastTournaments.map((tournament) => (
                                 <EventCard
                                     key={tournament.tournament_id}
-                                    tournamentName={tournament.tournaments.name}
-                                    organizerName={tournament.tournaments.users.display_name}
-                                    // endTime={tournament.end_time}
+                                    tournamentName={tournament.events?.tournaments?.name ?? 'Unknown Tournament'}
+                                    organizerName={tournament.events?.tournaments?.users?.display_name ?? 'Unknown'}
                                     onClickTournament={() => router.push(`/tournaments/${tournament.tournament_id}`)}
+                                    endTime={tournament.events?.tournaments?.end_time}
+                                    placement={tournament.placement}
                                 />
                             ))
                         ) : (
-                            <p className="text-sm text-gray-400 text-center py-8 border-2 border-dashed border-gray-200 rounded-xl">
+                            <p className="text-sm text-gray-400 text-center py-8 border-2 border-dashed border-gray-300 rounded-xl">
                                 No past events yet.
                             </p>
                         )}

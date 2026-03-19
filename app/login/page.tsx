@@ -1,7 +1,6 @@
 'use client'
 import React, { useState } from 'react';
 import { signInWithEmail } from '@/lib/auth';
-import MatchupDescription from '@/features/account-creation/matchup-des';
 import AuthCard from '@/features/account-creation/auth-card';
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 
@@ -40,11 +39,7 @@ export default function LoginPage() {
 
     return (
         <div className="bg-primary font-[Poppins] absolute h-full inset-0 flex items-center justify-center p-4">
-            <div className="w-full max-w-4xl flex flex-col sm:flex-row rounded-lg overflow-hidden shadow-md bg-white">
-                {/* left side of card */}
-                <MatchupDescription />
-
-                {/* right side of card */}
+            <div className="w-full max-w-xl flex flex-col sm:flex-row rounded-lg overflow-hidden shadow-lg/40 sm:py-10 bg-main-bg">
                 <AuthCard
                     email={email}
                     password={password}

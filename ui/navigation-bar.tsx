@@ -23,11 +23,11 @@ export default function NavigationBar() {
         }
     }
 
-    const iconClassName = "size-5"
+    const iconClassName = "size-4"
 
     // for screens that show the buttons on the nav bar
-    const generalButtonClass = `flex flex-row items-center justify-center rounded-2xl hover:bg-white 
-                                hover:text-primary transition duration-200 p-1 px-2 gap-2`;
+    const generalButtonClass = `flex flex-row items-center justify-center rounded-2xl 
+                                hover:bg-white hover:text-primary transition duration-200 p-1 px-2 gap-2`;
 
     // for screens that show the button on the side panel when expanded
     const sidebarButtonClass = `flex flex-row items-center gap-3 w-full px-4 py-3 rounded-md 
@@ -37,7 +37,7 @@ export default function NavigationBar() {
 
     return (
         <>
-            <nav className="bg-primary p-3 sticky w-full top-0 z-10 font-jersey-25 text-lg lg:text-2xl">
+            <nav className="bg-primary p-2 px-4 sticky w-full top-0 z-10 font-jersey-25 text-base lg:text-xl">
                 <ul className="flex justify-between items-center list-none">
 
                     {/* Left: Logo */}
@@ -53,7 +53,7 @@ export default function NavigationBar() {
                     {/*    />*/}
                     {/*</Link>*/}
 
-                    <h1 className="text-3xl lg:text-5xl">
+                    <h1 className="text-3xl lg:text-4xl text-white">
                         Matchup
                     </h1>
 
@@ -133,21 +133,19 @@ export default function NavigationBar() {
             {/* Backdrop */}
             {menuOpen && (
                 <div
-                    className="fixed inset-0 bg-black/50 z-20 sm:hidden"
+                    className="fixed inset-0 bg-black/50 z-20 md:hidden"
                     onClick={closeMenu}
                 />
             )}
 
             {/* Side Panel */}
-            <div className={`fixed top-0 right-0 h-full w-64 bg-primary z-30 sm:hidden shadow-2xl
-                            transform transition-transform duration-300 ease-in-out font-jersey-10 text-2xl
+            <div className={`fixed top-0 right-0 h-full w-64 bg-primary z-30 md:hidden shadow-2xl
+                            transform transition-transform duration-300 ease-in-out font-jersey-25 text-lg
                             ${menuOpen ? 'translate-x-0' : 'translate-x-full'}`}
             >
                 {/* Panel Header */}
-                <div className="flex justify-between items-center p-4 border-b border-tertiary">
-                    <span className="text-4xl">
-                        Menu
-                    </span>
+                <div className="flex justify-between items-center p-4 border-b border-secondary">
+                    <span className="text-2xl text-white">Menu</span>
                     <button onClick={closeMenu} className="p-1 hover:bg-white/10 rounded-md">
                         <X className={iconClassName} />
                     </button>
