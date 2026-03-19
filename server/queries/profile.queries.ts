@@ -118,8 +118,6 @@ export async function fetchPastTournaments(user_id : string): Promise<QueryRespo
         .eq('user_id', user_id)
         .lt('events.tournaments.end_time', curr_date)
 
-    console.log(error)
-    console.log(data)
     // error check
     if (error) {
         return {
