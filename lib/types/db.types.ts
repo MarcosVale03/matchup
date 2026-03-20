@@ -555,6 +555,45 @@ export type Database = {
           },
         ]
       }
+      schedule_conflicts: {
+        Row: {
+          end_time: string
+          id: number
+          start_time: string
+          tournament_id: number
+          user_id: string
+        }
+        Insert: {
+          end_time: string
+          id?: number
+          start_time: string
+          tournament_id: number
+          user_id: string
+        }
+        Update: {
+          end_time?: string
+          id?: number
+          start_time?: string
+          tournament_id?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "schedule_conflicts_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "schedule_conflicts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       seeds: {
         Row: {
           entrant_user_id: string | null
@@ -793,6 +832,15 @@ export type Database = {
         Args: { p_content: string; p_thread_id: string }
         Returns: undefined
       }
+      insert_schedule_conflict: {
+        Args: {
+          s_end_time: string
+          s_start_time: string
+          s_tournament_id: number
+          s_user_id: string
+        }
+        Returns: undefined
+      }
       insert_thread: {
         Args: { t_content: string; t_title: string }
         Returns: undefined
@@ -843,6 +891,16 @@ export type Database = {
       }
       update_post: {
         Args: { p_new_content: string; p_post_id: string }
+        Returns: undefined
+      }
+      update_schedule_conflict: {
+        Args: {
+          s_end_time: string
+          s_id: number
+          s_start_time: string
+          s_tournament_id: number
+          s_user_id: string
+        }
         Returns: undefined
       }
       update_tournament: {
