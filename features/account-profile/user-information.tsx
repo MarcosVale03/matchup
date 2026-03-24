@@ -140,6 +140,8 @@ export default function UserInformation({
 
                     <div className="px-4 sm:px-8 pb-5 sm:pb-8">
                         <div className="flex flex-col -mt-10 sm:-mt-12 gap-3 sm:gap-4">
+
+                            {/* Profile picture */}
                             <div className="bg-white rounded-full flex w-fit border-2 border-white shadow-sm">
                                 <CircleUser
                                     size={80}
@@ -148,6 +150,7 @@ export default function UserInformation({
                                 />
                             </div>
 
+                            {/* User information */}
                             <div className="flex-1 sm:pb-1">
                                 <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
                                     <div className="flex gap-2 items-center min-w-0">
@@ -162,7 +165,10 @@ export default function UserInformation({
                                         </h1>
                                     </div>
 
-                                    <button className="shrink-0 bg-primary text-white py-1.5 px-3 rounded-lg
+                                    {/* Edit button */}
+                                    <button
+                                        onClick={() => {router.push(`/profile-settings`)}}
+                                        className="shrink-0 bg-primary text-white py-1.5 px-3 rounded-lg
                                         text-sm font-jersey-25 hover:bg-secondary transition-colors duration-150
                                         flex items-center gap-2">
                                         <Pencil size={14}/>
