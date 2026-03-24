@@ -11,11 +11,6 @@ type EditPostProps = {
     onUpdatePostAction?: (updatedPost: Post) => void;
 };
 
-
-/*  onCancelAction calls setEditingPostId(null) in forum-post-list to close the edit form
-*   onUpdatePostAction calls setEditingPostId(null) and shows a success message in forum-post-list after successful edit;
-*   it also sends the updated post back to forum-post-list to update the post content
-*/
 export default function EditPost({
     post,
     onCancelAction,
@@ -59,7 +54,7 @@ export default function EditPost({
             onSubmit={handleSubmit}
             className="space-y-2 p-1"
         >
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
+            <h2 className="text-lg sm:text-xl font-jersey-25">
                 Editing Post
             </h2>
 
@@ -75,12 +70,11 @@ export default function EditPost({
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="Edit your post content..."
-                rows={5}
+                rows={3}
                 disabled={isSubmitting}
-                className="w-full px-4 py-3 text-base sm:text-lg leading-relaxed border border-gray-300
-                           rounded-lg min-h-[140px] sm:min-h-40 resize-y placeholder:text-gray-500
-                           focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent 
-                           transition-all duration-150 text-gray-900 disabled:bg-gray-50 disabled:cursor-not-allowed"
+                className="w-full px-4 py-2 min-h-[50px] leading-relaxed border border-gray-300
+                           rounded-lg resize-y focus:outline-none focus:ring-2 focus:ring-primary
+                           focus:border-transparent transition duration-200 font-[Poppins] bg-white"
             />
 
             {/* Cancel/Save Buttons */}
@@ -89,10 +83,10 @@ export default function EditPost({
                     type="button"
                     onClick={onCancelAction}
                     disabled={isSubmitting}
-                    className="flex items-center justify-center gap-2 px-5 sm:px-6 py-3 sm:py-2.5 text-sm
-                               sm:text-base font-medium text-gray-700 border border-gray-300 rounded-lg
-                               hover:bg-gray-50 active:bg-gray-100 transition-colors touch-manipulation
-                               flex-1 sm:flex-none disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center justify-center gap-2 py-1 px-4
+                               rounded-md shadow-sm text-base md:text-lg font-jersey-25
+                               text-white bg-primary hover:bg-secondary disabled:opacity-50
+                               transition-colors"
                 >
                     <X className="size-5 sm:size-4" />
                     Cancel
@@ -100,10 +94,10 @@ export default function EditPost({
                 <button
                     type="submit"
                     disabled={!content.trim() || isSubmitting}
-                    className="flex items-center justify-center gap-2 px-6 sm:px-7 py-3 sm:py-2.5
-                               text-sm sm:text-base font-medium bg-primary text-white rounded-lg
-                               hover:bg-secondary active:bg-primary/90 transition-colors disabled:opacity-50
-                               disabled:cursor-not-allowed touch-manipulation flex-1 sm:flex-none shadow-sm"
+                    className="flex items-center justify-center gap-2 py-1 px-4
+                               rounded-md shadow-sm text-base md:text-lg font-jersey-25
+                               text-white bg-primary hover:bg-secondary disabled:opacity-50
+                               transition-colors"
                 >
                     <Save className="size-5 sm:size-4" />
                     {isSubmitting ? "Saving..." : "Save"}

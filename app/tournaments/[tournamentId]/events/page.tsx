@@ -2,7 +2,7 @@ import {fetchEventsFromTournamentId} from "@/server/queries/events.queries";
 import {notFound} from "next/navigation";
 import Link from "next/link";
 
-export default async function Page({ params }: { params: { tournamentId: string } }) {
+export default async function Events({ params }: { params: { tournamentId: string } }) {
     const { tournamentId: idStr } = await params
     const tournamentId = Number(idStr);
 

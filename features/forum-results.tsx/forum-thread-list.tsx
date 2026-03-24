@@ -1,124 +1,153 @@
 'use client'
-import { Thread } from "@/server/queries/forum.queries";
-import { FetchTournamentFromIdResponse } from "@/server/queries/tournaments.queries";
-import React, { useState } from "react";
-import { CheckCircle, CircleAlert } from "lucide-react";
-import ForumThreadSingle from "./forum-thread-single";
+import {Thread} from "@/server/queries/forum.queries";
+import React, {useState} from "react";
+import {CircleAlert, Plus, X} from "lucide-react";
 import SearchBar from "@/ui/search-bar";
 import AddForumThread from '../forum-crud/add-thread';
-import { useAuth } from "@/app/client-layout";
+import {useProfile} from "@/app/client-layout";
+import {useToast} from "@/ui/toast/use-toast";
+import {Toast} from "@/ui/toast/toast";
+import Link from "next/link";
+import Image from "next/image";
+import {formatDate} from "date-fns";
 
-export default function ForumThreadList({posts, tournamentData}: { posts: Thread[], tournamentData?: FetchTournamentFromIdResponse }) {
-    const {user, loading} = useAuth();
+export default function ForumThreadList({threads}: {
+    threads: Thread[],
+}) {
+    const {user} = useProfile();
 
     const [searchQuery, setSearchQuery] = useState('');
-    const [successMessage, setSuccessMessage] = useState<string | null>(null);
+    const [isFormOpen, setIsFormOpen] = useState(false);
 
-    const handleThreadDeleted = () => {
-        setSuccessMessage("Thread deleted successfully!");
-        setTimeout(() => setSuccessMessage(null), 3000);
-    };
+    const toast = useToast();
 
     const handleThreadAdded = () => {
-        setSuccessMessage("Thread created successfully!");
-        setTimeout(() => setSuccessMessage(null), 3000);
+        toast.show("Thread created successfully!");
+        setIsFormOpen(false);
     }
 
-    const filteredThreads = posts
+    // show the filtered threads from the search bar
+    const filteredThreads = threads
         .filter(thread =>
             thread.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
             thread.content.toLowerCase().includes(searchQuery.toLowerCase())
         );
 
-    const skeletonButton = (
-        <div className="w-full p-3 bg-primary text-center animate-pulse rounded-md">
-            Loading...
-        </div>
-    )
+    const iconClassName = "size-4 sm:size-5 place-self-center"
 
     return (
-        <div className="space-y-6">
-            {/* Search bar*/}
-            <SearchBar
-                searchQuery={searchQuery}
-                handleInputChange={(e) => setSearchQuery(e.target.value)}
-                searchPlaceholder={
-                    tournamentData?.id
-                        ? "Search posts in this tournament..."
-                        : "Search forum posts..."
-                }
-                inputClassName="w-full max-w-full p-3 pl-10 text-base border-2 border-gray-300 
-                                rounded-xl outline-primary transition duration-150 shadow-sm
-                                placeholder:text-gray-400 text-gray-800"
-            />
+        <div className="w-full rounded-2xl 3xl:px-16">
+            {/* Search bar, add button */}
+            <div className="flex flex-col md:flex-row gap-3 mb-4">
+                <SearchBar
+                    searchQuery={searchQuery}
+                    handleInputChange={(e) => setSearchQuery(e.target.value)}
+                    searchPlaceholder="Search forum posts..."
+                    inputClassName="block bg-white w-full rounded-xl text-black text-sm md:text-base
+                                    p-2.5 pl-9 focus:outline-none focus:border-primary shadow-sm transition
+                                    duration-400 border-2 border-white placeholder:font-semibold"
+                />
 
-            {loading ? (
-                <div className="w-full">
-                    {/* placeholder buttons */}
-                    {skeletonButton}
-                </div>
-            ) : (
-                <>
-                    {user ? (
-                        <>
-                            {/* Add post button | only show if logged in*/}
-                            <AddForumThread onAddAction={handleThreadAdded}/>
-                        </>
-                    ) : (
-                        <div
-                            className="w-full sm:flex-1 flex items-center justify-center gap-2 py-2.5 sm:py-3 px-4 border
-                                       border-transparent rounded-md shadow-sm text-sm sm:text-base font-medium
-                                       text-white bg-primary transition-colors"
-                        >
-                            <CircleAlert className="w-5 h-5"/>
-                            Log in or make an account to create a thread
-                        </div>
-                    )}
-                </>
+                {/* Add Thread button | only available if logged in */}
+                {user ? (
+                    <button
+                        type="button"
+                        onClick={() => setIsFormOpen(!isFormOpen)}
+                        className="flex flex-row items-center justify-center gap-2 w-full md:w-auto py-2.5 text-center
+                                 bg-primary text-sm md:text-base font-jersey-25 tracking-wide px-6
+                                  rounded-lg hover:bg-secondary text-white hover:cursor-pointer
+                                  transition duration-200 whitespace-nowrap"
+                    >
+                        {isFormOpen ? <X className={iconClassName}/> : <Plus className={iconClassName}/>}
+                        {isFormOpen ? 'Cancel' : 'New Thread'}
+                    </button>
+                ) : (
+                    <div
+                        className="flex flex-row items-center justify-center gap-2 w-full md:w-auto py-2.5 text-center
+                                 bg-primary text-sm md:text-base font-jersey-25 tracking-wide px-6
+                                  rounded-lg text-white transition duration-200 whitespace-nowrap"
+                    >
+                        <CircleAlert className={iconClassName}/>
+                        Log in or make an account to create a thread
+                    </div>
+                )}
+            </div>
+
+            {/* Add thread form */}
+            {isFormOpen && (
+                <AddForumThread
+                    onAddAction={handleThreadAdded}
+                    onCancelAction={() => setIsFormOpen(false)}
+                />
             )}
 
             {/* Forum Threads */}
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
 
                 {/* Success Message */}
-                {successMessage && (
-                    <div
-                        className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">
-                        <CheckCircle className="w-5 h-5"/>
-                        {successMessage}
-                    </div>
-                )}
+                <Toast message={toast.message}/>
 
-                <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">
-                    {tournamentData?.id ? "Tournament Discussion" : "Forum Threads"}
+                <h2 className="text-xl sm:text-2xl font-semibold tracking-tight">
+                    Forum Threads
                 </h2>
 
-                <div className="overflow-y-auto">
-                    <div className="sm:h-[calc(100vh-350px)] overflow-y-auto lg:pr-2">
-                        {/* Loading or empty state */}
-                        {filteredThreads.length === 0 ? (
-                            // Show different messages based on whether there's a search query or if we're filtering by tournament
-                            <div className="p-8 sm:p-12 text-center text-gray-500">
-                                {searchQuery.trim()
-                                    ? `No results for "${searchQuery.trim()}"`
-                                    : tournamentData?.id
-                                        ? "No threads yet – start the conversation!"
-                                        : "No forum threads found."}
-                            </div>
-                        ) : (
-                            // Generate the threads
-                            <div className="space-y-4 lg:pr-2">
-                                {filteredThreads.map((thread) => (
-                                    <ForumThreadSingle
+                <div className="overflow-y-auto sm:h-[calc(100vh-350px)]">
+                    {/* Loading or empty state */}
+                    {filteredThreads.length === 0 ? (
+                        // Show different messages based on whether there's a search query
+                        <div className="p-8 text-center text-gray-500">
+                            {searchQuery.trim()
+                                ? `No results for "${searchQuery.trim()}"`
+                                : "No forum threads found."}
+                        </div>
+                    ) : (
+                        // Generate the threads
+                        <div className="space-y-4">
+                            {filteredThreads.map((thread) => (
+                                <div
+                                    key={thread.id}
+                                    className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm
+                                               hover:shadow-md mb-4 hover:border-primary
+                                               transition duration-500"
+                                >
+                                    {/* Post Title, Author, Tournament, Timestamp */}
+                                    <Link
                                         key={thread.id}
-                                        thread={thread}
-                                        onThreadDeleteAction={handleThreadDeleted}
-                                        user={user}
-                                    />
-                                ))}
-                            </div>
-                        )}
-                    </div>
+                                        href={`/forums/${thread.id}?title=${encodeURIComponent(thread.title)}`}
+                                    >
+                                        <div className="flex flex-col gap-2 mb-1 text-black">
+
+                                            {/* Author of thread */}
+                                            <div className="flex flex-1 min-w-0 gap-2.5 sm:gap-3 text-sm">
+                                                <div className="flex flex-row gap-2 place-content-center">
+                                                    <Image
+                                                        src="/random-pfp.png"
+                                                        alt="random-pfp"
+                                                        width={24}
+                                                        height={24}
+                                                        className="rounded-full"
+                                                    />
+                                                    <p className="font-semibold">Author Name</p>
+                                                </div>
+                                                <p className="hidden sm:inline">•</p>
+                                                <p className="font-medium">{formatDate(thread.created_at, "MMM d, yyyy @ h:mm a")}</p>
+                                            </div>
+
+                                            {/* Title */}
+                                            <h3 className="text-2xl sm:text-3xl font-jersey-25 text-primary">
+                                                {thread.title}
+                                            </h3>
+                                        </div>
+
+                                        {/* Thread content */}
+                                        <p className="text-gray-700 leading-relaxed whitespace-pre-wrap text-[15px] sm:text-base">
+                                            {thread.content}
+                                        </p>
+                                    </Link>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
