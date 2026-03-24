@@ -5,8 +5,9 @@ export default async function ForumsPage() {
     const threads = await fetchThreads();
     const threadData = threads.success ? (threads.data ?? []) : [];
 
+
     return (
-        <main className="flex-col bg-main-bg font-[Poppins] font-semibold text-black justify-center items-center p-4 md:px-8 3xl:px-16">
+        <main className="flex-col bg-main-bg font-[Poppins] text-black justify-center items-center p-4 md:px-8 3xl:px-32">
             <div className="text-center mb-6 mt-4 w-fit place-self-center">
                 <h1 className="text-3xl md:text-4xl 3xl:text-5xl font-jersey-25 tracking-wide font-normal">
                     Welcome to the Matchup Forums: Connect and Share!

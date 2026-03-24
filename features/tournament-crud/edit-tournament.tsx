@@ -101,7 +101,7 @@ export default function TournamentEditForm({initialData}: { initialData: FetchTo
                 onSubmit={handleSubmit}
                 className="mb-6"
             >
-                <h2 className="text-base md:text-lg lg:text-xl font-jersey-25 mb-4 border-b-2 border-gray-400">
+                <h2 className="text-base md:text-lg lg:text-xl font-jersey-25 mb-3 border-b border-gray-300">
                     Tournament ID: <span className="">{formData.id}</span>
                 </h2>
 

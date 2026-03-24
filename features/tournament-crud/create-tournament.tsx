@@ -115,7 +115,7 @@ export default function TournamentInsertForm() {
 
     return (
         <div className="mt-4 mx-4 xs:mx-auto xs:max-w-xs sm:max-w-lg md:max-w-2xl lg:max-w-4xl 2xl:max-w-6xl w-full">
-            <h1 className="text-xl md:text-2xl lg:text-3xl font-jersey-25 mb-4 border-b-2 border-gray-400">
+            <h1 className="text-xl md:text-2xl lg:text-3xl font-jersey-25 mb-2 border-b border-gray-300">
                 Create a New Tournament
             </h1>
 
@@ -135,7 +135,7 @@ export default function TournamentInsertForm() {
                 )}
 
                 {/* Section Heading */}
-                <h2 className="text-base md:text-lg lg:text-xl font-jersey-25 mb-4">
+                <h2 className="text-lg md:text-xl lg:text-2xl font-jersey-25 mb-4">
                     Basic Information
                 </h2>
 

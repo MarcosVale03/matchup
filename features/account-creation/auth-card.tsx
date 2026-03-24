@@ -27,28 +27,28 @@ type AuthCardProps = {
 }
 
 export default function AuthCard({
-                                     step = 1,
-                                     email,
-                                     password,
-                                     confirmPassword,
-                                     firstName,
-                                     lastName,
-                                     displayName,
-                                     prefix,
-                                     isLoading,
-                                     formErrors,
-                                     fieldErrors,
-                                     authType,
-                                     handleAuth,
-                                     onEmailChange,
-                                     onPasswordChange,
-                                     onConfirmPasswordChange,
-                                     onFirstNameChange,
-                                     onLastNameChange,
-                                     onDisplayNameChange,
-                                     onPREChange,
-                                     onBack
-                                 }: AuthCardProps) {
+    step = 1,
+    email,
+    password,
+    confirmPassword,
+    firstName,
+    lastName,
+    displayName,
+    prefix,
+    isLoading,
+    formErrors,
+    fieldErrors,
+    authType,
+    handleAuth,
+    onEmailChange,
+    onPasswordChange,
+    onConfirmPasswordChange,
+    onFirstNameChange,
+    onLastNameChange,
+    onDisplayNameChange,
+    onPREChange,
+    onBack
+}: AuthCardProps) {
     const headerMessage = authType === 'Signup' ? 'Welcome!' : 'Welcome back!';
     const subHeaderMessage = authType === 'Signup' ? 'Create a MatchUp account' : 'Sign in to your MatchUp account';
     const footer = authType === 'Signup' ? 'Already have an account?' : "Don't have an account?";

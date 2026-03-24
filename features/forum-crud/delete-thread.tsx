@@ -33,7 +33,7 @@ export default function DeleteThread({ threadId }: {threadId: string}) {
             }
 
             setShowDeleteConfirm(false);
-            router.push("/forums"); // send back to forums to reflect the deleted thread
+            router.push("/forums?deleted=true"); // send back to forums to reflect the deleted thread
         } catch (err) {
             setError("Failed to delete the thread. Please try again.");
             console.error(err);

@@ -5,6 +5,12 @@ import {createClient} from "@/server/db/server";
 import {TournamentDetails} from "@/features/tournament-search/tournament-details";
 import {Trophy} from "lucide-react";
 import Link from "next/link";
+import {fetchEventsFromTournamentId} from "@/server/queries/events.queries";
+import {FetchEventsFromTournamentIdResponse} from "@/server/queries/events.queries";
+
+
+class fetchEventsFromTournamentIdResponse {
+}
 
 export default async function TournamentDetailsPage({params}: { params: { tournamentId: string } }) {
     const {tournamentId: idStr} = await params;
@@ -14,8 +20,11 @@ export default async function TournamentDetailsPage({params}: { params: { tourna
         notFound();
     }
 
-    const {success, tournament} = await fetchTournamentFromId(id);
-    if (!success || !tournament) {
+    const {success: tournamentSuccess, tournament} = await fetchTournamentFromId(id);
+    const {success: eventsSuccess, events} = await fetchEventsFromTournamentId(id);
+
+
+    if (!tournamentSuccess || !tournament) {
         return (
             <main className="bg-main-bg flex flex-col items-center justify-center py-10 text-black font-[Poppins]">
                 <Trophy size={48} className="text-gray-300 mb-4" />
@@ -47,8 +56,12 @@ export default async function TournamentDetailsPage({params}: { params: { tourna
     };
 
     return (
-        <main className="bg-main-bg flex flex-col font-[Poppins]">
-            <TournamentDetails tournament={tournament} permissions={permissions}/>
+        <main className="bg-main-bg flex flex-col font-[Poppins] text-black">
+            <TournamentDetails
+                tournament={tournament}
+                permissions={permissions}
+                events={events}
+            />
         </main>
     );
 }

@@ -2,6 +2,7 @@
 import {useRouter, useSearchParams, usePathname} from 'next/navigation';
 import React, {useCallback, useState} from 'react';
 import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import SearchBar from '@/ui/search-bar';
 import {useDebouncedCallback} from 'use-debounce';
 import {X} from "lucide-react";
@@ -81,6 +82,7 @@ export default function SearchControls() {
                                p-2.5 border-2 border-white focus:outline-none focus:border-primary
                                shadow-sm transition duration-400"
                     />
+                    {/* Clear the date */}
                     {currentDate && (
                         <button
                             type="button"

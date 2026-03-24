@@ -74,7 +74,7 @@ export default function EditPost({
                 disabled={isSubmitting}
                 className="w-full px-4 py-2 min-h-[50px] leading-relaxed border border-gray-300
                            rounded-lg resize-y focus:outline-none focus:ring-2 focus:ring-primary
-                           focus:border-transparent font-[Poppins] bg-white"
+                           focus:border-transparent transition duration-200 font-[Poppins] bg-white"
             />
 
             {/* Cancel/Save Buttons */}

@@ -1,6 +1,5 @@
 'use client';
 import {FetchTournamentFromIdResponse} from "@/server/queries/tournaments.queries";
-import {formatDateTime} from "@/ui/format-time";
 import {getTimeUntilStart} from "@/lib/utils/time-until-start";
 import {useRouter} from "next/navigation";
 import {Mail, Pencil, Globe, Trash} from "lucide-react";
@@ -8,6 +7,9 @@ import Image from "next/image";
 import React, {useState} from "react";
 import {deleteTournament} from "@/server/mutations/tournaments.mutations";
 import {ConfirmButton} from "@/ui/confirm-button";
+import {FetchEventsFromTournamentIdResponse} from "@/server/queries/events.queries";
+import EventList from "@/features/tournament-events/event-list";
+import {formatDate} from "date-fns";
 
 export type TournamentPermissions = {
     canEdit: boolean;
@@ -15,10 +17,12 @@ export type TournamentPermissions = {
 };
 
 export function TournamentDetails({
-                                      tournament,
-                                      permissions
-                                  }: {
+    tournament,
+    events,
+    permissions
+}: {
     tournament: FetchTournamentFromIdResponse;
+    events?: FetchEventsFromTournamentIdResponse;
     permissions: TournamentPermissions;
 }) {
     const router = useRouter();
@@ -54,8 +58,7 @@ export function TournamentDetails({
                                     w-full p-4 place-content-center`
 
     return (
-        <div className="overflow-y-auto text-black">
-
+        <div>
             {/* Container for tournament name, edit/delete button, owner, and start/end time */}
             <div className="p-4 sm:p-8 pt-6 sm:pt-10">
                 {/* Tournament Name and Edit */}
@@ -63,7 +66,8 @@ export function TournamentDetails({
                     className="flex flex-col lg:flex-row items-start lg:items-center mb-2 gap-3 lg:gap-0 justify-between">
 
                     {/* Tournament Name */}
-                    <h1 className="text-2xl lg:text-4xl text-primary font-jersey-25 break-all min-w-0 flex-1" title={tournament.name}>
+                    <h1 className="text-2xl lg:text-4xl text-primary font-jersey-25 break-all min-w-0 flex-1"
+                        title={tournament.name}>
                         {tournament.name}
                     </h1>
 
@@ -124,7 +128,7 @@ export function TournamentDetails({
                         </h2>
                         <div className="flex flex-row">
                             <p className="truncate min-w-0 font-[Poppins] text-sm md:text-base lg:text-lg">
-                                {formatDateTime(tournament.start_time)}
+                                {formatDate(tournament.start_time, "MMM d, yyyy @ h:mm a")}
                             </p>
                         </div>
                     </div>
@@ -136,7 +140,7 @@ export function TournamentDetails({
                         </h2>
                         <div className="flex flex-row">
                             <p className="truncate min-w-0 font-[Poppins] text-sm md:text-base lg:text-lg">
-                                {formatDateTime(tournament.end_time)}
+                                {formatDate(tournament.end_time, "MMM d, yyyy @ h:mm a")}
                             </p>
                         </div>
                     </div>
@@ -168,8 +172,8 @@ export function TournamentDetails({
                         <div className="ml-2 text-sm md:text-base font-[Poppins] font-semibold tracking-normal">
                             {/* if not discord, show not provided */}
                             {tournament.email_contact ? (
-                                <p>{tournament.email_contact}</p>
-                            ) :
+                                    <p>{tournament.email_contact}</p>
+                                ) :
                                 <p>Not provided</p>
                             }
                         </div>
@@ -256,126 +260,7 @@ export function TournamentDetails({
                 }}
             />
 
-            {/* Events */}
-            {/* a lot of this is placeholder for now */}
-            <div className="p-4 sm:p-6 lg:p-8 mt-2">
-                <div className="pb-3 border-b-2 border-zinc-600 mb-4">
-                    <h1 className="text-xl lg:text-3xl wrap-break-word font-jersey-25">
-                        Tournament Events
-                    </h1>
-                    <h2 className="text-sm lg:text-base font-[Poppins] font-semibold text-gray-600">
-                        Select an event below to view its details
-                    </h2>
-                </div>
-
-                {/* All events container */}
-                <div className="w-full grid grid-cols-1 sm:grid-cols-3 gap-5">
-
-                    {/* Making 4 event placeholders for now */}
-                    {[...Array(4)].map((_, i) => (
-                        <div key={i} className="rounded-md shadow-lg">
-
-                            {/* Image container */}
-                            <div
-                                className="relative bg-black py-12 sm:py-16 lg:py-25 text-center text-primary rounded-t-md">
-                                {/* image goes here */}
-                                <p className="text-lg lg:text-2xl text-white">
-                                    [Game Image]
-                                </p>
-
-                                {/* Game name in the bottom left corner of image */}
-                                <div
-                                    className="absolute text-white left-3 bottom-3 sm:left-5 sm:bottom-5
-                                    bg-zinc-600 rounded-lg px-2 py-1 sm:p-2 text-sm lg:text-base font-jersey-25"
-                                >
-                                    Game Name
-                                </div>
-                            </div>
-
-                            {/* Event details container */}
-                            <div className="p-3 sm:p-4 bg-card-input text-black rounded-b-md">
-
-                                {/* Event Name, Platform, Date, and Time */}
-                                <div
-                                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
-                                    <div>
-                                        <p className="text-base lg:text-xl font-jersey-25">
-                                            Event Name
-                                        </p>
-                                        <p className="text-sm lg:text-sm font-[Poppins] tracking-tight">
-                                            Platform
-                                        </p>
-                                    </div>
-                                    <div className="sm:text-right">
-                                        <p className="text-base lg:text-xl font-jersey-25">
-                                            Date
-                                        </p>
-                                        <p className="text-sm lg:text-sm font-[Poppins] tracking-tight">
-                                            Time
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {/* Event Information */}
-                                <div
-                                    className="grid grid-cols-1 xs:grid-cols-2 mt-3 border-y-2 border-y-gray-300 py-4 gap-y-3">
-
-                                    {/* Entry Fee */}
-                                    <div>
-                                        <h3 className="text-sm lg:text-base font-jersey-25 tracking-wide">
-                                            Entry Fee
-                                        </h3>
-                                        <p className="text-sm lg:text-md font-[Poppins] tracking-tight">
-                                            $20
-                                        </p>
-                                    </div>
-
-                                    {/* Team size */}
-                                    <div>
-                                        <h3 className="text-sm lg:text-base font-jersey-25 tracking-wide">
-                                            Team Size
-                                        </h3>
-                                        <p className="text-sm font-[Poppins] tracking-tight">
-                                            Squads (4)
-                                        </p>
-                                    </div>
-
-                                    {/* Amount of teams registered out of maximum allowed */}
-                                    <div>
-                                        <h3 className="text-sm lg:text-base font-jersey-25 tracking-wide">
-                                            Registered
-                                        </h3>
-                                        <p className="text-sm font-[Poppins] tracking-tight">
-                                            16/20 Teams
-                                        </p>
-                                    </div>
-
-                                    {/* Bracket type */}
-                                    <div>
-                                        <h3 className="text-sm lg:text-base font-jersey-25 tracking-wide">
-                                            Bracket Type
-                                        </h3>
-                                        <p className="text-sm font-[Poppins] tracking-tight">
-                                            Single Elimination
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {/* Event Details Button */}
-                                <button
-                                    className="flex items-center justify-center gap-2 p-2 px-4 mt-4
-                                               rounded-md shadow-sm text-sm md:text-base lg:text-lg
-                                               font-jersey-25 text-white bg-primary hover:bg-secondary
-                                               cursor-pointer disabled:opacity-50 transition-colors duration-200 w-full"
-                                >
-                                    View Details
-                                </button>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
+            <EventList events={events} />
         </div>
     );
 }

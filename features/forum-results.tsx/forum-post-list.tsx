@@ -1,11 +1,11 @@
 'use client'
 import DeletePost from "../forum-crud/delete-post";
 import {Edit2, Trash2} from "lucide-react";
-import {formatDateTime} from "@/ui/format-time";
 import {useState} from "react";
 import {Post} from "@/server/queries/forum.queries";
 import EditPost from "../forum-crud/edit-post";
 import {useProfile} from "@/app/client-layout";
+import {formatDate} from "date-fns";
 
 type toast = {
     message: string | null
@@ -49,12 +49,15 @@ export default function ForumPostsList({posts, toastControl}: { posts: Post[], t
                     >
                         {/* Header */}
                         <div className="flex items-center justify-between gap-2 mb-3">
-                            <div className="flex flex-wrap items-center gap-2 text-sm text-gray-500">
-                                <span className="font-semibold text-primary/80">
+                            <div className="flex flex-wrap items-center gap-2 text-sm">
+                                <div className="font-semibold">
                                     Author
-                                </span>
-                                <span>•</span>
-                                <span>{formatDateTime(post.created_at)}</span>
+                                    <span className="font-semibold text-blue-900 italic">
+                                        {user?.id === post.author_id ? " OP" : ''}
+                                    </span>
+                                </div>
+                                <p>•</p>
+                                <p>{formatDate(post.created_at, "MMM d, yyyy @ h:mm a")}</p>
                             </div>
 
                             {user && post.author_id === user.id && (

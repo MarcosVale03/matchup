@@ -1,11 +1,15 @@
-import {formatDateTime} from "@/ui/format-time";
 import {CircleUser} from "lucide-react";
 import Link from "next/link";
 import {FetchTournamentsForSearchResponse} from "@/server/queries/tournaments.queries";
 import {getTimeUntilStart} from "@/lib/utils/time-until-start";
 import React from "react";
+import {formatDate} from "date-fns";
 
-export const SearchResults = ({tournaments}: { tournaments: FetchTournamentsForSearchResponse }) => {
+export const SearchResults = ({
+    tournaments
+}: {
+    tournaments: FetchTournamentsForSearchResponse
+}) => {
     // will have to limit the amount of shown results if too many are returned
 
     if (tournaments.length === 0) {
@@ -17,12 +21,11 @@ export const SearchResults = ({tournaments}: { tournaments: FetchTournamentsForS
         )
     } else {
         return (
-            <ul className="gap-4 sm:gap-6">
+            <ul className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 {tournaments.map((tournament) => (
                     <li
                         key={tournament.id}
-                        className="relative flex flex-col my-2 rounded-3xl shadow-sm
-                            xs:flex-row xs:justify-between xs:items-center
+                        className="relative flex flex-col rounded-3xl shadow-sm
                             p-4 bg-white hover:shadow-md transition duration-200"
                     >
                         <div className="min-w-0 w-full">
@@ -38,24 +41,23 @@ export const SearchResults = ({tournaments}: { tournaments: FetchTournamentsForS
                                         : "bg-zinc-600 text-white"         // Upcoming / Started
 
                                     return (
-                                        <span
-                                            className={`shrink-0 w-fit flex items-center gap-1.5 text-xs px-2 py-0.5 rounded-md ${colorClass}`}>
-                                                {started && !ended && (
-                                                    <span className="relative flex h-2.5 w-2.5 shrink-0">
-                                                        <span
-                                                            className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"/>
-                                                        <span
-                                                            className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"/>
-                                                    </span>
-                                                )}
+                                        <div
+                                            className={`shrink-0 w-fit flex items-center gap-1.5 text-xs px-2 rounded-md ${colorClass}`}>
+                                            {started && !ended && (
+                                                <div className="relative flex h-2.5 w-2.5 shrink-0">
+                                                    <p className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"/>
+                                                    <p className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"/>
+                                                </div>
+                                            )}
                                             {getTimeUntilStart(new Date(tournament.start_time), new Date(tournament.end_time))}
-                                            </span>
+                                        </div>
                                     );
                                 })()}
 
                                 {/* Tournament Name */}
-                                <h1 className="text-primary font-jersey-25 font-normal text-lg lg:text-2xl wrap-break-word text-left min-w-0">
-
+                                <h1
+                                    className="text-primary font-jersey-25 font-normal text-lg lg:text-2xl
+                                                truncate text-left min-w-0">
                                     {tournament.name}
                                 </h1>
                             </div>
@@ -63,11 +65,10 @@ export const SearchResults = ({tournaments}: { tournaments: FetchTournamentsForS
                             {/* Tournament Start and End Time */}
                             <div className="space-y-0.5 place-self-start text-xs md:text-sm">
                                 <p className="">
-                                    <span
-                                        className="text-zinc-600">Starts: </span> {formatDateTime(tournament.start_time)}
+                                   Starts: {formatDate(tournament.start_time, "MMM d, yyyy @ h:mm a")}
                                 </p>
                                 <p className=" whitespace-pre">
-                                    <span className="text-zinc-600">Ends: </span> {formatDateTime(tournament.end_time)}
+                                    Ends: {formatDate(tournament.end_time, "MMM d, yyyy @ h:mm a")}
                                 </p>
                             </div>
 

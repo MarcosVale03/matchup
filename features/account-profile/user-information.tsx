@@ -2,10 +2,10 @@
 
 import Image from "next/image";
 import {CircleUser, Calendar, MapPin, Clock, ChevronRight, Trophy, Pencil} from "lucide-react";
-import {formatDateTime} from "@/ui/format-time";
 import {FutureTournamentsResponse, PastTournamentsResponse, User} from "@/server/queries/profile.queries";
 import {MouseEventHandler} from "react";
 import {useRouter} from "next/navigation";
+import {formatDate} from "date-fns";
 
 // for placements
 function getOrdinal(n: number): string {
@@ -16,13 +16,13 @@ function getOrdinal(n: number): string {
 
 // tournament cards that appear for future and past tournaments
 function EventCard({
-                       tournamentName,
-                       organizerName,
-                       startTime,
-                       endTime,
-                       onClickTournament,
-                       placement,
-                   }: {
+    tournamentName,
+    organizerName,
+    startTime,
+    endTime,
+    onClickTournament,
+    placement,
+}: {
     tournamentName: string;
     organizerName: string;
     startTime?: string;
@@ -68,14 +68,14 @@ function EventCard({
                 {/* Start time for mobile */}
                 {startTime && (
                     <p className="text-xs text-gray-500 mt-0.5 sm:hidden">
-                        Starts: <span className="font-semibold text-gray-700">{formatDateTime(startTime)}</span>
+                        Starts: <span className="font-semibold text-gray-700">{formatDate(startTime, "MMM d, yyyy @ h:mm a")}</span>
                     </p>
                 )}
 
                 {/* End time for mobile */}
                 {endTime && (
                     <p className="text-xs text-gray-500 mt-0.5 sm:hidden">
-                        Ended: <span className="font-semibold text-gray-700">{formatDateTime(endTime)}</span>
+                        Ended: <span className="font-semibold text-gray-700">{formatDate(endTime, "MMM d, yyyy @ h:mm a")}</span>
                     </p>
                 )}
 
@@ -91,7 +91,7 @@ function EventCard({
             {startTime && (
                 <div className="hidden sm:block shrink-0 text-right">
                     <p className="text-sm text-gray-700">
-                        Starts: <span className="font-semibold">{formatDateTime(startTime)}</span>
+                        Starts: <span className="font-semibold">{formatDate(startTime, "MMM d, yyyy @ h:mm a")}</span>
                     </p>
                 </div>
             )}
@@ -100,7 +100,7 @@ function EventCard({
             {endTime && !startTime && (
                 <div className="hidden sm:block shrink-0 text-right text-black">
                     <p className="text-sm text-gray-500">
-                        Ended: <span className="font-semibold text-gray-700">{formatDateTime(endTime)}</span>
+                        Ended: <span className="font-semibold text-gray-700">{formatDate(endTime, "MMM d, yyyy @ h:mm a")}</span>
                     </p>
                     {placement && (
                         <p className="text-sm text-gray-500">
@@ -117,10 +117,10 @@ function EventCard({
 }
 
 export default function UserInformation({
-                                            profile,
-                                            futureTournaments,
-                                            pastTournaments
-                                        }: {
+    profile,
+    futureTournaments,
+    pastTournaments
+}: {
     profile: User;
     futureTournaments: FutureTournamentsResponse;
     pastTournaments: PastTournamentsResponse;
@@ -178,7 +178,7 @@ export default function UserInformation({
                                     <span className="hidden sm:inline text-gray-400">·</span>
                                     <span className="flex items-center gap-1">
                                         <Clock size={12}/>
-                                        Joined {formatDateTime(profile?.time_joined)}
+                                        Joined {formatDate(profile?.time_joined, "MMM d, yyyy")}
                                     </span>
                                     <span className="hidden sm:inline text-gray-400">·</span>
                                     <span className="flex items-center gap-1">

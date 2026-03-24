@@ -1,13 +1,12 @@
 'use client'
 import React, {useState} from 'react';
-import {X, Plus, Send} from "lucide-react";
+import {Send} from "lucide-react";
 import {useRouter} from 'next/navigation';
 import {insertForumThread} from '@/server/mutations/forum.mutation';
 
 // onAddAction calls handleThreadAdded in forum-thread-list to show success message after creating a thread
 export default function AddForumThread({
                                            onAddAction,
-                                           onCancelAction
                                        }: {
     onAddAction: () => void;
     onCancelAction: () => void;
@@ -43,13 +42,12 @@ export default function AddForumThread({
     };
 
     return (
-        <div className="">
+        <div className="mb-4">
             <form
                 onSubmit={handleSubmitThread}
-                className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 sm:p-6
-                             lg:p-7 space-y-5 sm:space-y-6"
+                className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 space-y-5"
             >
-                <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">
+                <h2 className="text-xl sm:text-2xl font-jersey-25 font-normal">
                     Create New Thread
                 </h2>
 
@@ -61,53 +59,40 @@ export default function AddForumThread({
                 )}
 
                 {/* Title input */}
-                <input
-                    type="text"
+                <textarea
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="Post title"
                     autoFocus
-                    className="w-full px-4 py-3.5 text-base sm:text-lg font-medium border
-                               border-gray-300 rounded-lg placeholder:text-gray-500
-                               focus:outline-none focus:ring-2 focus:ring-primary
-                               focus:border-transparent transition-all duration-150
-                               text-gray-800"
+                    className="block bg-white w-full rounded-lg border border-gray-300
+                             text-black text-sm lg:text-base p-2.5 pb-0 focus:outline-none
+                             focus:ring-2 focus:ring-primary focus:border-transparent transition
+                             duration-200 font-[Poppins]"
                 />
 
-                {/* Textarea */}
+                {/* Content */}
                 <textarea
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
                     placeholder="What's on your mind?"
-                    className="w-full px-4 py-3.5 leading-relaxed border border-gray-300 rounded-lg min-h-[140px]
-                               sm:min-h-40 resize-yplaceholder:text-gray-500 focus:outline-none focus:ring-2
-                               focus:ring-primary focus:border-transparent transition-all duration-150
-                               text-gray-800"
+                    className="block bg-white w-full rounded-xl border border-gray-300
+                             text-black text-sm lg:text-base p-2.5 focus:outline-none
+                             focus:ring-2 focus:ring-primary focus:border-transparent
+                              transition duration-200 font-[Poppins] min-h-[140px]
+                              sm:min-h-40 resize-y leading-relaxed"
                 />
 
-                {/* Cancel/Post Buttons */}
-                <div className="flex flex-col-reverse sm:flex-row gap-3 sm:gap-4 justify-end pt-2 sm:pt-4">
-                    <button
-                        type="button"
-                        onClick={onCancelAction}
-                        className="flex items-center justify-center gap-2 px-5 sm:px-6 py-3 sm:py-2.5 text-sm
-                                   sm:text-base font-medium text-gray-700 border border-gray-300 rounded-lg
-                                   hover:bg-gray-50 active:bg-gray-100 transition-colors touch-manipulation
-                                   flex-1 sm:flex-none"
-                    >
-                        <X className="size-5 sm:size-4"/>
-                        Cancel
-                    </button>
+                {/* Post Button */}
+                <div className="flex flex-col-reverse sm:flex-row gap-3 sm:gap-4 justify-end pt-2">
                     <button
                         type="submit"
-                        className="flex items-center justify-center gap-2 px-6 sm:px-7 py-3 sm:py-2.5 text-sm
-                                   sm:text-base font-medium bg-primary text-white rounded-lg
-                                   hover:bg-secondary active:bg-primary/90 transition-colors
-                                   disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation
-                                   flex-1 sm:flex-none shadow-sm"
+                        className="w-full flex flex-row xs:w-auto text-center bg-primary text-sm md:text-base
+                                   font-jersey-25 font-normal tracking-wide p-2 px-6 rounded-lg hover:bg-secondary
+                                   text-white hover:cursor-pointer transition duration-200 gap-2 place-self-center
+                                   disabled:bg-primary/70 disabled:cursor-not-allowed place-content-center"
                         disabled={!title.trim() || !content.trim() || isSubmitting}
                     >
-                        <Send size={18} className=" size-4 place-self-center"/>
+                        <Send size={18} className="size-5 sm:size-4 place-self-center"/>
                         Post
                     </button>
                 </div>

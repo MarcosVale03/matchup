@@ -1,5 +1,8 @@
 'use client'
-import {useState} from "react";
+import {Fragment, useState} from "react";
+import {FetchEventFromEventIdResponse} from "@/server/queries/events.queries";
+import {formatDate} from "date-fns";
+import {CalendarSync, ChevronRight, Crown, ShieldAlert, Wrench, X} from "lucide-react";
 
 interface Team {
     rank: number;
@@ -209,18 +212,23 @@ const CUTOFF = 8;
 function rankClass(rank: number): string {
     if (rank === 1) return "text-primary";
     if (rank === 2) return "text-secondary";
-    if (rank === 3) return "text-amber-700";
-    return "text-gray-400";
+    if (rank === 3) return "text-secondary/95";
+    return "text-gray-700";
 }
 
 function rowBg(team: Team, selected: boolean): string {
-    if (selected) return "bg-primary/10";
-    if (team.rank <= 3) return "bg-primary/5";
+    if (selected) return "bg-primary/15";
+    if (team.rank <= 3) return "bg-gray-300/30";
+
     if (team.rank <= CUTOFF) return "bg-gray-50";
     return "bg-white";
 }
 
-export default function TournamentStandings() {
+export default function EventDetails({
+    event
+}: {
+    event: FetchEventFromEventIdResponse
+}) {
     const [activeTab, setActiveTab] = useState<"standings" | "matches" | "upcoming">("standings");
     const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
     const [showAdmin, setShowAdmin] = useState(false);
@@ -229,39 +237,52 @@ export default function TournamentStandings() {
         ? TEAMS.find((x) => x.name === selectedTeam)
         : undefined;
 
+    const redButtonClassName = `flex items-center justify-center gap-2 p-2 px-4 lg:mt-0
+                             rounded-md shadow-sm text-sm md:text-lg font-jersey-25
+                             text-white bg-primary hover:bg-secondary cursor-pointer
+                             disabled:opacity-50 transition-colors duration-200`
+
     return (
-        <div className="overflow-y-auto text-gray-900 mx-0 sm:mx-4 lg:mx-20 border-x-0 sm:border-x-2 border-gray-200">
+        <div className="overflow-y-auto mx-0 sm:mx-4 lg:mx-20 border-x-0 sm:border-x-2 border-gray-200">
             <div className="mx-auto p-4 sm:p-6 lg:p-8">
 
                 {/* HEADER */}
-                <header className="pt-6 pb-7 border-b border-gray-100">
+                <header className="pt-6">
                     <div className="flex flex-wrap justify-between items-start gap-4">
+
+                        {/* Event Details */}
                         <div>
                             <div className="flex items-center gap-2.5 mb-3">
-                                <span
+                                <p
                                     className="text-xs font-bold tracking-widest uppercase text-white
                                     bg-secondary px-3 py-1 rounded"
                                 >
-                                  Organizer View
-                                </span>
+                                    Organizer View
+                                </p>
                             </div>
-                            <h1 className="text-3xl lg:text-5xl font-extrabold tracking-tight text-primary">
-                                {TOURNAMENT.name}
+                            <h1 className="text-3xl lg:text-5xl font-jersey-25 text-primary">
+                                {event.name}
                             </h1>
-                            <p className="mt-2 text-base sm:text-lg text-gray-700 font-medium">
-                                {TOURNAMENT.game} · {TOURNAMENT.format} · {TOURNAMENT.startDate} — {TOURNAMENT.endDate}
+                            <p className="mt-2 text-base sm:text-lg font-semibold text-gray-700">
+                                {event.video_game_name} · BRACKET FORMAT
+                                · {formatDate(event.start_time, 'MMM d, yyyy')} — {formatDate(event.end_time, 'MMM d, yyyy')}
                             </p>
                         </div>
 
+                        {/* Admin tools button */}
                         <button
                             onClick={() => setShowAdmin(!showAdmin)}
-                            className="flex items-center justify-center gap-2 p-2 px-4
-                            lg:mt-0 border border-transparent rounded-md shadow-sm text-sm
-                            sm:text-base font-medium text-white bg-primary
-                            hover:bg-secondary cursor-pointer disabled:opacity-50
-                            transition-colors duration-200 break-all"
+                            className={redButtonClassName}
                         >
-                            {showAdmin ? "✕ Close Admin Tools" : "⚙ Admin Tools"}
+                            {!showAdmin && (
+                                <Wrench className="size-5"/>
+                            )}
+
+                            {showAdmin && (
+                                <X className="size-5"/>
+                            )}
+
+                            {showAdmin ? "Close Admin Tools" : "Admin Tools"}
                         </button>
                     </div>
 
@@ -278,9 +299,11 @@ export default function TournamentStandings() {
                             {label: "Remaining", value: String(TOURNAMENT.matchesRemaining)},
                         ].map((s, i) => (
                             <div key={i}
-                                 className="relative overflow-hidden bg-gray-50 border border-gray-100 rounded-xl px-4 py-4">
-                                <p className="text-xs font-bold tracking-widest uppercase text-gray-400 mb-1">{s.label}</p>
-                                <p className="text-2xl font-extrabold text-gray-900">{s.value}</p>
+                                 className="relative overflow-hidden bg-white rounded-xl
+                                 px-4 py-4 shadow-md"
+                            >
+                                <p className="font-jersey-25 text-base md:text-lg lg:text-xl">{s.label}</p>
+                                <p className="font-semibold text-lg text-primary">{s.value}</p>
                             </div>
                         ))}
                     </div>
@@ -288,8 +311,8 @@ export default function TournamentStandings() {
 
                 {/* ADMIN PANEL */}
                 {showAdmin && (
-                    <div className="my-6 p-5 rounded-xl border border-primary bg-primary/4">
-                        <p className="text-sm font-bold tracking-widest uppercase text-primary mb-4">
+                    <div className="my-6 p-5 rounded-xl border border-zinc-700 bg-zinc-800 text-white">
+                        <p className="font-jersey-25 text-base md:text-lg lg:text-xl uppercase text-white mb-4">
                             Admin Alerts & Actions
                         </p>
 
@@ -298,18 +321,15 @@ export default function TournamentStandings() {
                             {ALERTS.map((a, i) => (
                                 <div
                                     key={i}
-                                    className="flex items-center gap-3 px-4 py-3 bg-white border border-gray-100 rounded-lg text-base"
+                                    className="flex items-center gap-3 p-3 border border-zinc-600
+                                               bg-zinc-700/50 rounded-lg text-base"
                                 >
-                                    <span className="flex-1 text-gray-500">
+                                    <p className="flex-1 font-semibold text-base">
                                         {a.msg}
-                                    </span>
+                                    </p>
                                     {a.type === "warning" && (
                                         <button
-                                            className="flex items-center justify-center gap-2 p-2 px-4
-                                            lg:mt-0 border border-transparent rounded-md shadow-sm text-sm
-                                            sm:text-base font-medium text-white bg-primary
-                                            hover:bg-secondary cursor-pointer disabled:opacity-50
-                                            transition-colors duration-200 break-all"
+                                            className={redButtonClassName}
                                         >
                                             Review
                                         </button>
@@ -323,8 +343,9 @@ export default function TournamentStandings() {
                             {["Edit", "Override Result", "Reschedule Match", "Export Data"].map((a) => (
                                 <button
                                     key={a}
-                                    className="bg-white border border-gray-200 text-gray-500 px-4 py-2 rounded-lg
-                                    text-sm font-bold cursor-pointer hover:bg-gray-50 transition-colors"
+                                    className="bg-zinc-700 border border-zinc-600 px-4 py-2 rounded-lg
+                                                cursor-pointer hover:bg-zinc-600 transition-colors text-zinc-300
+                                                hover:text-white font-jersey-25 text-sm md:text-lg"
                                 >
                                     {a}
                                 </button>
@@ -334,17 +355,17 @@ export default function TournamentStandings() {
                 )}
 
                 {/* TABS */}
-                <nav className="flex mt-7 border-b-2 border-gray-100">
+                <nav className="flex mt-7">
                     {(["standings", "matches", "upcoming"] as const).map((tab) => (
                         <button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
-                            className={`px-7 py-3.5 text-sm font-bold tracking-widest uppercase -mb-0.5 
-                            transition-colors cursor-pointer border-b-[3px] 
+                            className={`flex-1 sm:flex-none px-2 sm:px-7 py-2 text-sm md:text-lg uppercase
+                                        -mb-0.5 transition-colors cursor-pointer border-b-3 font-jersey-25
                             ${
                                 activeTab === tab
                                     ? "text-primary border-primary"
-                                    : "text-gray-400 border-transparent"
+                                    : "text-gray-700 border-transparent"
                             }`}
                         >
                             {tab}
@@ -362,10 +383,12 @@ export default function TournamentStandings() {
                                 <table className="w-full border-separate border-spacing-y-1.5">
                                     <thead>
                                     <tr>
-                                        {["#", "Team", "W", "L", "D", "PTS", "Streak", "Seed", ""].map((h, i) => (
+                                        {["#", "Team", "W", "L", "D", "PTS", "Streak", ""].map((h, i) => (
                                             <th
                                                 key={i}
-                                                className={`px-3.5 py-2.5 text-xs font-bold tracking-widest uppercase text-gray-400 ${
+                                                className={`px-3.5 py-2.5 font-jersey-25 text-base uppercase text-gray-700
+                                                font-normal 
+                                                ${
                                                     i === 1 ? "text-left" : "text-center"
                                                 }`}
                                             >
@@ -379,11 +402,9 @@ export default function TournamentStandings() {
                                         const sel = selectedTeam === team.name;
                                         const isCut = team.rank === CUTOFF;
 
-
                                         return (
-                                            <>
+                                            <Fragment key={team.name}>
                                                 <tr
-                                                    key={team.name}
                                                     onClick={() => setSelectedTeam(sel ? null : team.name)}
                                                     className={`cursor-pointer transition-colors ${rowBg(team, sel)} ${
                                                         sel ? "shadow-[inset_3px_0_0_var(--color-primary)]" : ""
@@ -397,27 +418,29 @@ export default function TournamentStandings() {
                                                     {/* Team Name */}
                                                     <td className="px-3.5 py-4">
                                                         <div className="flex items-center gap-3">
-                                                            <p className="font-bold text-base text-gray-900">{team.name}</p>
+                                                            <p className="font-jersey-25 text-base md:text-lg lg:text-xl">{team.name}</p>
                                                         </div>
                                                     </td>
 
                                                     {/* Team Stats */}
-                                                    <td className="text-center px-3.5 py-4 font-bold text-base text-black">{team.wins}</td>
-                                                    <td className="text-center px-3.5 py-4 font-bold text-base text-black">{team.losses}</td>
-                                                    <td className="text-center px-3.5 py-4 font-bold text-base text-gray-400">{team.draws}</td>
-                                                    <td className="text-center px-3.5 py-4 font-extrabold text-xl text-gray-900">{team.pts}</td>
+                                                    <td className="text-center px-3.5 py-4 font-jersey-25 text-xl text-black">{team.wins}</td>
+                                                    <td className="text-center px-3.5 py-4 font-jersey-25 text-xl text-black">{team.losses}</td>
+                                                    <td className="text-center px-3.5 py-4 font-jersey-25 text-xl text-gray-500">{team.draws}</td>
+                                                    <td className="text-center px-3.5 py-4 font-jersey-25 text-2xl text-gray-900">{team.pts}</td>
 
                                                     <td className="text-center px-3.5 py-4">
-                                                        <span
+                                                        <p
                                                             className="text-sm font-bold px-2.5 py-0.5 rounded-md
                                                             text-black"
                                                         >
                                                             {team.streak}
-                                                        </span>
+                                                        </p>
                                                     </td>
 
-                                                    <td className="text-center px-3.5 py-4 text-sm text-gray-700 font-semibold">#{team.seed}</td>
-                                                    <td className="text-center px-2 py-4 rounded-r-lg text-base text-gray-800">›</td>
+                                                    <td className="text-center px-2 py-4 rounded-r-lg text-base text-gray-800">
+                                                        <ChevronRight
+                                                            className="size-5 hover:text-primary transition-colors duration-300"/>
+                                                    </td>
                                                 </tr>
 
                                                 {/* Cutoff line */}
@@ -430,9 +453,9 @@ export default function TournamentStandings() {
                                                                     border-primary"
                                                                 />
                                                                 <span
-                                                                    className="text-xs font-extrabold tracking-widest
-                                                                     uppercase whitespace-nowrap px-3 py-1 rounded
-                                                                     bg-primary/5 text-primary"
+                                                                    className="text-base font-extrabold rounded-xl
+                                                                     uppercase whitespace-nowrap px-3 py-1 bg-white
+                                                                     text-primary"
                                                                 >
                                                                     Elimination Cutoff
                                                                 </span>
@@ -444,7 +467,7 @@ export default function TournamentStandings() {
                                                         </td>
                                                     </tr>
                                                 )}
-                                            </>
+                                            </Fragment>
                                         );
                                     })}
                                     </tbody>
@@ -453,16 +476,15 @@ export default function TournamentStandings() {
 
                             {/* selected team detail */}
                             {selectedData && (
-                                <div className="mt-5 p-6 rounded-xl border border-gray-200 bg-gray-100">
+                                <div className="mt-5 p-5 rounded-xl bg-white border border-gray-200 shadow-sm">
                                     <div className="flex flex-wrap justify-between items-center gap-4">
                                         <div className="flex items-center gap-3.5">
                                             <div>
-                                                <p className="text-2xl font-extrabold text-gray-900">
+                                                <p className="text-2xl font-jersey-25">
                                                     {selectedData.name}
                                                 </p>
-                                                <p className="text-base text-gray-700">
-                                                    Seed
-                                                    #{selectedData.seed} · {selectedData.wins}W-{selectedData.losses}L-{selectedData.draws}D
+                                                <p className="text-base font-semibold text-gray-700">
+                                                    {selectedData.wins}W-{selectedData.losses}L-{selectedData.draws}D
                                                 </p>
                                             </div>
                                         </div>
@@ -471,29 +493,17 @@ export default function TournamentStandings() {
                                             {showAdmin && (
                                                 <>
                                                     <button
-                                                        className="flex items-center justify-center gap-2 p-2 px-4
-                                                        lg:mt-0 border border-transparent rounded-md shadow-sm text-sm
-                                                        sm:text-base font-medium text-white bg-primary
-                                                        hover:bg-secondary cursor-pointer disabled:opacity-50
-                                                        transition-colors duration-200 break-all"
+                                                        className={redButtonClassName}
                                                     >
+                                                        <ShieldAlert className="size-5"/>
                                                         Disqualify
-                                                    </button>
-                                                    <button
-                                                        className="flex items-center justify-center gap-2 p-2 px-4
-                                                        lg:mt-0 border border-transparent rounded-md shadow-sm text-sm
-                                                        sm:text-base font-medium text-white bg-primary
-                                                        hover:bg-secondary cursor-pointer disabled:opacity-50
-                                                        transition-colors duration-200 break-all"
-                                                    >
-                                                        Edit Seed
                                                     </button>
                                                 </>
                                             )}
                                         </div>
                                     </div>
 
-                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-5">
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-5 ">
                                         {[
                                             {
                                                 label: "Win Rate",
@@ -504,12 +514,11 @@ export default function TournamentStandings() {
                                         ].map((s, i) => (
                                             <div
                                                 key={i}
-                                                className="text-center py-3.5 px-3 bg-white rounded-lg border
-                                                border-gray-100"
+                                                className="text-center py-3.5 px-3 bg-gray-50 rounded-lg border
+                                                border-gray-200"
                                             >
                                                 <p
-                                                    className="text-xs font-bold tracking-widest uppercase
-                                                    text-gray-400 mb-1.5"
+                                                    className="font-jersey-25 uppercase text-gray-500 mb-1.5"
                                                 >
                                                     {s.label}
                                                 </p>
@@ -530,63 +539,82 @@ export default function TournamentStandings() {
                             {RECENT_MATCHES.map((m) => (
                                 <div
                                     key={m.id}
-                                    className="flex flex-wrap items-center gap-4 px-5 py-4 bg-gray-50 border
-                                    border-gray-100 rounded-xl"
+                                    className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 px-5 py-4
+                           bg-gray-50 border border-gray-100 rounded-xl shadow-sm"
                                 >
-                                    <span
-                                        className="text-xs font-bold tracking-wider uppercase text-gray-400 min-w-12">
-                                      R{m.round}
-                                    </span>
-
-                                    <div className="flex-1 flex items-center justify-center gap-4 min-w-60">
-                                        <span
-                                            className={`flex-1 text-right text-base ${
-                                                m.score1 > m.score2 ?
-                                                    "font-extrabold text-gray-900" :
-                                                    "font-medium text-gray-600"
-                                            }`}
-                                        >
-                                          {m.team1}
-                                        </span>
-
-                                        <div
-                                            className="flex items-center justify-center gap-2 px-5 py-2 rounded-lg
-                                            bg-primary min-w-18"
-                                        >
-                                            <span
-                                                className={`text-xl font-extrabold ${m.score1 > m.score2 ?
-                                                    "text-white" :
-                                                    "text-white/70"
-                                                }`}>
-                                                {m.score1}
-                                            </span>
-                                            <span className="text-xl font-extrabold text-white/25">:</span>
-                                            <span className={`text-xl font-extrabold ${m.score2 > m.score1 ?
-                                                "text-white" :
-                                                "text-white/50"
-                                            }`}>
-                                                {m.score2}
-                                            </span>
-                                        </div>
-
-                                        <span
-                                            className={`flex-1 text-left text-base ${
-                                                m.score2 > m.score1 ?
-                                                    "font-extrabold text-gray-900" :
-                                                    "font-medium text-gray-600"
-                                            }`}
-                                        >
-                                            {m.team2}
-                                        </span>
+                                    {/* Round and Time - side by side on mobile, split on desktop */}
+                                    <div className="flex justify-between sm:contents">
+                                        <p className="text-xs font-bold tracking-wider uppercase text-gray-700 sm:min-w-12">
+                                            R{m.round}
+                                        </p>
+                                        <p className="text-sm text-gray-700 font-semibold sm:hidden">
+                                            {m.time}
+                                        </p>
                                     </div>
 
-                                    <span className="text-md text-gray-700 font-medium min-w-28 text-right">
+                                    {/* Scores and team results */}
+                                    <div className="flex-1 flex items-center justify-center gap-3 sm:gap-4">
+                                        {/* Left side team */}
+                                        <div
+                                            className={`flex-1 text-right font-jersey-25 text-base sm:text-xl ${
+                                                m.score1 > m.score2 ? "" : "text-gray-500"
+                                            }`}
+                                        >
+                                            <div className="flex justify-end gap-2">
+                                                {m.score1 > m.score2 && (
+                                                    <Crown
+                                                        className="size-4 sm:size-5 text-yellow-500 place-self-center"/>
+                                                )}
+                                                {m.team1}
+                                            </div>
+                                        </div>
+
+                                        {/* Score divider */}
+                                        <div
+                                            className="flex items-center justify-center gap-2 px-3 sm:px-5 py-1.5 sm:py-2
+                                   rounded-lg bg-primary shrink-0"
+                                        >
+                                            <p className={`text-base sm:text-xl font-semibold ${
+                                                m.score1 > m.score2 ? "text-white" : "text-white/70"
+                                            }`}>
+                                                {m.score1}
+                                            </p>
+                                            <p className="text-base sm:text-xl font-semibold text-white/25">:</p>
+                                            <p className={`text-base sm:text-xl font-semibold ${
+                                                m.score2 > m.score1 ? "text-white" : "text-white/50"
+                                            }`}>
+                                                {m.score2}
+                                            </p>
+                                        </div>
+
+                                        {/* Right side team */}
+                                        <div
+                                            className={`flex-1 text-left font-jersey-25 text-base sm:text-xl ${
+                                                m.score2 > m.score1 ? "" : "text-gray-500"
+                                            }`}
+                                        >
+                                            <div className="flex justify-start gap-2">
+                                                {m.team2}
+                                                {m.score2 > m.score1 && (
+                                                    <Crown
+                                                        className="size-4 sm:size-5 text-yellow-500 place-self-center"/>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Time - hidden on mobile (shown above), visible on desktop */}
+                                    <p className="hidden sm:block text-sm text-gray-700 font-semibold min-w-28 text-right">
                                         {m.time}
-                                    </span>
+                                    </p>
 
                                     {showAdmin && (
                                         <button
-                                            className="text-xs font-bold bg-white border border-gray-200 text-gray-500 px-3.5 py-1 rounded-md cursor-pointer hover:bg-gray-50">
+                                            className="text-base font-semibold bg-white border border-gray-300
+                                   text-gray-700 px-3.5 py-1 rounded-md cursor-pointer
+                                   hover:bg-gray-100 transition-colors duration-300
+                                   w-full sm:w-auto"
+                                        >
                                             Edit
                                         </button>
                                     )}
@@ -601,42 +629,43 @@ export default function TournamentStandings() {
                             {UPCOMING.map((m) => (
                                 <div
                                     key={m.id}
-                                    className="flex flex-wrap items-center gap-4 px-5 py-4 bg-gray-50 border
-                                    border-gray-100 rounded-xl"
+                                    className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 px-5 py-4
+                           bg-gray-50 border border-gray-100 rounded-xl shadow-sm"
                                 >
-                                      <span
-                                          className="text-xs font-bold tracking-wider uppercase text-gray-400 min-w-12">
-                                          R{m.round}
-                                      </span>
-
-                                    <div className="flex-1 flex items-center justify-center gap-4 min-w-60">
-                                        <span className="flex-1 text-right text-base font-bold text-gray-900">
-                                            {m.team1}
-                                        </span>
-
-                                        <span
-                                            className="px-5 py-1.5 rounded-lg text-sm font-extrabold tracking-widest
-                                            bg-red-50 border border-primary text-primary"
-                                        >
-                                            VS
-                                        </span>
-
-                                        <span className="flex-1 text-left text-base font-bold text-gray-900">
-                                            {m.team2}
-                                        </span>
+                                    {/* Round and Time - side by side on mobile */}
+                                    <div className="flex justify-between sm:contents">
+                                        <p className="text-xs font-bold tracking-wider uppercase text-gray-700 sm:min-w-12">
+                                            R{m.round}
+                                        </p>
+                                        <p className="text-sm text-gray-700 font-semibold sm:hidden">
+                                            {m.time}
+                                        </p>
                                     </div>
 
-                                    <span className="text-md text-gray-700 min-w-36 text-right">
+                                    {/* Team pairings */}
+                                    <div className="flex-1 flex items-center justify-center gap-3 sm:gap-4">
+                                        <p className="flex-1 text-right font-jersey-25 text-base sm:text-xl">
+                                            {m.team1}
+                                        </p>
+
+                                        <p className="px-3 sm:px-5 py-1.5 rounded-lg text-sm font-extrabold tracking-widest
+                                  bg-red-50 border border-primary text-primary shrink-0">
+                                            VS
+                                        </p>
+
+                                        <p className="flex-1 text-left font-jersey-25 text-base sm:text-xl">
+                                            {m.team2}
+                                        </p>
+                                    </div>
+
+                                    {/* Time - hidden on mobile, visible on desktop */}
+                                    <p className="hidden sm:block text-sm text-gray-700 font-semibold min-w-28 text-right">
                                         {m.time}
-                                    </span>
+                                    </p>
+
                                     {showAdmin && (
-                                        <button
-                                            className="flex items-center justify-center gap-2 p-2 px-4
-                                                        lg:mt-0 border border-transparent rounded-md shadow-sm text-sm
-                                                        sm:text-base font-medium text-white bg-primary
-                                                        hover:bg-secondary cursor-pointer disabled:opacity-50
-                                                        transition-colors duration-200 break-all"
-                                        >
+                                        <button className={`${redButtonClassName} w-full sm:w-auto`}>
+                                            <CalendarSync className="size-5"/>
                                             Reschedule
                                         </button>
                                     )}
@@ -648,7 +677,7 @@ export default function TournamentStandings() {
 
                 {/* footer */}
                 <div
-                    className="py-5 border-t border-gray-100 text-xs text-gray-400 text-center tracking-wider font-semibold">
+                    className="py-5 border-t border-gray-300 text-xs text-gray-400 text-center tracking-wider font-semibold">
                     LAST SYNCED 2 MIN AGO
                 </div>
             </div>
