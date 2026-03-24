@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Poppins } from "next/font/google";
+import { Geist, Geist_Mono, Poppins, Jersey_25, Oswald } from "next/font/google";
 import NavigationBar from "@/ui/navigation-bar";
 import { cookies } from "next/headers";
 import { createClient } from "@/server/db/server";
@@ -13,6 +13,11 @@ const geistSans = Geist({
 });
 
 const geistMono = Geist_Mono({
+    weight: [
+        "100", "200", "300",
+        "400", "500", "600",
+        "700", "800", "900"
+    ],
     variable: "--font-geist-mono",
     subsets: ["latin"],
 });
@@ -26,6 +31,20 @@ const poppins = Poppins({
   variable: "--font-poppins", 
   display: "swap",            
 });
+
+const oswald = Oswald({
+    subsets: ["latin"],
+    weight: ["200", "300", "400", "500", "600" , "700"],
+    variable: "--font-jersey-10",
+    display: "swap",
+})
+
+const jersey25 = Jersey_25({
+    subsets: ["latin"],
+    weight: ["400"],
+    variable: "--font-jersey-25",
+    display: "swap",
+})
 
 export const metadata: Metadata = {
     title: "Matchup Homepage",
@@ -45,15 +64,17 @@ export default async function RootLayout({
     const { data: { user } } = await supabase.auth.getUser();
 
     return (
-        <html lang="en" className="bg-white h-screen">
+        <html lang="en" className="bg-zinc-100 h-screen">
         <head>
             <meta name="viewport" content="width=device-width, initial-scale=1.0" />
             <title></title>
         </head>
             <body
-                className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable} antialiased`}
+                className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable} ${oswald.variable} ${jersey25.variable} antialiased`}
             >
-            <ClientLayout initialUser={user}>
+            <ClientLayout
+                initialUser={user}
+            >
                 <NavigationBar />
                 {children}
             </ClientLayout>

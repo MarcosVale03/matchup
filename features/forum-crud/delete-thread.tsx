@@ -1,19 +1,11 @@
+'use client'
 import { ConfirmButton } from "@/ui/confirm-button";
 import { deleteThread } from "@/server/mutations/forum.mutation";
 import { useState } from "react";
 import { useRouter } from 'next/navigation';
 import { Trash2 } from "lucide-react";
 
-// onConfirm sets setShowDeleteConfirm to false in forum-thread-single after 
-// successfully deleting the thread to hide the delete confirmation window and 
-// show the success message in forum-thread-list 
-export default function DeleteThread({
-    threadId,
-    onConfirm,
-}: {
-    threadId: string;
-    onConfirm: () => void;
-}) {
+export default function DeleteThread({ threadId }: {threadId: string}) {
     const router = useRouter();
     const [error, setError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -40,14 +32,11 @@ export default function DeleteThread({
                 return;
             }
 
-            onConfirm(); // If deletion was successful, hide the delete window
             setShowDeleteConfirm(false);
-            router.refresh(); // Refresh the page to reflect the deleted thread
+            router.push("/forums?deleted=true"); // send back to forums to reflect the deleted thread
         } catch (err) {
             setError("Failed to delete the thread. Please try again.");
             console.error(err);
-        } finally {
-            setIsSubmitting(false);
         }
     };
 
@@ -59,7 +48,7 @@ export default function DeleteThread({
                 aria-label="Delete thread"
                 className="p-2.5 sm:p-2 text-gray-600 hover:text-primary
                                    hover:bg-gray-100 rounded-lg transition-colors 
-                                   active:bg-gray-200 touch-manipulation"
+                                   active:bg-gray-200"
                 
             >
                 <Trash2 className="w-5 h-5 sm:w-4 sm:h-4" />
@@ -74,6 +63,5 @@ export default function DeleteThread({
                 onCancelForm={handleCancel}
             />
         </>
-
     )
 }
