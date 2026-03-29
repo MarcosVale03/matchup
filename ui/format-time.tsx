@@ -1,31 +1,4 @@
-// Define the desired formatting options once
-const customDateTimeOptions: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
-    month: 'short', // Use 'short' (e.g., Dec) or 'numeric' (e.g., 12)
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true, // Use AM/PM format
-};
-
-/**
- * Formats a Date object into a readable string without seconds.
- * @param date The Date object to format.
- * @returns The formatted date and time string.
- */
-export function formatDateTime(date: Date | string): string {
-    const newDate = typeof date === 'string' ? new Date(date) : date;
-
-    // Check for invalid dates
-    if (isNaN(newDate.getTime())) {
-        return 'N/A';
-    }
-    
-    return newDate.toLocaleString('en-US', customDateTimeOptions);
-}
-
-/**
- * Formats a date for use in <input type="datetime-local">
+/*** Formats a date for use in <input type="datetime-local">
  * Returns string in format: "YYYY-MM-DDTHH:mm"
  */
 export function toDateTimeLocalInput(dateInput: Date | string | null | undefined): string {

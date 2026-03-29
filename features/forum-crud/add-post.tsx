@@ -1,23 +1,30 @@
 'use client'
-import React, { useState } from 'react';
-import { X, Send } from "lucide-react";
-import { insertPost } from '@/server/mutations/forum.mutation';
-import { Thread } from "@/server/queries/forum.queries";
+import React, {useState} from 'react';
+import {X, Send} from "lucide-react";
+import {insertPost} from '@/server/mutations/forum.mutation';
+import {Toast} from "@/ui/toast/toast";
+import {useRouter} from "next/navigation";
 
-export default function AddForumPost({
-    thread,
-    onPostAddedAction,
-    onPostCancelAction
-}: {
-    thread: Thread;
-    onPostAddedAction: () => void;
-    onPostCancelAction: () => void
-}) {
+type Toast = {
+    message: string | null
+    show: (text: string) => void;
+}
 
+
+export default function AddThreadPost({ threadId, toastControl }: {threadId: string, toastControl: Toast }) {
+
+    const router = useRouter();
     const [content, setContent] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [isAddButtonsOpen, setIsAddButtonsOpen] = useState(false);
 
+
+    const handlePostAdded = () => {
+        setIsAddButtonsOpen(false);
+        setContent('');
+        toastControl.show("Post added successfully.");
+    };
 
     // Insert forum post
     const handleSubmitPost = async (e: React.FormEvent) => {
@@ -28,15 +35,15 @@ export default function AddForumPost({
         setError(null);
 
         try {
-            const result = await insertPost(thread.id, content);
+            const result = await insertPost(threadId, content);
 
             if (!result.success) {
                 setError(result.formErrors?.[0] || "Failed to create post");
                 return;
             }
 
-            onPostAddedAction();
-            setContent('');
+            handlePostAdded();
+            router.refresh();
 
         } catch (err) {
             setError("An error occurred");
@@ -49,13 +56,13 @@ export default function AddForumPost({
     return (
         <form
             onSubmit={handleSubmitPost}
-            className="bg-white rounded-xl border border-gray-200 shadow-sm p-5
-                       lg:px-7 space-y-5 sm:space-y-6 mt-4"
+            onBlur={(e) => {
+                // If focus moved outside the form, close buttons
+                if (!e.currentTarget.contains(e.relatedTarget)) {
+                    setIsAddButtonsOpen(false);
+                }
+            }}
         >
-            <h2 className="text-xl font-semibold text-gray-900">
-                Create a new post for {thread.title}
-            </h2>
-
             {/* Error message */}
             {error && (
                 <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
@@ -67,39 +74,49 @@ export default function AddForumPost({
             <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                placeholder="What's on your mind?"
-                className="w-full px-4 py-2 leading-relaxed border border-gray-300
-                           rounded-lg min-h-[100px] sm:min-h-[120px] resize-y 
-                           placeholder:text-gray-500 focus:outline-none focus:ring-2
-                           focus:ring-primary focus:border-transparent transition-all duration-150
-                           text-gray-800"
+                onFocus={() => setIsAddButtonsOpen(true)}
+                placeholder="Create a post"
+                className="w-full px-4 py-2 min-h-[50px] leading-relaxed border border-gray-300
+                           rounded-lg resize-y focus:outline-none focus:ring-2 focus:ring-primary
+                           focus:border-transparent font-[Poppins] bg-white"
             />
 
             {/* Cancel/Post Buttons */}
-            <div className="flex flex-col-reverse sm:flex-row gap-3 sm:gap-4 justify-end pt-2">
-                <button
-                    type="button"
-                    onClick={onPostCancelAction}
-                    className="flex items-center justify-center gap-2 px-5 sm:px-6 py-3 sm:py-2.5 text-sm
-                                           sm:text-base font-medium text-gray-700 border border-gray-300 rounded-lg
-                                           hover:bg-gray-50 active:bg-gray-100 transition-colors touch-manipulation
-                                           flex-1 sm:flex-none"
-                >
-                    <X className="size-5 sm:size-4" />
-                    Cancel
-                </button>
-                <button
-                    type="submit"
-                    className="flex items-center justify-center gap-2 px-6 sm:px-7 py-3 sm:py-2.5 text-sm
-                               sm:text-base font-medium bg-primary text-white rounded-lg hover:bg-secondary 
-                               active:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed
-                               touch-manipulation flex-1 sm:flex-none shadow-sm"
-                    disabled={!content.trim() || isSubmitting}
-                >
-                    <Send size={18} className=" size-4 place-self-center" />
-                    Post
-                </button>
-            </div>
+            {isAddButtonsOpen && (
+                <div
+                    className={`grid transition-all duration-300 ease-in-out ${isAddButtonsOpen
+                        ? 'grid-rows-[1fr] opacity-100' :
+                        'grid-rows-[0fr] opacity-0'
+                    }`}>
+                    <div className="overflow-hidden">
+
+                        <div className="flex flex-col-reverse sm:flex-row gap-3 sm:gap-4 justify-end pt-2">
+                            <button
+                                type="button"
+                                onClick={() => setIsAddButtonsOpen(false)}
+                                className="flex items-center justify-center gap-2 py-1 px-4
+                                   rounded-md shadow-sm text-base md:text-lg font-jersey-25
+                                   text-white bg-primary hover:bg-secondary disabled:opacity-50
+                                   transition-colors"
+                            >
+                                <X className="size-5 sm:size-4"/>
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                className="flex items-center justify-center gap-2 py-1 px-4
+                                   rounded-md shadow-sm text-base md:text-lg font-jersey-25
+                                   text-white bg-primary hover:bg-secondary disabled:opacity-50
+                                   transition-colors"
+                                disabled={!content.trim() || isSubmitting}
+                            >
+                                <Send size={18} className=" size-4 place-self-center"/>
+                                Post
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </form>
     );
 }

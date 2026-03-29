@@ -10,17 +10,30 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-oswald: var(--font-oswald);
+  --font-poppins: var(--font-poppins);
+}
+
+@theme {
+  --font-jersey-25: var(--font-jersey-25);
+  --font-oswald: var(--font-oswald);
+  --font-poppins: var(--font-poppins);
+
 }
 
 @theme {
   --color-primary:   #BD2D2D; /* main red color */
   --color-secondary: #992323; /* darker red color */
+  --color-main-bg: #f4f4f5;  /* main-bg color */
+  --color-card-input: #ffffff; /* bg color for inputs and cards (such as in the search page */
+  --color-errors: #E46868;    /* error text color for input errors */
 }
 
 @theme {
   --breakpoint-xs: 30rem;
   --breakpoint-2xl: 100rem;
   --breakpoint-3xl: 120rem;
+  --breakpoint-4xl: 140rem;
 }
 
 @media (prefers-color-scheme: dark) {

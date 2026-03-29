@@ -44,7 +44,6 @@ export async function fetchEventsFromTournamentId(tournamentId: number): Promise
         throw new Error("DB error while trying to query events: " + error.details + " " + error.message)
     }
 
-
     return {
         success: true,
         events: data
