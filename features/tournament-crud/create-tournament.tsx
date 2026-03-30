@@ -8,6 +8,8 @@ import { dateToInputString } from "@/lib/utils";
 import { ArrowRight } from 'lucide-react';
 import { ErrorMessageForTournament } from "@/features/tournament-crud/error-message-tournament";
 import Checkbox from "@/ui/checkbox";
+import { AdminInsertErrors, insertAdmin } from '@/server/mutations/add-admin.mutation';
+import { getUserIdfromEmail } from '@/server/queries/profile.queries';
 
 // Initial state for the form
 interface FormState {
@@ -21,6 +23,8 @@ interface FormState {
     isPublic: boolean;
     // Location is simplified for the form input
     locationAddress: string;
+    adminEmail : string;
+    adminPermissionLevel : number;
 }
 
 // Initial form state with default values
@@ -34,6 +38,8 @@ const initialFormState: FormState = {
     discord: '',
     isPublic: true,
     locationAddress: '',
+    adminEmail : '',
+    adminPermissionLevel : 4, // default to lowest 
 };
 
 export default function TournamentInsertForm() {
@@ -41,6 +47,7 @@ export default function TournamentInsertForm() {
     const [formData, setFormData] = useState<FormState>(initialFormState);
     const [fieldErrors, setFieldErrors] = useState<TournamentInsertErrors>({});
     const [formError, setFormError] = useState<string | null>(null);
+    const [admin, setAdmin] = useState<AdminInsertErrors>({})
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Placeholder for location data (we would integrate Google Maps API here)
@@ -86,7 +93,15 @@ export default function TournamentInsertForm() {
                 locationArg
             );
 
-            if (response.success) {
+            if (response.success && response.data) {
+                
+                if (formData.adminEmail.trim()) {
+
+                    const user = await getUserIdfromEmail(formData.adminEmail)
+                    if (user.success && user.data) {
+                        await insertAdmin(response.data, user.data, formData.adminPermissionLevel);
+                    }
+                }
                 alert(`Tournament "${formData.name}" created successfully!`);
                 // Redirect to the new tournament's detail page
                 // will change this to push to create events page
@@ -354,7 +369,36 @@ export default function TournamentInsertForm() {
                     </div>
                     <ErrorMessageForTournament field='contact' fieldErrors={fieldErrors}/>
                 </fieldset>
-
+                <fieldset className="p-4 px-5 border-2 border-zinc-600 rounded-2xl mb-6 w-full">
+                    <legend className={legendClass}>
+                        Add Tournament Admins
+                    </legend>
+                    {/* Admin Email */}
+                    <div className="mt-2">
+                        <BasicInputWithLabel
+                            labelClassName={pageLabelClass}
+                            labelText='Admin Email'
+                            inputType='email'
+                            inputName='adminEmail'
+                            inputId='adminEmail'
+                            inputValue={formData.adminEmail}
+                            inputOnChange={handleChange}
+                            required={false}
+                            inputPlaceholder='Enter your admin email'
+                            inputClassName={pageInputClass}
+                        />
+                    </div>
+                    {/* Admin Permission Level */}         
+                    <div>
+                        <label htmlFor='adminPermissionLevel'>Premission Level</label>
+                        <select name='adminPermissionLevel' value={formData.adminPermissionLevel} onChange={handleChange} className={pageInputClass}>
+                            <option value={1}>Admin</option>
+                            <option value={2}>Moderator</option>
+                            <option value={3}>Bracket Manager</option>
+                            <option value={4}>Reporter</option>
+                        </select>
+                    </div>
+                </fieldset>
                 {/* Submit Button */}
                 <div className="pt-4 sm:pt-6 mt-4 border-t-2 border-gray-400 flex gap-2">
                     <button

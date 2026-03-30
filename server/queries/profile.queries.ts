@@ -72,6 +72,29 @@ export async function fetchUserInfo(user_id: string): Promise<QueryResponse<User
     }
 }
 
+export async function getUserIdfromEmail(email : string):  Promise<QueryResponse<string>> {
+    // creating client 
+    const cookieStore = await cookies()
+    const supabase = await createClient(cookieStore)
+
+    // grabbing information needed for user
+    const {data, error} = await supabase.from('users').select('user_id').eq('email', email).single()
+
+    // error check
+    if (error) {
+        return {
+            success : false,
+            message : error.message
+        }
+    }
+
+    // returning data from DB
+    return {
+        success : true,
+        data : data.user_id
+    }
+}
+
 // Functions to display past/future tournaments User was in
 export async function fetchFutureTournaments(user_id: string): Promise<QueryResponse<FutureTournamentsResponse>> {
     // creating client

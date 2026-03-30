@@ -9,7 +9,7 @@ import { MutationResponse } from "@/lib/types/types"
 const AdminInsertSchema = z.object({
     tournament_id : z.number().int().positive(),
     user_id : z.string().uuid(),
-    permission_level : z.enum(['0', '1', '2', '3', '4']).transform(Number)
+    permission_level : z.number().int().min(0).max(4)
 })
 
 // init the admin insert errors
@@ -66,7 +66,7 @@ export async function insertAdmin(tournament_id : number, user_id : string, perm
 const AdminUpdateSchema = z.object({
     tournament_id : z.number().int().positive(),
     user_id : z.string().uuid(),
-    permission_level : z.enum(['0', '1', '2', '3', '4']).transform(Number)
+    permission_level : z.number().int().min(0).max(4)
 })
 
 // init the admin udpate errors
