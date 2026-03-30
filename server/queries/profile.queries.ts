@@ -78,7 +78,7 @@ export async function getUserIdfromEmail(email : string):  Promise<QueryResponse
     const supabase = await createClient(cookieStore)
 
     // grabbing information needed for user
-    const {data, error} = await supabase.from('users').select('user_id').eq('email', email).single()
+    const {data, error} = await supabase.rpc('getuserfromemail', {user_email : email})
 
     // error check
     if (error) {
@@ -91,7 +91,7 @@ export async function getUserIdfromEmail(email : string):  Promise<QueryResponse
     // returning data from DB
     return {
         success : true,
-        data : data.user_id
+        data : data
     }
 }
 

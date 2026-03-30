@@ -21,7 +21,7 @@ export type AdminInsertErrors = {
 
 // function inserts adminds into the table in the db
 export async function insertAdmin(tournament_id : number, user_id : string, permission_level : number) : Promise<MutationResponse<void, AdminInsertErrors>> {
-
+    
     // creating client 
     const cookieStore = await cookies()
     const supabase = await createClient(cookieStore)
