@@ -9,8 +9,6 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@stripe/react-stripe-js": "^6.1.0",
-    "@stripe/stripe-js": "^9.0.1",
     "@supabase/ssr": "^0.7.0",
     "country-state-city": "^3.2.1",
     "date-fns": "^4.1.0",
@@ -19,7 +17,6 @@
     "react": "19.2.0",
     "react-datepicker": "^9.1.0",
     "react-dom": "19.2.0",
-    "stripe": "^21.0.1",
     "use-debounce": "^10.1.0",
     "zod": "^4.1.13"
   },
