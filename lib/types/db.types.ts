@@ -498,6 +498,54 @@ export type Database = {
           },
         ]
       }
+      payments: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          currency: string
+          id: number
+          status: string
+          stripe_payment_intent_id: string
+          tournament_id: number
+          user_id: string
+        }
+        Insert: {
+          amount_cents: number
+          created_at?: string
+          currency?: string
+          id?: number
+          status?: string
+          stripe_payment_intent_id: string
+          tournament_id: number
+          user_id: string
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          currency?: string
+          id?: number
+          status?: string
+          stripe_payment_intent_id?: string
+          tournament_id?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_tournaments_fk_01"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_users_fk_01"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       permission_levels: {
         Row: {
           description: string
@@ -668,9 +716,11 @@ export type Database = {
       }
       tournaments: {
         Row: {
+          currency: string
           discord_invite: string | null
           email_contact: string | null
           end_time: string
+          entry_fee_cents: number
           home_page: string
           id: number
           is_online: boolean
@@ -682,9 +732,11 @@ export type Database = {
           start_time: string
         }
         Insert: {
+          currency?: string
           discord_invite?: string | null
           email_contact?: string | null
           end_time: string
+          entry_fee_cents?: number
           home_page?: string
           id?: number
           is_online: boolean
@@ -696,9 +748,11 @@ export type Database = {
           start_time: string
         }
         Update: {
+          currency?: string
           discord_invite?: string | null
           email_contact?: string | null
           end_time?: string
+          entry_fee_cents?: number
           home_page?: string
           id?: number
           is_online?: boolean
@@ -848,9 +902,11 @@ export type Database = {
       insert_tournament: {
         Args: {
           t_address?: string
+          t_currency?: string
           t_discord?: string
           t_email?: string
           t_end_time: string
+          t_entry_fee_cents?: number
           t_is_online: boolean
           t_is_public: boolean
           t_latitude?: number
@@ -906,9 +962,11 @@ export type Database = {
       update_tournament: {
         Args: {
           t_address?: string
+          t_currency?: string
           t_discord?: string
           t_email?: string
           t_end_time: string
+          t_entry_fee_cents?: number
           t_id: number
           t_is_online: boolean
           t_is_public: boolean

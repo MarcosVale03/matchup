@@ -41,6 +41,7 @@ const TournamentSchema = z.object({
         ))
     }).refine(data => data.email || data.discord, {error: "Must provide at least one contact"}),
     is_public: z.boolean(),
+    entry_fee_cents: z.number().int().min(0).max(1_000_000).default(0),
 }).refine(data => data.is_online || data.location, {error: "Need location for offline tournament", path: ["location"],})
 
 const TournamentInsertSchema = TournamentSchema
@@ -55,6 +56,7 @@ export type TournamentInsertErrors = {
     location?: string[],
     contact?: string[],
     is_public?: string[],
+    entry_fee_cents?: string[],
 }
 
 
@@ -95,6 +97,7 @@ export async function insertTournament(name: string, startTime: Date, endTime: D
                                             latitude: number,
                                             longitude: number
                                        },
+                                       entryFeeCents?: number,
                                      ): Promise<MutationResponse<number, TournamentInsertErrors>> {
     // Create supabase client
     const cookieStore = await cookies()
@@ -112,6 +115,7 @@ export async function insertTournament(name: string, startTime: Date, endTime: D
         location: location,
         contact: contact,
         is_public: isPublic,
+        entry_fee_cents: entryFeeCents ?? 0,
     })
 
     // Returns errors if validation isn't successful
@@ -139,6 +143,7 @@ export async function insertTournament(name: string, startTime: Date, endTime: D
         t_latitude: result.data.location?.latitude,
         t_longitude: result.data.location?.longitude,
         t_is_public: result.data.is_public,
+        t_entry_fee_cents: result.data.entry_fee_cents,
     })
 
     // Throws error if something goes wrong
@@ -183,7 +188,8 @@ export type TournamentUpdateErrors = {
     times?: string[],
     is_online?: string[],
     location?: string[],
-    contact?: string[]
+    contact?: string[],
+    entry_fee_cents?: string[],
 }
 
 /**
@@ -224,6 +230,7 @@ export async function updateTournament(id: number, name: string, startTime: Date
                                            latitude: number,
                                            longitude: number
                                        },
+                                       entryFeeCents?: number,
 ): Promise<MutationResponse<number, TournamentUpdateErrors>> {
     // Creates supabase client
     const cookieStore = await cookies()
@@ -241,7 +248,8 @@ export async function updateTournament(id: number, name: string, startTime: Date
         is_online: isOnline,
         location: location,
         contact: contact,
-        is_public: isPublic
+        is_public: isPublic,
+        entry_fee_cents: entryFeeCents ?? 0,
     })
 
     // Returns errors if validation isn't successful
@@ -270,6 +278,7 @@ export async function updateTournament(id: number, name: string, startTime: Date
         t_latitude: result.data.location?.latitude,
         t_longitude: result.data.location?.longitude,
         t_is_public: result.data.is_public,
+        t_entry_fee_cents: result.data.entry_fee_cents,
     })
 
     // Throws error if something goes wrong
