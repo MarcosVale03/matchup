@@ -55,12 +55,26 @@ export default async function TournamentDetailsPage({params}: { params: { tourna
         canDelete: user?.id === tournament.owner.user_id,
     };
 
+    // Check if user is already registered as attendee
+    let isRegistered = false;
+    if (user) {
+        const {data: attendee} = await supabase
+            .from('attendees')
+            .select('tournament_id')
+            .eq('tournament_id', id)
+            .eq('user_id', user.id)
+            .maybeSingle();
+        isRegistered = !!attendee;
+    }
+
     return (
         <main className="bg-main-bg flex flex-col font-[Poppins] text-black">
             <TournamentDetails
                 tournament={tournament}
                 permissions={permissions}
                 events={events}
+                isLoggedIn={!!user}
+                isRegistered={isRegistered}
             />
         </main>
     );

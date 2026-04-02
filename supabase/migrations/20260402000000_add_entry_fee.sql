@@ -157,3 +157,19 @@ WHERE id = t_id;
 RETURN t_id;
 END;
 $function$;
+
+-- RLS policies for attendees (allow users to register themselves and view their own registrations)
+CREATE POLICY attendees_select_own ON public.attendees
+    FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY attendees_select_admin ON public.attendees
+    FOR SELECT USING (
+        EXISTS (
+            SELECT 1 FROM public.admins
+            WHERE admins.tournament_id = attendees.tournament_id
+            AND admins.user_id = auth.uid()
+        )
+    );
+
+CREATE POLICY attendees_insert_own ON public.attendees
+    FOR INSERT WITH CHECK (auth.uid() = user_id);
