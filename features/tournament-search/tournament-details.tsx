@@ -10,6 +10,8 @@ import {ConfirmButton} from "@/ui/confirm-button";
 import {FetchEventsFromTournamentIdResponse} from "@/server/queries/events.queries";
 import EventList from "@/features/tournament-events/event-list";
 import {formatDate} from "date-fns";
+import {EntryFeeCheckout} from "@/features/tournament-search/entry-fee-checkout";
+import {registerForFreeTournament} from "@/server/mutations/payments.mutations";
 
 export type TournamentPermissions = {
     canEdit: boolean;
@@ -19,15 +21,39 @@ export type TournamentPermissions = {
 export function TournamentDetails({
     tournament,
     events,
-    permissions
+    permissions,
+    isLoggedIn = false,
+    isRegistered: initialIsRegistered = false,
 }: {
     tournament: FetchTournamentFromIdResponse;
     events?: FetchEventsFromTournamentIdResponse;
     permissions: TournamentPermissions;
+    isLoggedIn?: boolean;
+    isRegistered?: boolean;
 }) {
     const router = useRouter();
 
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [isRegistered, setIsRegistered] = useState(initialIsRegistered);
+    const [isRegistering, setIsRegistering] = useState(false);
+    const [registerError, setRegisterError] = useState<string | null>(null);
+
+    const handleFreeRegister = async () => {
+        setIsRegistering(true);
+        setRegisterError(null);
+        try {
+            const result = await registerForFreeTournament(tournament.id);
+            if (result.success) {
+                setIsRegistered(true);
+            } else {
+                setRegisterError(result.formErrors?.[0] ?? "Registration failed.");
+            }
+        } catch {
+            setRegisterError("An unexpected error occurred.");
+        } finally {
+            setIsRegistering(false);
+        }
+    };
     const [isDeleting, setIsDeleting] = useState(false);
     const [deleteError, setDeleteError] = useState<string | null>(null);
 
@@ -97,6 +123,38 @@ export function TournamentDetails({
                                 Delete
                             </button>
                         </div>
+                    )}
+
+                    {/* Registration */}
+                    {isLoggedIn && !isRegistered && tournament.entry_fee_cents > 0 && (
+                        <EntryFeeCheckout
+                            tournamentId={tournament.id}
+                            tournamentName={tournament.name}
+                            entryFeeCents={tournament.entry_fee_cents}
+                            onSuccess={() => setIsRegistered(true)}
+                        />
+                    )}
+                    {isLoggedIn && !isRegistered && tournament.entry_fee_cents <= 0 && (
+                        <div className="flex flex-col items-end shrink-0">
+                            <button
+                                onClick={handleFreeRegister}
+                                disabled={isRegistering}
+                                className="flex items-center justify-center gap-2 p-2 px-4
+                                           rounded-md shadow-sm text-sm md:text-lg font-jersey-25
+                                           text-white bg-primary hover:bg-secondary cursor-pointer
+                                           disabled:opacity-50 transition-colors duration-200"
+                            >
+                                {isRegistering ? "Registering..." : "Register (Free)"}
+                            </button>
+                            {registerError && (
+                                <p className="text-red-500 text-sm mt-1">{registerError}</p>
+                            )}
+                        </div>
+                    )}
+                    {isLoggedIn && isRegistered && (
+                        <span className="text-sm md:text-lg font-jersey-25 text-green-600 shrink-0">
+                            ✓ Registered
+                        </span>
                     )}
                 </div>
 
