@@ -2,7 +2,7 @@
 import {FetchTournamentFromIdResponse} from "@/server/queries/tournaments.queries";
 import {getTimeUntilStart} from "@/lib/utils/time-until-start";
 import {useRouter} from "next/navigation";
-import {Mail, Pencil, Globe, Trash} from "lucide-react";
+import {Mail, Pencil, Globe, Trash, DollarSign} from "lucide-react";
 import Image from "next/image";
 import React, {useState} from "react";
 import {deleteTournament} from "@/server/mutations/tournaments.mutations";
@@ -213,7 +213,8 @@ export function TournamentDetails({
                 </div>
 
                 {/* Status */}
-                <div className="flex flex-col w-full p-4 place-content-center">
+                <div className="flex flex-col w-full p-4 place-content-center border-b-2 border-b-secondary
+                                    lg:border-b-0 lg:border-r-2 lg:border-r-secondary">
                     <h2 className="mb-1 text-base lg:text-lg font-jersey-25">
                         Status
                     </h2>
@@ -243,6 +244,21 @@ export function TournamentDetails({
                             </div>
                         );
                     })()}
+                </div>
+
+                {/* Entry Fee */}
+                <div className="flex flex-col w-full p-4 place-content-center">
+                    <h2 className="mb-1 text-base lg:text-lg font-jersey-25">
+                        Entry Fee
+                    </h2>
+                    <div className="flex flex-row items-center">
+                        <DollarSign size={22}/>
+                        <div className="ml-2 text-sm md:text-base font-[Poppins] font-semibold tracking-normal">
+                            <p>{tournament.entry_fee_cents > 0
+                                ? `$${(tournament.entry_fee_cents / 100).toFixed(2)}`
+                                : "Free"}</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 

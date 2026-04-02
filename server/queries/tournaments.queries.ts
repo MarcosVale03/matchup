@@ -143,6 +143,7 @@ export type FetchTournamentFromIdResponse = {
     discord_invite: string | null,
     email_contact: string | null,
     end_time: string,
+    entry_fee_cents: number,
     home_page: string,
     id: number
     is_public: boolean,
@@ -193,6 +194,7 @@ export async function fetchTournamentFromId(id: number): Promise<{
         email_contact,
         is_public,
         is_online,
+        entry_fee_cents,
         locations (
             id,
             maps_place_id,

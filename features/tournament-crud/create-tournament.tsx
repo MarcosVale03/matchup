@@ -19,6 +19,7 @@ interface FormState {
     email: string;
     discord: string;
     isPublic: boolean;
+    entryFee: string;
     // Location is simplified for the form input
     locationAddress: string;
 }
@@ -33,6 +34,7 @@ const initialFormState: FormState = {
     email: '',
     discord: '',
     isPublic: true,
+    entryFee: '',
     locationAddress: '',
 };
 
@@ -75,6 +77,8 @@ export default function TournamentInsertForm() {
         const endTimeArg = new Date(formData.endTime);
 
         try {
+            const entryFeeCents = formData.entryFee ? Math.round(parseFloat(formData.entryFee) * 100) : 0;
+
             const response = await insertTournament(
                 formData.name,
                 startTimeArg,
@@ -83,7 +87,8 @@ export default function TournamentInsertForm() {
                 {email: formData.email.trim() || undefined, discord: formData.discord.trim() || undefined},
                 formData.isPublic,
                 slugArg,
-                locationArg
+                locationArg,
+                entryFeeCents
             );
 
             if (response.success) {
@@ -310,6 +315,34 @@ export default function TournamentInsertForm() {
                         >
                             Private
                         </label>
+                    </div>
+                </fieldset>
+
+                {/* Entry Fee */}
+                <fieldset className="p-4 px-5 border-2 border-zinc-600 rounded-2xl mb-6 w-full">
+                    <legend className={legendClass}>
+                        Entry Fee
+                    </legend>
+
+                    <div className="mt-2 max-w-xs">
+                        <BasicInputWithLabel
+                            labelClassName={pageLabelClass}
+                            labelText="Entry Fee in USD (Optional, leave empty for free)"
+                            inputType="number"
+                            inputName="entryFee"
+                            inputId="entryFee"
+                            inputValue={formData.entryFee}
+                            inputOnChange={handleChange}
+                            required={false}
+                            inputPlaceholder="0.00"
+                            inputClassName={pageInputClass}
+                        />
+                        <ErrorMessageForTournament field='entry_fee_cents' fieldErrors={fieldErrors}/>
+                        {formData.entryFee && parseFloat(formData.entryFee) > 0 && (
+                            <p className="text-xs text-zinc-500 mt-1 font-[Poppins]">
+                                Participants will be charged ${parseFloat(formData.entryFee).toFixed(2)} to register
+                            </p>
+                        )}
                     </div>
                 </fieldset>
 
