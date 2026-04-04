@@ -1,5 +1,6 @@
-import {fetchEventFromEventId} from "@/server/queries/events.queries";
-import {notFound} from "next/navigation";
+import { fetchEventFromEventId } from "@/server/queries/events.queries";
+import { fetchBracket } from "@/server/queries/brackets.queries";
+import { notFound } from "next/navigation";
 import EventDetails from "@/features/tournament-events/event-details";
 
 export default async function Page({ params }: { params: { tournamentId: string, eventId: string } }) {
@@ -10,18 +11,18 @@ export default async function Page({ params }: { params: { tournamentId: string,
     if (isNaN(tournamentId) || tournamentId <= 0 || isNaN(eventId) || eventId <= 0) {
         notFound();
     }
+    
+    const { success: eventSuccess, event } = await fetchEventFromEventId(tournamentId, eventId);
 
-    console.log(tournamentId, eventId);
-    const {success, event} = await fetchEventFromEventId(tournamentId, eventId);
-
-    if (!success || event === undefined) {
+    if (!eventSuccess || event === undefined) {
         notFound();
     }
 
+    const { success: bracketSuccess, data: bracketMatches } = await fetchBracket(tournamentId, eventId);
 
     return (
         <div className="bg-main-bg font-[Poppins] text-black">
-            <EventDetails event={event} />
+            <EventDetails event={event} bracketMatches={bracketMatches ?? []} />
         </div>
     )
 }

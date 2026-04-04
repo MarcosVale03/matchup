@@ -5,12 +5,12 @@ import React from "react";
 // helper function
 const getErrorMessage = (field: string, msg: string) => {
     if (field === 'name') return 'Tournament name should be longer than 3 characters';
-    if (field === 'slug' && msg === 'Too small: expected string to have >=3 characters') return 'Slug name should be longer than 3 characters';
+    if (field === 'slug' && msg === 'Invalid input') return 'Slug name should be longer than 3 characters';
     if (field === 'location') return 'Address should be longer than 3 characters';
     return msg;
 };
 
-export function ErrorMessageForTournament({ field, fieldErrors }: {
+export function     ErrorMessageForTournament({ field, fieldErrors }: {
     field: keyof TournamentUpdateErrors;
     fieldErrors: TournamentUpdateErrors;
 }) {

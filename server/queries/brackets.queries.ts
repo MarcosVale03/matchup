@@ -18,7 +18,7 @@ export interface BracketMatch extends Match {
 // function to fetch all matches and slots for a tournament/event and assemble them into a structured format
 export async function fetchBracket(
     tournamentId: number,
-    eventName: string
+    eventId: number
 ): Promise<QueryResponse<BracketMatch[]>> {
     const cookieStore = await cookies()
     const supabase = await createClient(cookieStore)
@@ -28,7 +28,7 @@ export async function fetchBracket(
         .from('matches')
         .select('*')
         .eq('tournament_id', tournamentId)
-        .eq('event_name', eventName)
+        .eq('event_id', eventId)
 
     if (matchError) {
         return { success: false, message: matchError.message }
@@ -39,7 +39,7 @@ export async function fetchBracket(
         .from('match_slots')
         .select('*')
         .eq('tournament_id', tournamentId)
-        .eq('event_name', eventName)
+        .eq('event_id', eventId)
 
     if (slotError) {
         return { success: false, message: slotError.message }
@@ -50,7 +50,7 @@ export async function fetchBracket(
         .from('seeds')
         .select('*')
         .eq('tournament_id', tournamentId)
-        .eq('event_name', eventName)
+        .eq('event_id', eventId)
 
     if (seedError) {
         return { success: false, message: seedError.message }

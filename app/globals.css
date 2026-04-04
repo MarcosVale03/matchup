@@ -9,14 +9,11 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-oswald: var(--font-oswald);
   --font-poppins: var(--font-poppins);
 }
 
 @theme {
   --font-jersey-25: var(--font-jersey-25);
-  --font-oswald: var(--font-oswald);
   --font-poppins: var(--font-poppins);
 
 }

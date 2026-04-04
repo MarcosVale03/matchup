@@ -1,7 +1,7 @@
 import {CircleUser} from "lucide-react";
 import Link from "next/link";
 import {FetchTournamentsForSearchResponse} from "@/server/queries/tournaments.queries";
-import {getTimeUntilStart} from "@/lib/utils/time-until-start";
+import {getTimeUntilStart} from "@/lib/utils";
 import React from "react";
 import {formatDate} from "date-fns";
 

@@ -16,13 +16,13 @@ export default function EventList({
                 <h1 className="text-xl lg:text-3xl wrap-break-word font-jersey-25">
                     Tournament Events
                 </h1>
-                <h2 className="text-sm lg:text-base font-[Poppins] font-semibold text-gray-600">
+                <h2 className="text-base text-gray-600">
                     Select an event below to view its details
                 </h2>
             </div>
 
             {events && events.length > 0 ? (
-                <div className="w-full grid grid-cols-1 sm:grid-cols-3 gap-5">
+                <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-5">
                     {events.map((event, i) => (
                         <div key={i} className="rounded-md shadow-lg">
 
@@ -50,10 +50,10 @@ export default function EventList({
                                 <div
                                     className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
                                     <div>
-                                        <p className="text-lg lg:text-xl font-jersey-25">
+                                        <p className="text-lg lg:text-2xl font-jersey-25 text-primary">
                                             {event.name}
                                         </p>
-                                        <p className="text-sm">
+                                        <p className="text-sm text-gray-">
                                             <span className="font-jersey-25 text-base tracking-normal font-normal">Platform: </span>{event.gaming_platform_name}
                                         </p>
                                     </div>
@@ -102,10 +102,10 @@ export default function EventList({
                                     {/* Bracket type */}
                                     <div>
                                         <h3 className="text-sm lg:text-base font-jersey-25 tracking-wide">
-                                            Bracket Type
+                                            Registration Window
                                         </h3>
                                         <p className="text-sm font-[Poppins] tracking-tight">
-                                            Single Elimination
+                                            Placeholder Date
                                         </p>
                                     </div>
                                 </div>

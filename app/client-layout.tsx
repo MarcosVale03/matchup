@@ -3,7 +3,7 @@
 import React, { createContext, useContext } from "react"
 import { User } from "@supabase/supabase-js"
 
-type AuthContextType = {
+export type AuthContextType = {
     user: User | null
 }
 

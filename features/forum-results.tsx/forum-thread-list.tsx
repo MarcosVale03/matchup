@@ -87,11 +87,7 @@ export default function ForumThreadList({threads}: {
                 {/* Success Message */}
                 <Toast message={toast.message}/>
 
-                <h2 className="text-xl sm:text-2xl font-semibold tracking-tight">
-                    Forum Threads
-                </h2>
-
-                <div className="overflow-y-auto sm:h-[calc(100vh-350px)]">
+                <div className="">
                     {/* Loading or empty state */}
                     {filteredThreads.length === 0 ? (
                         // Show different messages based on whether there's a search query
