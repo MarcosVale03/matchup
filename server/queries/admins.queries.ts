@@ -108,7 +108,7 @@ export async function fetchAdminsFromTournament(tournamentId: number): Promise<A
     // DB Query
     const {data, error} = await supabase
         .from('admins')
-        .select(`
+        .select(`   
             permission_levels (
                 id,
                 name,

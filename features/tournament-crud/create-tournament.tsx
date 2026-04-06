@@ -22,7 +22,7 @@ interface FormState {
     discord: string;
     isPublic: boolean;
     // Location is simplified for the form input
-    locationAddress: string;
+    locationAddress: string;    
     adminEmail : string;
     adminPermissionLevel : number;
 }
@@ -47,7 +47,7 @@ export default function TournamentInsertForm() {
     const [formData, setFormData] = useState<FormState>(initialFormState);
     const [fieldErrors, setFieldErrors] = useState<TournamentInsertErrors>({});
     const [formError, setFormError] = useState<string | null>(null);
-    const [admin, setAdmin] = useState<AdminInsertErrors>({})
+    const [admin, setAdmin] = useState([{adminEmail : "", adminPermissionLevel : 4}])
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Placeholder for location data (we would integrate Google Maps API here)
@@ -58,6 +58,37 @@ export default function TournamentInsertForm() {
         latitude: 34.0522, // Mock data for LA
         longitude: -118.2437, // Mock data for LA
     };
+
+    // handler for admin add
+    const handleAdminAdd=()=>{
+        setAdmin([...admin, {adminEmail: "", adminPermissionLevel : 4}])
+    }
+
+    // handler for admin change
+    const handleAdminChange=(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, i: number)=> {
+        const {name, value}=e.target
+        const onChangeVal = [...admin]
+
+        if (name === 'adminPermissionLevel') {
+            onChangeVal[i].adminPermissionLevel = parseInt(value, 10)
+        } 
+        
+        if (name === 'adminEmail') {
+            onChangeVal[i].adminEmail = value
+        }
+
+        setAdmin(onChangeVal)
+    }
+
+    // handler for admin delete
+    const handleAdminDelete=()=> {
+        const deleteVal = [...admin]
+        if (admin.length > 1) {
+            setAdmin(admin.slice(0,-1))
+        }
+
+    }
+    
 
     // handler for changes in inputs
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -94,14 +125,16 @@ export default function TournamentInsertForm() {
             );
 
             if (response.success && response.data) {
-                
-                if (formData.adminEmail.trim()) {
 
-                    const user = await getUserIdfromEmail(formData.adminEmail)
-                    if (user.success && user.data) {
-                        await insertAdmin(response.data, user.data, formData.adminPermissionLevel);
+                for (const admins of admin) {
+                    if (admins.adminEmail.trim()) {
+                        const user = await getUserIdfromEmail(admins.adminEmail)
+                        if (user.success && user.data) {
+                            await insertAdmin(response.data, user.data, admins.adminPermissionLevel);
+                        }
                     }
                 }
+            
                 alert(`Tournament "${formData.name}" created successfully!`);
                 // Redirect to the new tournament's detail page
                 // will change this to push to create events page
@@ -371,33 +404,50 @@ export default function TournamentInsertForm() {
                 </fieldset>
                 <fieldset className="p-4 px-5 border-2 border-zinc-600 rounded-2xl mb-6 w-full">
                     <legend className={legendClass}>
-                        Add Tournament Admins
+                        Tournament Admins
                     </legend>
-                    {/* Admin Email */}
-                    <div className="mt-2">
-                        <BasicInputWithLabel
-                            labelClassName={pageLabelClass}
-                            labelText='Admin Email'
-                            inputType='email'
-                            inputName='adminEmail'
-                            inputId='adminEmail'
-                            inputValue={formData.adminEmail}
-                            inputOnChange={handleChange}
-                            required={false}
-                            inputPlaceholder='Enter your admin email'
-                            inputClassName={pageInputClass}
-                        />
+                    {
+                        admin.map((val, i) => (
+                            <div key={i}>
+                                {/* Admin Email */}
+                                <div className="mt-2">
+                                    <BasicInputWithLabel
+                                        labelClassName={pageLabelClass}
+                                        labelText='Admin Email'
+                                        inputType='email'
+                                        inputName='adminEmail'
+                                        inputId='adminEmail'
+                                        inputValue={val.adminEmail}
+                                        inputOnChange={(e) => handleAdminChange(e, i)}
+                                        required={false}
+                                        inputPlaceholder='Enter your admin email'
+                                        inputClassName={pageInputClass}
+                                    />
+                                </div>
+                                {/* Admin Permission Level */}         
+                                <div>
+                                    <label htmlFor='adminPermissionLevel'>Premission Level</label>
+                                    <select name='adminPermissionLevel' value={val.adminPermissionLevel} onChange={(e) => handleAdminChange(e, i)} className={pageInputClass}>
+                                        <option value={1}>Admin</option>
+                                        <option value={2}>Moderator</option>
+                                        <option value={3}>Bracket Manager</option>
+                                        <option value={4}>Reporter</option>
+                                    </select>
+                                </div>
+                            </div>
+                        ))  
+                    }   
+                    
+                    {/* Add/Delete Admins Button */}
+                    <div className='flex items-center gap-4 mt-3 '>  
+                        <button type='button' onClick={handleAdminAdd} className='rounded-md shadow-sm text-base md:text-lg lg:text-xl font-jersey-25
+                                   text-white bg-primary hover:bg-secondary disabled:opacity-50
+                                   transition-colors py-2.5 px-4'>+</button>
+                        <button type='button' disabled={admin.length <=1} onClick={() => handleAdminDelete()} className='rounded-md shadow-sm text-base md:text-lg lg:text-xl font-jersey-25
+                                   text-white bg-primary hover:bg-secondary disabled:opacity-50
+                                   transition-colors py-2.5 px-4'>-</button>
                     </div>
-                    {/* Admin Permission Level */}         
-                    <div>
-                        <label htmlFor='adminPermissionLevel'>Premission Level</label>
-                        <select name='adminPermissionLevel' value={formData.adminPermissionLevel} onChange={handleChange} className={pageInputClass}>
-                            <option value={1}>Admin</option>
-                            <option value={2}>Moderator</option>
-                            <option value={3}>Bracket Manager</option>
-                            <option value={4}>Reporter</option>
-                        </select>
-                    </div>
+                    
                 </fieldset>
                 {/* Submit Button */}
                 <div className="pt-4 sm:pt-6 mt-4 border-t-2 border-gray-400 flex gap-2">

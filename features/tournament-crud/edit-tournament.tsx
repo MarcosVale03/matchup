@@ -9,9 +9,10 @@ import {toDateTimeLocalInput} from '@/ui/format-time';
 import {ErrorMessageForTournament} from "@/features/tournament-crud/error-message-tournament";
 import Checkbox from '@/ui/checkbox';
 import { getUserIdfromEmail } from '@/server/queries/profile.queries';
-import { insertAdmin, updateAdmin } from '@/server/mutations/add-admin.mutation';
+import { AdminInsertErrors, insertAdmin, updateAdmin } from '@/server/mutations/add-admin.mutation';
+import { AdminsFromTournamentResponse, fetchAdminsFromTournament } from '@/server/queries/admins.queries';
 
-export default function TournamentEditForm({initialData}: { initialData: FetchTournamentFromIdResponse }) {
+export default function TournamentEditForm({initialData, currAdmins}: { initialData: FetchTournamentFromIdResponse, currAdmins : AdminsFromTournamentResponse[]}) {
     const router = useRouter();
 
     const [formData, setFormData] = useState({
@@ -43,6 +44,9 @@ export default function TournamentEditForm({initialData}: { initialData: FetchTo
         }));
     };
 
+    // seperate handler becuase admins is an object (not single data)
+
+
     // submit handler calls the updateTournament and handles success/error states
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -73,12 +77,13 @@ export default function TournamentEditForm({initialData}: { initialData: FetchTo
                 }
         );
 
+
         if (response.success) {
             if (formData.adminEmail.trim()) {
             
                 const user = await getUserIdfromEmail(formData.adminEmail)
                 if (user.success && user.data) {
-                    await insertAdmin(formData.id, user.data, formData.adminPermissionLevel);
+                    await updateAdmin(formData.id, user.data, formData.adminPermissionLevel);
                 }
             }
             alert(`Tournament "${formData.name}" updated successfully!`);
