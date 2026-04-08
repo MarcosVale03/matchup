@@ -1,14 +1,14 @@
 'use client'
-import {Post} from "@/server/queries/forum.queries";
+import { Post } from "@/server/queries/forum.queries";
 import Link from "next/link";
-import {ArrowLeft, MessageCircle} from "lucide-react";
+import { ArrowLeft, MessageCircle } from "lucide-react";
 import DeleteThread from "@/features/forum-crud/delete-thread";
 import Image from "next/image";
 import ForumPostsList from "@/features/forum-results.tsx/forum-post-list";
 import AddThreadPost from "@/features/forum-crud/add-post";
-import {useToast} from "@/ui/toast/use-toast";
-import {Toast} from "@/ui/toast/toast";
-import {formatDate} from "date-fns";
+import { useToast } from "@/ui/toast/use-toast";
+import { Toast } from "@/ui/toast/toast";
+import { formatDate } from "date-fns";
 
 export function ThreadView({
     title,
@@ -32,7 +32,7 @@ export function ThreadView({
                     className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-primary
                            transition-colors mb-6"
                 >
-                    <ArrowLeft className="size-4"/>
+                    <ArrowLeft className="size-4" />
                     Back to Forums
                 </Link>
 
@@ -60,7 +60,7 @@ export function ThreadView({
 
                             </div>
                             {isOwner && (
-                                <DeleteThread threadId={mainThread.thread_id}/>
+                                <DeleteThread threadId={mainThread.thread_id} />
                             )}
                         </div>
 
@@ -86,23 +86,21 @@ export function ThreadView({
                 />
 
                 <div className="mb-2">
-                    <Toast message={toast.message}/>
+                    <Toast message={toast.message} />
                 </div>
 
                 {/* Posts under thread */}
                 <div className="space-y-4">
                     <div className="flex items-center gap-2 text-gray-600">
-                        <MessageCircle className="size-5"/>
+                        <MessageCircle className="size-5" />
                         <h2 className="text-lg font-semibold">
                             {posts.length}
                         </h2>
                     </div>
 
-                    <ForumPostsList posts={posts} toastControl={toast}/>
+                    <ForumPostsList posts={posts} toastControl={toast} />
                 </div>
             </div>
         </main>
     )
-
-
 }

@@ -16,13 +16,19 @@ export default function NotificationsList({ notifications = [] }: { notification
                         <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0" />
 
                         <div className="flex flex-col gap-1 min-w-0">
+
+                            {/* Torunament name */}
                             <p>
                                 {item.tournamentName}
                             </p>
+
+                            {/* Player and event name */}
                             <p className="text-sm font-medium text-gray-800 leading-snug">
                                 <span>{item.playerName}</span> joined{" "}
                                 <span className="text-primary">{item.eventName}</span>
                             </p>
+
+                            {/* Timestamp */}
                             <p className="text-xs text-gray-400 font-light">
                                 {formatDistanceToNow(new Date(item.timestamp), { addSuffix: true })}
                             </p>
