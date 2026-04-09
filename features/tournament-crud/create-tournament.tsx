@@ -133,7 +133,7 @@ export default function TournamentInsertForm() {
                             await insertAdmin(response.data, user.data, admins.adminPermissionLevel);
                         }
                     }
-                }
+                }           
             
                 alert(`Tournament "${formData.name}" created successfully!`);
                 // Redirect to the new tournament's detail page

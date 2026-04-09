@@ -26,14 +26,45 @@ export default function TournamentEditForm({initialData, currAdmins}: { initialD
         email: initialData.email_contact ?? '',
         discord: initialData.discord_invite ? `https://discord.gg/${initialData.discord_invite}` : '',
         locationAddress: 'Los Angeles, CA', // add location later
-        adminEmail : '',
+        adminEmail : "",
         adminPermissionLevel : 4,
     });
 
     const [fieldErrors, setFieldErrors] = useState<TournamentUpdateErrors>({});
     const [formError, setFormError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
-
+    const [admin, setAdmin] = useState([{adminEmail : "", adminPermissionLevel : 4}])
+    
+     // handler for admin add
+        const handleAdminAdd=()=>{
+            setAdmin([...admin, {adminEmail: "", adminPermissionLevel : 4}])
+        }
+    
+        // handler for admin change
+        const handleAdminChange=(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, i: number)=> {
+            const {name, value}=e.target
+            const onChangeVal = [...admin]
+    
+            if (name === 'adminPermissionLevel') {
+                onChangeVal[i].adminPermissionLevel = parseInt(value, 10)
+            } 
+            
+            if (name === 'adminEmail') {
+                onChangeVal[i].adminEmail = value
+            }
+    
+            setAdmin(onChangeVal)
+        }
+    
+        // handler for admin delete
+        const handleAdminDelete=()=> {
+            const deleteVal = [...admin]
+            if (admin.length > 1) {
+                setAdmin(admin.slice(0,-1))
+            }
+    
+        }
+        
     // handler for text, email, datetime-local, checkbox
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const {name, value, type} = e.target;
@@ -43,9 +74,6 @@ export default function TournamentEditForm({initialData, currAdmins}: { initialD
             [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : name === 'adminPermissionLevel' ? parseInt(value, 10) : value,
         }));
     };
-
-    // seperate handler becuase admins is an object (not single data)
-
 
     // submit handler calls the updateTournament and handles success/error states
     const handleSubmit = async (e: React.FormEvent) => {
@@ -78,12 +106,14 @@ export default function TournamentEditForm({initialData, currAdmins}: { initialD
         );
 
 
-        if (response.success) {
-            if (formData.adminEmail.trim()) {
+        if (response.success && response.data) {
             
-                const user = await getUserIdfromEmail(formData.adminEmail)
-                if (user.success && user.data) {
-                    await updateAdmin(formData.id, user.data, formData.adminPermissionLevel);
+            for (const admins of admin) {
+                if (admins.adminEmail.trim()) {
+                    const user = await getUserIdfromEmail(admins.adminEmail)
+                    if (user.success && user.data) {
+                        await insertAdmin(response.data, user.data, admins.adminPermissionLevel);
+                    }
                 }
             }
             alert(`Tournament "${formData.name}" updated successfully!`);
