@@ -1,6 +1,6 @@
 'use client';
 import BasicInputWithLabel from '@/ui/basic-input-with-label';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useRouter} from 'next/navigation';
 import {updateTournament, TournamentUpdateErrors} from '@/server/mutations/tournaments.mutations';
 import {ArrowLeft, Save} from 'lucide-react';
@@ -9,7 +9,7 @@ import {toDateTimeLocalInput} from '@/ui/format-time';
 import {ErrorMessageForTournament} from "@/features/tournament-crud/error-message-tournament";
 import Checkbox from '@/ui/checkbox';
 import { getUserIdfromEmail } from '@/server/queries/profile.queries';
-import { AdminInsertErrors, insertAdmin, updateAdmin } from '@/server/mutations/add-admin.mutation';
+import { AdminInsertErrors, deleteAdmins, insertAdmin, updateAdmin } from '@/server/mutations/add-admin.mutation';
 import { AdminsFromTournamentResponse, fetchAdminsFromTournament } from '@/server/queries/admins.queries';
 
 export default function TournamentEditForm({initialData, currAdmins}: { initialData: FetchTournamentFromIdResponse, currAdmins : AdminsFromTournamentResponse[]}) {
@@ -33,37 +33,42 @@ export default function TournamentEditForm({initialData, currAdmins}: { initialD
     const [fieldErrors, setFieldErrors] = useState<TournamentUpdateErrors>({});
     const [formError, setFormError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [admin, setAdmin] = useState([{adminEmail : "", adminPermissionLevel : 4}])
+    const [admin, setAdmin] = useState(
+        // using filter to not display the owner (owner technically an admin through perm level 0) we only want 2-4 perms
+        currAdmins.filter(admin => admin.permission_levels.id !== 0).map(admin => ({
+            adminEmail : admin.email,
+            adminPermissionLevel : admin.permission_levels.id
+        }))
+    )
     
-     // handler for admin add
-        const handleAdminAdd=()=>{
-            setAdmin([...admin, {adminEmail: "", adminPermissionLevel : 4}])
+    // handler for admin add
+    const handleAdminAdd=()=>{
+        setAdmin([...admin, {adminEmail: "", adminPermissionLevel : 4}])
+    }
+
+    // handler for admin change
+    const handleAdminChange=(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, i: number)=> {
+        const {name, value}=e.target
+        const onChangeVal = [...admin]
+
+        if (name === 'adminPermissionLevel') {
+            onChangeVal[i].adminPermissionLevel = parseInt(value, 10)
+        } 
+        
+        if (name === 'adminEmail') {
+            onChangeVal[i].adminEmail = value
         }
-    
-        // handler for admin change
-        const handleAdminChange=(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, i: number)=> {
-            const {name, value}=e.target
-            const onChangeVal = [...admin]
-    
-            if (name === 'adminPermissionLevel') {
-                onChangeVal[i].adminPermissionLevel = parseInt(value, 10)
-            } 
-            
-            if (name === 'adminEmail') {
-                onChangeVal[i].adminEmail = value
-            }
-    
-            setAdmin(onChangeVal)
+
+        setAdmin(onChangeVal)
+    }
+
+    // handler for admin delete
+    const handleAdminDelete=()=> {
+        if (admin.length > 1) {
+            setAdmin(admin.slice(0,-1))
         }
-    
-        // handler for admin delete
-        const handleAdminDelete=()=> {
-            const deleteVal = [...admin]
-            if (admin.length > 1) {
-                setAdmin(admin.slice(0,-1))
-            }
-    
-        }
+
+    }
         
     // handler for text, email, datetime-local, checkbox
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -107,12 +112,18 @@ export default function TournamentEditForm({initialData, currAdmins}: { initialD
 
 
         if (response.success && response.data) {
+
+            // delete all admins that are not 0
+            await deleteAdmins(response.data)
             
+            // insert the admins, based on use state
             for (const admins of admin) {
-                if (admins.adminEmail.trim()) {
-                    const user = await getUserIdfromEmail(admins.adminEmail)
-                    if (user.success && user.data) {
-                        await insertAdmin(response.data, user.data, admins.adminPermissionLevel);
+                if (admins.adminEmail) {
+                    if (admins.adminEmail.trim()) {
+                        const user = await getUserIdfromEmail(admins.adminEmail)
+                        if (user.success && user.data) {
+                            await insertAdmin(response.data, user.data, admins.adminPermissionLevel, admins.adminEmail);
+                        }
                     }
                 }
             }
@@ -370,35 +381,52 @@ export default function TournamentEditForm({initialData, currAdmins}: { initialD
                     <ErrorMessageForTournament field='contact' fieldErrors={fieldErrors}/>
                 </fieldset>
                 <fieldset className="p-4 px-5 border-2 border-zinc-600 rounded-2xl mb-6 w-full">
-                    <legend className={legendClass}>
-                        Add Tournament Admins
-                    </legend>
-                    {/* Admin Email */}
-                    <div className="mt-2">
-                        <BasicInputWithLabel
-                            labelClassName={pageLabelClass}
-                            labelText='Admin Email'
-                            inputType='email'
-                            inputName='adminEmail'
-                            inputId='adminEmail'
-                            inputValue={formData.adminEmail}
-                            inputOnChange={handleChange}
-                            required={false}
-                            inputPlaceholder='Enter your admin email'
-                            inputClassName={pageInputClass}
-                        />
-                    </div>
-                    {/* Admin Permission Level */}         
-                    <div>
-                        <label htmlFor='adminPermissionLevel'>Premission Level</label>
-                        <select name='adminPermissionLevel' value={formData.adminPermissionLevel} onChange={handleChange} className={pageInputClass}>
-                            <option value={1}>Admin</option>
-                            <option value={2}>Moderator</option>
-                            <option value={3}>Bracket Manager</option>
-                            <option value={4}>Reporter</option>
-                        </select>
-                    </div>
-                </fieldset>               
+                                    <legend className={legendClass}>
+                                        Tournament Admins
+                                    </legend>
+                                    {
+                                        admin.map((val, i) => (
+                                            <div key={i}>
+                                                {/* Admin Email */}
+                                                <div className="mt-2">
+                                                    <BasicInputWithLabel
+                                                        labelClassName={pageLabelClass}
+                                                        labelText='Admin Email'
+                                                        inputType='email'
+                                                        inputName='adminEmail'
+                                                        inputId='adminEmail'
+                                                        inputValue={val.adminEmail}
+                                                        inputOnChange={(e) => handleAdminChange(e, i)}
+                                                        required={false}
+                                                        inputPlaceholder='Enter your admin email'
+                                                        inputClassName={pageInputClass}
+                                                    />
+                                                </div>
+                                                {/* Admin Permission Level */}         
+                                                <div>
+                                                    <label htmlFor='adminPermissionLevel'>Premission Level</label>
+                                                    <select name='adminPermissionLevel' value={val.adminPermissionLevel} onChange={(e) => handleAdminChange(e, i)} className={pageInputClass}>
+                                                        <option value={1}>Admin</option>
+                                                        <option value={2}>Moderator</option>
+                                                        <option value={3}>Bracket Manager</option>
+                                                        <option value={4}>Reporter</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        ))  
+                                    }   
+                                    
+                                    {/* Add/Delete Admins Button */}
+                                    <div className='flex items-center gap-4 mt-3 '>  
+                                        <button type='button' onClick={handleAdminAdd} className='rounded-md shadow-sm text-base md:text-lg lg:text-xl font-jersey-25
+                                                   text-white bg-primary hover:bg-secondary disabled:opacity-50
+                                                   transition-colors py-2.5 px-4'>+</button>
+                                        <button type='button' disabled={admin.length <=1} onClick={() => handleAdminDelete()} className='rounded-md shadow-sm text-base md:text-lg lg:text-xl font-jersey-25
+                                                   text-white bg-primary hover:bg-secondary disabled:opacity-50
+                                                   transition-colors py-2.5 px-4'>-</button>
+                                    </div>
+                                    
+                                </fieldset>           
                 {/* Back/Submit Button */}
                 <div className="pt-4 sm:pt-6 mt-4 border-t-2 border-gray-400 flex gap-2">
                     <button

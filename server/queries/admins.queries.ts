@@ -90,8 +90,9 @@ export type AdminsFromTournamentResponse = {
         prefix: string | null,
         display_name: string,
         first_name: string,
-        last_name: string
-    }
+        last_name: string,
+    },
+    email? : string
 }
 
 /**
@@ -104,11 +105,12 @@ export async function fetchAdminsFromTournament(tournamentId: number): Promise<A
     // Create supabase client
     const cookieStore = await cookies()
     const supabase = await createClient(cookieStore)
-
+    
     // DB Query
     const {data, error} = await supabase
         .from('admins')
-        .select(`   
+        .select(`
+            email,   
             permission_levels (
                 id,
                 name,
@@ -130,3 +132,4 @@ export async function fetchAdminsFromTournament(tournamentId: number): Promise<A
 
     return data
 }
+

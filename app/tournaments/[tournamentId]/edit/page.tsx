@@ -19,10 +19,22 @@ export default async function EditTournamentPage({ params }: { params: { tournam
         return notFound();
     }
 
-    if (!user || user.id !== tournament.owner.user_id) {
+    // get admins
+    const admins = await fetchAdminsFromTournament(id)
+    let adminPermLevel
+
+    for (const admin of admins) {
+        if (user?.id === admin.users.user_id) {
+            adminPermLevel = admin.permission_levels.id
+            break
+        }
+    }
+    const adminCheck = adminPermLevel !== undefined && adminPermLevel <= 1
+
+    if (!user || user.id !== tournament.owner.user_id && !adminCheck) {
         redirect('/tournaments')
     }
-
+        
     return (
             <main className="bg-main-bg flex flex-col text-black font-[Poppins]">
                 <div className="flex">

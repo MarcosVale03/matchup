@@ -72,32 +72,34 @@ export function TournamentDetails({
                     </h1>
 
                     {/* Shows edit/delete option if user has permissions */}
+                    <div className="flex gap-4 tracking-wide shrink-0">
                     {permissions.canEdit && (
-                        <div className="flex gap-4 tracking-wide shrink-0">
-                            <button
-                                onClick={handleEditClick}
-                                className="flex items-center justify-center gap-2 p-2 px-4 lg:mt-0
-                                           rounded-md shadow-sm text-sm md:text-lg font-jersey-25
-                                           text-white bg-primary hover:bg-secondary cursor-pointer
-                                           disabled:opacity-50 transition-colors duration-200"
-                            >
-                                <Pencil className="size-5"/>
-                                Edit
-                            </button>
-
-                            {/* Will throw an error if an event is tied to the tournament */}
-                            <button
-                                onClick={() => setShowDeleteModal(true)}
-                                className="flex items-center justify-center gap-2 p-2 px-4 lg:mt-0
-                                           rounded-md shadow-sm text-sm md:text-lg font-jersey-25
-                                           text-white bg-primary hover:bg-secondary cursor-pointer
-                                           disabled:opacity-50 transition-colors duration-200"
-                            >
-                                <Trash className="size-5"/>
-                                Delete
-                            </button>
-                        </div>
+                        <button
+                            onClick={handleEditClick}
+                            className="flex items-center justify-center gap-2 p-2 px-4 lg:mt-0
+                                        rounded-md shadow-sm text-sm md:text-lg font-jersey-25
+                                        text-white bg-primary hover:bg-secondary cursor-pointer
+                                        disabled:opacity-50 transition-colors duration-200"
+                        >
+                            <Pencil className="size-5"/>
+                            Edit
+                        </button>
                     )}
+    
+                    {/* Will throw an error if an event is tied to the tournament */}
+                    {permissions.canDelete && (
+                        <button
+                            onClick={() => setShowDeleteModal(true)}
+                            className="flex items-center justify-center gap-2 p-2 px-4 lg:mt-0
+                                        rounded-md shadow-sm text-sm md:text-lg font-jersey-25
+                                        text-white bg-primary hover:bg-secondary cursor-pointer
+                                        disabled:opacity-50 transition-colors duration-200"
+                        >
+                            <Trash className="size-5"/>
+                            Delete
+                        </button>
+                    )}
+                    </div>
                 </div>
 
                 {/* organizer, start/end time*/}

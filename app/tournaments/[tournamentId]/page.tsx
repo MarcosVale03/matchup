@@ -7,6 +7,7 @@ import {Trophy} from "lucide-react";
 import Link from "next/link";
 import {fetchEventsFromTournamentId} from "@/server/queries/events.queries";
 import {FetchEventsFromTournamentIdResponse} from "@/server/queries/events.queries";
+import { fetchAdminsFromTournament } from "@/server/queries/admins.queries";
 
 
 class fetchEventsFromTournamentIdResponse {
@@ -50,9 +51,21 @@ export default async function TournamentDetailsPage({params}: { params: { tourna
     const supabase = await createClient(cookieStore);
     const {data: {user}} = await supabase.auth.getUser();
 
+    // get admins
+    const admins = await fetchAdminsFromTournament(id)
+    let adminPermLevel
+
+    for (const admin of admins) {
+        if (user?.id === admin.users.user_id) {
+            adminPermLevel = admin.permission_levels.id
+            break
+        }
+    }
+
     const permissions = {
-        canEdit: user?.id === tournament.owner.user_id,
+        canEdit: adminPermLevel !== undefined && adminPermLevel <= 1,
         canDelete: user?.id === tournament.owner.user_id,
+
     };
 
     return (

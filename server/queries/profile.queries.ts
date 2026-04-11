@@ -76,7 +76,7 @@ export async function getUserIdfromEmail(email : string):  Promise<QueryResponse
     // creating client 
     const cookieStore = await cookies()
     const supabase = await createClient(cookieStore)
-
+    
     // grabbing information needed for user
     const {data, error} = await supabase.rpc('getuserfromemail', {user_email : email})
 

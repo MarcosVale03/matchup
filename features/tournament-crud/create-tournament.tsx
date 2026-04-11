@@ -130,7 +130,7 @@ export default function TournamentInsertForm() {
                     if (admins.adminEmail.trim()) {
                         const user = await getUserIdfromEmail(admins.adminEmail)
                         if (user.success && user.data) {
-                            await insertAdmin(response.data, user.data, admins.adminPermissionLevel);
+                            await insertAdmin(response.data, user.data, admins.adminPermissionLevel, admins.adminEmail);
                         }
                     }
                 }           
