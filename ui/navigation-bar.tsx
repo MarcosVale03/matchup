@@ -53,9 +53,9 @@ export default function NavigationBar() {
                     {/*    />*/}
                     {/*</Link>*/}
 
-                    <h1 className="text-3xl lg:text-4xl text-white">
+                    <Link href='/'><h1 className="text-3xl lg:text-4xl text-white">
                         Matchup
-                    </h1>
+                    </h1></Link>
 
                     {/* Desktop: Navigation Buttons (hidden on small screens) */}
                     {!isAuthPage && (
