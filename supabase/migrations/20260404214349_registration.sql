@@ -167,14 +167,14 @@ VALUES (e_tournament_id, e_name, e_start_time, e_end_time, e_price, e_video_game
 INTO e_id;
 
 -- Creates first bracket phase for said event
-INSERT INTO public.bracket_phases (tournament_id, event_id, name, num_progressing_per_group, bracket_type_name, next_phase_id)
-VALUES (e_tournament_id, e_id, 'Bracket', 1, 'Single Elimination', NULL)
+INSERT INTO public.bracket_phases (id, tournament_id, event_id, name, num_progressing_per_group, bracket_type_name, next_phase_id)
+VALUES (1, e_tournament_id, e_id, 'Bracket', 1, 'Single Elimination', NULL)
     RETURNING id
 INTO bp_id;
 
 -- Creates first phase group for said bracket phase
 INSERT INTO public.phase_groups (identifier, tournament_id, event_id, bracket_phase_id, wave_identifier)
-VALUES ('Bracket', e_tournament_id, e_id, bp_id, NULL)
+VALUES ('1', e_tournament_id, e_id, bp_id, NULL)
     RETURNING identifier
 INTO pg_id;
 
@@ -330,3 +330,19 @@ END IF;
 RETURN res;
 END;
 $function$;
+
+alter table "public"."bracket_phases" alter column "id" drop identity;
+
+create view bp_detailed as
+select bp.*, next.name as next_phase_name, count(*) as num_pools, coalesce(sum(pg.num_seeds), 0) as num_entrants
+from public.bracket_phases as bp left outer join public.bracket_phases as next ON (
+    bp.tournament_id = next.tournament_id AND bp.event_id = next.event_id AND bp.next_phase_id = next.id
+    ) left outer join (
+    select phase_groups.tournament_id, phase_groups.event_id, phase_groups.bracket_phase_id, phase_groups.identifier, coalesce(count(*), 0) as num_seeds
+    from public.phase_groups inner join public.seeds ON (
+    phase_groups.tournament_id = seeds.tournament_id AND phase_groups.event_id = seeds.event_id AND phase_groups.identifier = seeds.phase_group_identifier
+    )
+    where seeds.entrant_user_id is not null OR seeds.team_name is not null
+    group by phase_groups.tournament_id, phase_groups.event_id, phase_groups.identifier
+    ) as pg on (bp.tournament_id = pg.tournament_id AND bp.event_id = pg.event_id AND bp.id = pg.bracket_phase_id)
+group by bp.tournament_id, bp.event_id, bp.id, next_phase_name;

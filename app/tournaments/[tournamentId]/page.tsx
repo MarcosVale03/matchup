@@ -6,13 +6,10 @@ import {TournamentDetails} from "@/features/tournament-search/tournament-details
 import {Trophy} from "lucide-react";
 import Link from "next/link";
 import {fetchEventsFromTournamentId} from "@/server/queries/events.queries";
-import {FetchEventsFromTournamentIdResponse} from "@/server/queries/events.queries";
 
 
-class fetchEventsFromTournamentIdResponse {
-}
 
-export default async function TournamentDetailsPage({params}: { params: { tournamentId: string } }) {
+export default async function TournamentDetailsPage({params}: { params: Promise<{ tournamentId: string }> }) {
     const {tournamentId: idStr} = await params;
     const id = Number(idStr);
 
