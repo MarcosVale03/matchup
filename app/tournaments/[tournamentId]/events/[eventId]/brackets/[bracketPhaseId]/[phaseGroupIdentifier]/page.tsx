@@ -1,8 +1,8 @@
 import {notFound} from "next/navigation";
-import {
-    doesPhaseGroupExist,
-    fetchBracketTypeFromBracketPhase
-} from "@/server/queries/phases.queries";
+import {doesPhaseGroupExist, fetchBracketTypeFromBracketPhase} from "@/server/queries/phases.queries";
+import SingleElimBracket from "@/features/tournament-events/single-elim-bracket";
+import {fetchBracket} from "@/server/queries/brackets.queries";
+import {BracketType} from "@/lib/types/types";
 
 export default async function Page({ params }: { params: Promise<{
     tournamentId: string,
@@ -27,12 +27,16 @@ export default async function Page({ params }: { params: Promise<{
     if (!success) {
         notFound();
     }
-    console.log(bracketType)
+
+    const matches = await fetchBracket(tournamentId, eventId, phaseGroupIdentifier);
+    if (!matches) {
+        notFound();
+    }
 
 
     return (
         <div>
-
+            {bracketType == BracketType.SingleElimination && <SingleElimBracket rounds={matches} />}
         </div>
     )
 }

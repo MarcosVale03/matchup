@@ -23,22 +23,19 @@ interface FormState {
     locationAddress: string;
 }
 
-// Initial form state with default values
-const initialFormState: FormState = {
-    name: '',
-    slug: '',
-    startTime: new Date(),
-    endTime: new Date(Date.now() + 24 * 60 * 60 * 1000),
-    isOnline: true,
-    email: '',
-    discord: '',
-    isPublic: true,
-    locationAddress: '',
-};
-
 export default function TournamentInsertForm() {
     const router = useRouter();
-    const [formData, setFormData] = useState<FormState>(initialFormState);
+    const [formData, setFormData] = useState<FormState>(() => ({
+        name: '',
+        slug: '',
+        startTime: new Date(),
+        endTime: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        isOnline: true,
+        email: '',
+        discord: '',
+        isPublic: true,
+        locationAddress: '',
+    }));
     const [fieldErrors, setFieldErrors] = useState<TournamentInsertErrors>({});
     const [formError, setFormError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -71,16 +68,13 @@ export default function TournamentInsertForm() {
         const locationArg = formData.isOnline ? undefined : mockLocationData;
         const slugArg = formData.slug.trim() || undefined;
 
-        const startTimeArg = new Date(formData.startTime);
-        const endTimeArg = new Date(formData.endTime);
-
         try {
             const response = await insertTournament(
                 formData.name,
-                startTimeArg,
-                endTimeArg,
+                formData.startTime,
+                formData.endTime,
                 formData.isOnline,
-                {email: formData.email.trim() || undefined, discord: formData.discord.trim() || undefined},
+                { email: formData.email.trim() || undefined, discord: formData.discord.trim() || undefined },
                 formData.isPublic,
                 slugArg,
                 locationArg
@@ -104,20 +98,24 @@ export default function TournamentInsertForm() {
     };
 
     // general classNames used in most of the inputs on this page
-    const pageLabelClass = `block text-xs sm:text-base text-zinc-600 rounded-md peer-focus:text-primary transition
-                            duration-400 font-[Poppins] font-semibold`
+    const pageLabelClass = "block text-zinc-600 2xl:text-xl rounded-md peer-focus:text-primary transition duration-400";
+
 
     const pageInputClass = `peer block bg-white w-full rounded-xl border-2 border-white 
-                            text-black text-sm lg:text-base p-2.5 focus:outline-none 
-                            focus:border-primary shadow-sm transition duration-400 font-[Poppins]`
+                            text-black p-2 2xl:p-4 2xl:text-xl focus:outline-none 
+                            focus:border-primary shadow-sm transition duration-400 font-normal`;
 
-    const legendClass = "text-base lg:text-lg font-jersey-25 text-primary px-2 -mb-3"
+    const legendClass = "text-sm md:text-base lg:text-lg font-[Poppins] text-gray-700 px-2 -mb-3 tracking-tight"
 
     return (
-        <div className="mt-4 mx-4 xs:mx-auto xs:max-w-xs sm:max-w-lg md:max-w-2xl lg:max-w-4xl 2xl:max-w-6xl w-full">
-            <h1 className="text-xl md:text-2xl lg:text-3xl font-jersey-25 mb-2 border-b border-gray-300">
-                Create a New Tournament
+        <div className="mt-4 mx-4 sm:mx-auto w-full max-w-[calc(100%-2rem)] sm:max-w-2xl md:max-w-3xl lg:max-w-5xl 2xl:max-w-7xl">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-jersey-25">
+                Create Tournament
             </h1>
+
+            <h2 className="text-base mb-4 pb-1 text-gray-600 border-b border-gray-300">
+                Fill in the details below to create your tournament
+            </h2>
 
             <form
                 onSubmit={handleSubmit}
@@ -134,13 +132,9 @@ export default function TournamentInsertForm() {
                     </div>
                 )}
 
-                {/* Section Heading */}
-                <h2 className="text-lg md:text-xl lg:text-2xl font-jersey-25 mb-4">
-                    Basic Information
-                </h2>
 
                 {/* General Details */}
-                <fieldset className="space-y-4 mb-6">
+                <fieldset className="space-y-4 mb-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* Name */}
                         <div className="mb-2">
@@ -156,7 +150,7 @@ export default function TournamentInsertForm() {
                                 inputPlaceholder="Enter tournament name"
                                 inputClassName={pageInputClass}
                             />
-                            <ErrorMessageForTournament field='name' fieldErrors={fieldErrors}/>
+                            <ErrorMessageForTournament field='name' fieldErrors={fieldErrors} />
                         </div>
 
                         {/* Slug */}
@@ -173,7 +167,7 @@ export default function TournamentInsertForm() {
                                 inputPlaceholder="e.g., mytourney2025"
                                 inputClassName={pageInputClass}
                             />
-                            <ErrorMessageForTournament field='slug' fieldErrors={fieldErrors}/>
+                            <ErrorMessageForTournament field='slug' fieldErrors={fieldErrors} />
                         </div>
 
                         {/* Start Time */}
@@ -182,19 +176,19 @@ export default function TournamentInsertForm() {
                                 labelClassName={pageLabelClass}
                                 labelText="Start Date (Required)"
                                 inputType="datetime-local"
-                                inputName="startTimeCreate"
-                                inputId="startTimeCreate"
+                                inputName="startTime"
+                                inputId="startTime"
                                 inputValue={dateToInputString(formData.startTime)}
                                 inputOnChange={(e) => {
                                     if (!e.target.validity.valid) return;
-                                    setFormData({...formData, startTime: new Date(e.target.value)});
+                                    setFormData({ ...formData, startTime: new Date(e.target.value) });
                                 }}
                                 required={true}
                                 inputPlaceholder=""
                                 inputClassName={`${pageInputClass} appearance-none`}
                                 maxDateTime="9999-12-31T23:59"
                             />
-                            <ErrorMessageForTournament field='times' fieldErrors={fieldErrors}/>
+                            <ErrorMessageForTournament field='times' fieldErrors={fieldErrors} />
                         </div>
 
                         {/* End Time */}
@@ -203,12 +197,12 @@ export default function TournamentInsertForm() {
                                 labelClassName={pageLabelClass}
                                 labelText="End Date (Required)"
                                 inputType="datetime-local"
-                                inputName="endTimeCreate"
-                                inputId="endTimeCreate"
+                                inputName="endTime"
+                                inputId="endTime"
                                 inputValue={dateToInputString(formData.endTime)}
                                 inputOnChange={(e) => {
                                     if (!e.target.validity.valid) return;
-                                    setFormData({...formData, endTime: new Date(e.target.value)});
+                                    setFormData({ ...formData, endTime: new Date(e.target.value) });
                                 }}
                                 required={true}
                                 inputPlaceholder=""
@@ -220,7 +214,7 @@ export default function TournamentInsertForm() {
                 </fieldset>
 
                 {/* Location Type */}
-                <fieldset className="p-2 px-5 border-2 border-zinc-600 rounded-2xl mb-6 w-full">
+                <fieldset className="p-2 px-5 border-2 border-zinc-600 rounded-lg mb-6 w-full">
                     <legend className={`${legendClass} mb-0`}>
                         Location Type
                     </legend>
@@ -237,18 +231,19 @@ export default function TournamentInsertForm() {
                         checkedBoxClassName="bg-primary text-black"
                         iconSize={18}
                         iconClassName="group-hover:text-primary text-white"
-                        labelClassName="text-sm md:text-base lg:text-lg font-jersey-25"
+                        labelClassName=" text-sm md:text-base tracking-tight font-semibold"
                     />
-                    
+
 
                     {/* Location Address (Appears only if offline) */}
                     <div
                         className={`grid transition-all duration-500 
-                            ${!formData.isOnline ? 
-                                'grid-rows-[1fr] opacity-100' : 
+                            ${!formData.isOnline ?
+                                'grid-rows-[1fr] opacity-100' :
                                 'grid-rows-[0fr] opacity-0'
                             }
                         `}
+                        aria-hidden={formData.isOnline}
                     >
                         <div className="p-2 overflow-hidden">
                             <BasicInputWithLabel
@@ -262,14 +257,15 @@ export default function TournamentInsertForm() {
                                 required={!formData.isOnline}
                                 inputPlaceholder="e.g., 123 Main St, Anytown"
                                 inputClassName={`${pageInputClass}`}
+                                tabIndex={formData.isOnline ? -1 : 0}
                             />
-                            <ErrorMessageForTournament field='location' fieldErrors={fieldErrors}/>
+                            <ErrorMessageForTournament field='location' fieldErrors={fieldErrors} />
                         </div>
                     </div>
                 </fieldset>
 
                 {/* Tournament Visibility */}
-                <fieldset className="p-4 px-5 border-2 border-zinc-600 rounded-2xl mb-6 w-full">
+                <fieldset className="p-4 px-5 border-2 border-zinc-600 rounded-lg mb-6 w-full">
                     <legend className={legendClass}>
                         Tournament Visibility
                     </legend>
@@ -283,11 +279,11 @@ export default function TournamentInsertForm() {
                             value="public"
                             checked={formData.isPublic === true}
                             className="h-4 w-4 accent-primary shrink-0"
-                            onChange={() => setFormData({...formData, isPublic: true})}
+                            onChange={() => setFormData({ ...formData, isPublic: true })}
                         />
                         <label
                             htmlFor="tournament-public"
-                            className="ml-2 text-sm md:text-base lg:text-lg font-jersey-25"
+                            className="ml-2 text-sm md:text-base tracking-tight font-semibold"
                         >
                             Public
                         </label>
@@ -302,11 +298,11 @@ export default function TournamentInsertForm() {
                             value="private"
                             checked={formData.isPublic === false}
                             className="h-4 w-4 accent-primary shrink-0"
-                            onChange={() => setFormData({...formData, isPublic: false})}
+                            onChange={() => setFormData({ ...formData, isPublic: false })}
                         />
                         <label
                             htmlFor="tournament-private"
-                            className="ml-2 text-sm md:text-base lg:text-lg font-jersey-25"
+                            className="ml-2 text-sm md:text-base tracking-tight font-semibold"
                         >
                             Private
                         </label>
@@ -314,7 +310,7 @@ export default function TournamentInsertForm() {
                 </fieldset>
 
                 {/* Contact Information */}
-                <fieldset className="p-4 px-5 border-2 border-zinc-600 rounded-2xl mb-6 w-full">
+                <fieldset className="p-4 px-5 border-2 border-zinc-600 rounded-lg mb-6 w-full">
                     <legend className={legendClass}>
                         Contact Information (At least one required)
                     </legend>
@@ -352,7 +348,7 @@ export default function TournamentInsertForm() {
                             />
                         </div>
                     </div>
-                    <ErrorMessageForTournament field='contact' fieldErrors={fieldErrors}/>
+                    <ErrorMessageForTournament field='contact' fieldErrors={fieldErrors} />
                 </fieldset>
 
                 {/* Submit Button */}
@@ -366,7 +362,7 @@ export default function TournamentInsertForm() {
                                    transition-colors"
                     >
                         {isSubmitting ? 'Going to events...' : 'Create events for this tournament'}
-                        <ArrowRight size={16} className='shrink-0'/>
+                        <ArrowRight size={16} className='shrink-0' />
                     </button>
                 </div>
             </form>
