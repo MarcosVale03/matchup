@@ -1,10 +1,10 @@
 'use client'
-import { BracketMatch } from "@/server/queries/brackets.queries";
+import {FetchBracketResponse, MatchResponse} from "@/server/queries/brackets.queries";
 
 // Groups flat match array into rounds by parsing "R1", "R2", etc. from match identifiers,
 // then returns them sorted ascending so earlier rounds render left-to-right
-function organizeIntoRounds(matches: BracketMatch[]): BracketMatch[][] {
-    const roundMap = new Map<number, BracketMatch[]>();
+/*function organizeIntoRounds(matches: FetchBracketResponse[]): FetchBracketResponse[][] {
+    const roundMap = new Map<number, FetchBracketResponse[]>();
 
     for (const match of matches) {
         const roundNum = parseInt(match.identifier.match(/R(\d+)/)?.[1] ?? "0");
@@ -15,26 +15,39 @@ function organizeIntoRounds(matches: BracketMatch[]): BracketMatch[][] {
     return Array.from(roundMap.entries())
         .sort(([a], [b]) => a - b)
         .map(([, matches]) => matches);
-}
+}*/
 
 function Slot({
     name,
+    prefix,
     score,
     isWinner,
+    seed,
+    showSeed
 }: {
     name: string;
+    prefix: string;
     score: number | null;
     isWinner: boolean;
+    seed: number | null;
+    showSeed: boolean;
 }) {
     return (
         <div className={`flex items-center justify-between px-3 py-2 
             ${isWinner ? "bg-primary/10" : ""}
             ${name === "TBD" ? "text-gray-400 italic" : ""}`}
         >
-            <p className={`text-sm truncate flex-1 
+            <div className='flex flex-row items-center w-full justify-start'>
+                {showSeed && <div className={`text-sm mr-2 pr-3 border-r
                 ${isWinner ? "font-bold text-primary" : "text-gray-800"}`}>
-                {name}
-            </p>
+                    <p>{seed}</p>
+                </div>}
+                <p className={`text-sm truncate flex-1 
+                ${isWinner ? "font-bold text-primary" : "text-gray-800"}`}>
+                    {prefix && <span className="mr-1 text-xs">{prefix}</span>}<span>{name}</span>
+                </p>
+            </div>
+
             {score != null && (
                 <p className={`text-sm ml-2 font-bold
                     ${isWinner ? "text-primary" : "text-gray-400"}`}>
@@ -45,13 +58,14 @@ function Slot({
     );
 }
 
-function MatchNode({ match, roundIndex, isLast }: {
-    match: BracketMatch;
+function MatchNode({ match, roundIndex, isLast, showSeeds }: {
+    match: MatchResponse;
     roundIndex: number;
     isLast: boolean;
+    showSeeds: boolean
 }) {
-    const slot1 = match.slots[0];
-    const slot2 = match.slots[1];
+    const slot1 = match.match_slots[0];
+    const slot2 = match.match_slots[1];
 
     // TODO: winner detection is hardcoded — should compare slot scores
     // once scoring is wired up 
@@ -61,23 +75,31 @@ function MatchNode({ match, roundIndex, isLast }: {
     // : null;
 
     return (
-        <div className="flex items-center">
+        <div className="flex items-center relative ml-4">
             {/* Connector line leading in from the previous round */}
-            {roundIndex > 0 && <div className="w-6 h-px bg-gray-300" />}
+            {/*roundIndex > 0 && <div className="w-6 h-px bg-gray-300" />*/}
 
             <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden w-[200px]">
                 <Slot
-                    name={slot1?.seed?.team_name ?? "TBD"}
+                    name={slot1.seed?.user?.display_name ?? "TBD"}
+                    prefix={slot1.seed?.user?.prefix ?? ""}
                     score={2}
                     isWinner={true}
+                    seed={slot1.seed?.seed_num ?? null}
+                    showSeed={showSeeds}
                 />
                 <div className="h-px bg-gray-200" />
                 <Slot
-                    name={slot2?.seed?.team_name ?? "TBD"}
+                    name={slot2.seed?.user?.display_name ?? "TBD"}
+                    prefix={slot2.seed?.user?.prefix ?? ""}
                     score={1}
                     isWinner={false}
+                    seed={slot2.seed?.seed_num ?? null}
+                    showSeed={showSeeds}
                 />
             </div>
+            {/*Match Code*/}
+            <div className="absolute bg-gray-800 text-white -left-4 font-bold w-6 h-6 flex align-center justify-center">{match.code}</div>
 
             {/* Connector line leading out to the next round */}
             {!isLast && <div className="w-6 h-px bg-gray-300" />}
@@ -85,34 +107,33 @@ function MatchNode({ match, roundIndex, isLast }: {
     );
 }
 
-export default function SingleElimBracket({ matches }: { matches: BracketMatch[] }) {
-    const rounds = organizeIntoRounds(matches);
-
+export default function SingleElimBracket({ rounds, showSeeds = true }: { rounds: FetchBracketResponse, showSeeds?: boolean }) {
     if (rounds.length === 0) {
         return <p className="text-gray-400 text-center py-8">No bracket data yet</p>;
     }
 
     return (
-        <div className="flex overflow-x-auto gap-0 py-4">
+        <div className="flex overflow-x-auto gap-0 p-8 bg-white">
             {rounds.map((round, roundIndex) => (
                 <div key={roundIndex} className="flex flex-col justify-around min-w-[220px]">
                     {/* Label the last two rounds as Finals/Semifinals, everything else numerically */}
                     <p className="text-center font-[Poppins] font-semibold text-sm text-gray-500 mb-4">
-                        {roundIndex === rounds.length - 1
+                        {round.round_num === 1
                             ? "Finals"
-                            : roundIndex === rounds.length - 2
+                            : round.round_num === 2
                                 ? "Semifinals"
-                                : `Round ${roundIndex + 1}`}
+                                : `Round ${rounds.length - round.round_num + 1}`}
                     </p>
                     {/* justify-around distributes matches vertically so they align
                         with their parent match in the next round */}
                     <div className="flex flex-col justify-around flex-1 gap-4">
-                        {round.map((match) => (
+                        {round.matches.map((match) => (
                             <MatchNode
-                                key={match.identifier}
+                                key={match.code}
                                 match={match}
                                 roundIndex={roundIndex}
                                 isLast={roundIndex === rounds.length - 1}
+                                showSeeds={showSeeds}
                             />
                         ))}
                     </div>
