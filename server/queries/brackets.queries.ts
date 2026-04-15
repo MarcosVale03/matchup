@@ -2,85 +2,79 @@
 
 import { createClient } from "@/server/db/server"
 import { cookies } from 'next/headers'
-import { QueryResponse } from "@/lib/types/types"
-import { Database } from "@/lib/types/db.types"
 
-
-type Match = Database["public"]["Tables"]["matches"]["Row"]
-type MatchSlot = Database["public"]["Tables"]["match_slots"]["Row"]
-type Seed = Database["public"]["Tables"]["seeds"]["Row"]
-
-
-export interface BracketMatch extends Match {
-    slots: (MatchSlot & { seed?: Seed | null })[]
+export type MatchResponse = {
+    id: number,
+    code: string,
+    advance_match_id: number | null,
+    advance_slot_num: number | null,
+    match_slots: {
+        slot_num: number,
+        seed: {
+            seed_num: number,
+            user: {
+                first_name: string,
+                last_name: string,
+                display_name: string,
+                prefix: string,
+                country: string,
+                state: string,
+            } | null
+        }
+    }[]
 }
+
+export type FetchBracketResponse = {
+    tournament_id: number,
+    event_id: number,
+    phase_group_identifier: string,
+    round_num: number,
+    matches: MatchResponse[]
+}[]
 
 // function to fetch all matches and slots for a tournament/event and assemble them into a structured format
 export async function fetchBracket(
     tournamentId: number,
-    eventId: number
-): Promise<QueryResponse<BracketMatch[]>> {
+    eventId: number,
+    phaseGroupIdentifier: string
+): Promise<FetchBracketResponse> {
     const cookieStore = await cookies()
     const supabase = await createClient(cookieStore)
 
     // get all matches for this tournament/event
-    const { data: matches, error: matchError } = await supabase
-        .from('matches')
-        .select('*')
-        .eq('tournament_id', tournamentId)
-        .eq('event_id', eventId)
-
-    if (matchError) {
-        return { success: false, message: matchError.message }
-    }
-
-    // get all slots for the matches in this tournament/event
-    const { data: slots, error: slotError } = await supabase
-        .from('match_slots')
-        .select('*')
-        .eq('tournament_id', tournamentId)
-        .eq('event_id', eventId)
-
-    if (slotError) {
-        return { success: false, message: slotError.message }
-    }
-
-    // need seed info to know which entrants are in each match slot
-    const { data: seeds, error: seedError } = await supabase
-        .from('seeds')
-        .select('*')
-        .eq('tournament_id', tournamentId)
-        .eq('event_id', eventId)
-
-    if (seedError) {
-        return { success: false, message: seedError.message }
-    }
-
-    // assemble matches with their corresponding slots and seed info
-    const bracketMatches: BracketMatch[] = matches.map(match => {
-        const matchSlots = slots
-            .filter(s =>
-                s.match_identifier === match.identifier &&
-                s.phase_group_identifier === match.phase_group_identifier
+    const { data, error } = await supabase
+        .from('rounds')
+        .select(`
+            *,
+            matches(
+                advance_match_id,
+                advance_slot_num,
+                id,
+                code,
+                match_slots:match_slots_matches_fk_01(
+                    slot_num,
+                    seed:match_slots_seeds_fk_01(
+                        seed_num,
+                        user:users(
+                            first_name,
+                            last_name,
+                            display_name,
+                            prefix,
+                            country,
+                            state
+                        )
+                    )
+                )
             )
-            .map(slot => ({
-                ...slot,
-                seed: seeds.find(s => s.seed_num === slot.seed_num) ?? null
-            }))
-            .sort((a, b) => a.slot_num - b.slot_num)
+        `)
+        .eq('tournament_id', tournamentId)
+        .eq('event_id', eventId)
+        .eq('phase_group_identifier', phaseGroupIdentifier)
+        .order('round_num', {ascending: false})
 
-        return { ...match, slots: matchSlots }
-    })
+    if (error || !data) {
+        throw new Error("DB error while trying to query rounds: " + error.details + " " + error.message)
+    }
 
-   // sort matches by round and match number=
-    bracketMatches.sort((a, b) => {
-        const roundA = parseInt(a.identifier.match(/R(\d+)/)?.[1] ?? "0")
-        const roundB = parseInt(b.identifier.match(/R(\d+)/)?.[1] ?? "0")
-        if (roundA !== roundB) return roundA - roundB
-        const matchA = parseInt(a.identifier.match(/M(\d+)/)?.[1] ?? "0")
-        const matchB = parseInt(b.identifier.match(/M(\d+)/)?.[1] ?? "0")
-        return matchA - matchB
-    })
-
-    return { success: true, data: bracketMatches }
+    return data
 }
