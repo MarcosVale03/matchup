@@ -333,7 +333,7 @@ $function$;
 
 alter table "public"."bracket_phases" alter column "id" drop identity;
 
-create view bp_detailed as
+create view bp_detailed with (security_invoker = on) as
 select bp.*, next.name as next_phase_name, count(*) as num_pools, coalesce(sum(pg.num_seeds), 0) as num_entrants
 from public.bracket_phases as bp left outer join public.bracket_phases as next ON (
     bp.tournament_id = next.tournament_id AND bp.event_id = next.event_id AND bp.next_phase_id = next.id
