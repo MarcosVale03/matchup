@@ -1,7 +1,6 @@
 'use client'
 import Link from "next/link";
 import { useNotifications } from "@/features/notifications/get-notifications";
-import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useProfile } from "@/app/client-layout";
 import { signOut } from "@/lib/auth";
@@ -78,9 +77,9 @@ export default function NavigationBar() {
 					{/*    />*/}
 					{/*</Link>*/}
 
-					<h1 className="text-3xl lg:text-4xl text-white">
+					<Link href='/'><h1 className="text-3xl lg:text-4xl text-white">
 						Matchup
-					</h1>
+					</h1></Link>
 
 					{/* Desktop: Navigation Buttons (hidden on small screens) */}
 					{!isAuthPage && (
