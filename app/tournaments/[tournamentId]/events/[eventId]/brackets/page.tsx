@@ -1,4 +1,8 @@
-import {fetchBracketPhasesFromEventId} from "@/server/queries/phases.queries";
+import {
+    doesBracketPhaseExist,
+    fetchBracketPhasesFromEventId,
+    fetchPhaseGroupsFromBracketPhase
+} from "@/server/queries/phases.queries";
 import {notFound} from "next/navigation";
 import BracketDetails from "@/features/event-brackets/BracketDetails";
 
@@ -16,13 +20,25 @@ export default async function Page({ params, searchParams }: {
         notFound();
     }
 
+    if (bpid !== 0 && !(await doesBracketPhaseExist(tournamentId, eventId, bpid))) {
+        notFound();
+    }
+
     const bracketPhases = await fetchBracketPhasesFromEventId(tournamentId, eventId);
 
-    // let phaseGroups = null
+    const phaseGroups = bpid === 0 ?
+        await Promise.all(bracketPhases.map(async (bp) => {return {
+            bp: bp,
+            pg: await fetchPhaseGroupsFromBracketPhase(tournamentId, eventId, bp.id, 8)
+        }}))
+        : [{
+            bp: bracketPhases[bpid - 1],
+            pg: await fetchPhaseGroupsFromBracketPhase(tournamentId, eventId, bpid)
+        }]
 
     return (
         <div className="bg-main-bg font-[Poppins] text-black">
-            <BracketDetails bracketPhases={bracketPhases} currBP={bpid} />
+            <BracketDetails bracketPhases={bracketPhases} currBP={bpid} phaseGroups={phaseGroups} />
         </div>
     )
 }
