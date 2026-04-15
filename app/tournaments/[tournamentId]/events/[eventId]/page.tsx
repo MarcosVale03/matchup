@@ -1,9 +1,9 @@
-import { fetchEventFromEventId } from "@/server/queries/events.queries";
-import { fetchBracket } from "@/server/queries/brackets.queries";
-import { notFound } from "next/navigation";
+import {fetchEventFromEventId} from "@/server/queries/events.queries";
+import {notFound} from "next/navigation";
 import EventDetails from "@/features/tournament-events/event-details";
+import {fetchBracketPhasesFromEventId} from "@/server/queries/phases.queries";
 
-export default async function Page({ params }: { params: { tournamentId: string, eventId: string } }) {
+export default async function Page({ params }: { params: Promise<{ tournamentId: string, eventId: string }> }) {
     const { tournamentId: tidStr, eventId: eidStr } = await params
     const tournamentId = Number(tidStr);
     const eventId = Number(eidStr);
@@ -11,18 +11,18 @@ export default async function Page({ params }: { params: { tournamentId: string,
     if (isNaN(tournamentId) || tournamentId <= 0 || isNaN(eventId) || eventId <= 0) {
         notFound();
     }
-    
-    const { success: eventSuccess, event } = await fetchEventFromEventId(tournamentId, eventId);
 
-    if (!eventSuccess || event === undefined) {
+    const {success, event} = await fetchEventFromEventId(tournamentId, eventId);
+
+    if (!success || event === undefined) {
         notFound();
     }
 
-    const { success: bracketSuccess, data: bracketMatches } = await fetchBracket(tournamentId, eventId);
+    const bracket_phases = await fetchBracketPhasesFromEventId(tournamentId, eventId);
 
     return (
         <div className="bg-main-bg font-[Poppins] text-black">
-            <EventDetails event={event} bracketMatches={bracketMatches ?? []} />
+            <EventDetails event={event} bracketPhases={bracket_phases} />
         </div>
     )
 }

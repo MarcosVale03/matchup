@@ -1,10 +1,10 @@
 'use client'
-import { Fragment, useState } from "react";
-import { FetchEventFromEventIdResponse } from "@/server/queries/events.queries";
-import { formatDate } from "date-fns";
-import { CalendarSync, ChevronRight, Crown, ShieldAlert, Wrench, X } from "lucide-react";
-import { BracketMatch } from "@/server/queries/brackets.queries";
-import SingleElimBracket from "./single-elim-bracket"
+import {Fragment, useState} from "react";
+import {FetchEventFromEventIdResponse} from "@/server/queries/events.queries";
+import {formatDate} from "date-fns";
+import {CalendarSync, ChevronRight, Crown, ShieldAlert, Wrench, X} from "lucide-react";
+import {FetchBracketPhasesResponse} from "@/server/queries/phases.queries";
+import Link from "next/link";
 
 interface Team {
     rank: number;
@@ -40,6 +40,19 @@ interface Alert {
     type: "warning" | "info" | "success";
     msg: string;
 }
+
+const TOURNAMENT = {
+    name: "Test Event",
+    game: "Valorant",
+    format: "Round Robin → Single Elim",
+    startDate: "Mar 1, 2026",
+    endDate: "Mar 14, 2026",
+    currentRound: 3,
+    totalRounds: 5,
+    registeredTeams: 12,
+    matchesPlayed: 18,
+    matchesRemaining: 12,
+};
 
 const TEAMS: Team[] = [
     {
@@ -177,31 +190,26 @@ const TEAMS: Team[] = [
 ];
 
 const RECENT_MATCHES: Match[] = [
-    { id: 1, team1: "Phantom Rift", score1: 2, team2: "Solar Flare", score2: 0, round: 3, time: "Today, 4:30 PM" },
-    { id: 2, team1: "Neon Vanguard", score1: 2, team2: "Glacier Nine", score2: 1, round: 3, time: "Today, 3:00 PM" },
-    { id: 3, team1: "Iron Collective", score1: 2, team2: "Verdant Edge", score2: 0, round: 3, time: "Today, 1:30 PM" },
-    { id: 4, team1: "Dusk Protocol", score1: 2, team2: "Byte Force", score2: 1, round: 3, time: "Yesterday" },
-    { id: 5, team1: "Crimson Wolves", score1: 0, team2: "Echo Chamber", score2: 2, round: 3, time: "Yesterday" },
+    {id: 1, team1: "Phantom Rift", score1: 2, team2: "Solar Flare", score2: 0, round: 3, time: "Today, 4:30 PM"},
+    {id: 2, team1: "Neon Vanguard", score1: 2, team2: "Glacier Nine", score2: 1, round: 3, time: "Today, 3:00 PM"},
+    {id: 3, team1: "Iron Collective", score1: 2, team2: "Verdant Edge", score2: 0, round: 3, time: "Today, 1:30 PM"},
+    {id: 4, team1: "Dusk Protocol", score1: 2, team2: "Byte Force", score2: 1, round: 3, time: "Yesterday"},
+    {id: 5, team1: "Crimson Wolves", score1: 0, team2: "Echo Chamber", score2: 2, round: 3, time: "Yesterday"},
 ];
 
 const UPCOMING: UpcomingMatch[] = [
-    { id: 6, team1: "Phantom Rift", team2: "Neon Vanguard", round: 4, time: "Mar 10, 2:00 PM" },
-    { id: 7, team1: "Iron Collective", team2: "Dusk Protocol", round: 4, time: "Mar 10, 3:30 PM" },
-    { id: 8, team1: "Solar Flare", team2: "Echo Chamber", round: 4, time: "Mar 10, 5:00 PM" },
+    {id: 6, team1: "Phantom Rift", team2: "Neon Vanguard", round: 4, time: "Mar 10, 2:00 PM"},
+    {id: 7, team1: "Iron Collective", team2: "Dusk Protocol", round: 4, time: "Mar 10, 3:30 PM"},
+    {id: 8, team1: "Solar Flare", team2: "Echo Chamber", round: 4, time: "Mar 10, 5:00 PM"},
 ];
 
 const ALERTS: Alert[] = [
-    { type: "warning", msg: "Byte Force has requested a reschedule for Round 4 match" },
-    { type: "info", msg: "Tiebreaker rules activated for positions 2-3 and 6-8" },
-    { type: "success", msg: "Round 3 completed — all results confirmed" },
+    {type: "warning", msg: "Byte Force has requested a reschedule for Round 4 match"},
+    {type: "info", msg: "Tiebreaker rules activated for positions 2-3 and 6-8"},
+    {type: "success", msg: "Round 3 completed — all results confirmed"},
 ];
 
 const CUTOFF = 8;
-
-const redButtonClassName = `flex items-center justify-center gap-2 p-2 px-4 lg:mt-0
-                            rounded-md shadow-sm text-sm md:text-lg font-jersey-25
-                            text-white bg-primary hover:bg-secondary cursor-pointer
-                            disabled:opacity-50 transition-colors duration-200`
 
 function rankClass(rank: number): string {
     if (rank === 1) return "text-primary";
@@ -210,482 +218,59 @@ function rankClass(rank: number): string {
     return "text-gray-700";
 }
 
-function rowBg(team: { rank: number }, selected: boolean): string {
+function rowBg(team: Team, selected: boolean): string {
     if (selected) return "bg-primary/15";
     if (team.rank <= 3) return "bg-gray-300/30";
+
     if (team.rank <= CUTOFF) return "bg-gray-50";
     return "bg-white";
 }
 
-function AdminPanel({ showAdmin }: { showAdmin: boolean }) {
-    if (!showAdmin) return;
-
-    return (
-        <div className="my-6 p-5 rounded-xl border border-zinc-700 bg-zinc-800 text-white">
-            <p className="font-jersey-25 text-base md:text-lg lg:text-xl uppercase text-white mb-4">
-                Admin Alerts & Actions
-            </p>
-
-            {/* Alerts placeholder info */}
-            <div className="flex flex-col gap-2.5">
-                {ALERTS.map((a, i) => (
-                    <div
-                        key={i}
-                        className="flex items-center gap-3 p-3 border border-zinc-600
-                                               bg-zinc-700/50 rounded-lg text-base"
-                    >
-                        <p className="flex-1 font-semibold text-base">
-                            {a.msg}
-                        </p>
-                        {a.type === "warning" && (
-                            <button
-                                className={redButtonClassName}
-                            >
-                                Review
-                            </button>
-                        )}
-                    </div>
-                ))}
-            </div>
-
-            {/* Admin options */}
-            <div className="flex flex-wrap gap-2.5 mt-5">
-                {["Edit", "Override Result", "Reschedule Match", "Export Data"].map((a) => (
-                    <button
-                        key={a}
-                        className="bg-zinc-700 border border-zinc-600 px-4 py-2 rounded-lg
-                        cursor-pointer hover:bg-zinc-600 transition-colors text-zinc-300
-                        hover:text-white font-jersey-25 text-sm md:text-lg"
-                    >
-                        {a}
-                    </button>
-                ))}
-            </div>
-        </div>
-    )
-}
-
-interface TeamStanding {
-    name: string;
-    wins: number;
-    losses: number;
-    draws: number;
-    pts: number;
-    streak: string;
-    rank: number;
-}
-
-function computeStandings(matches: BracketMatch[]): TeamStanding[] {
-    const stats = new Map<string, {
-        wins: number;
-        losses: number;
-        draws: number;
-        // track results in order for streak calculation
-        results: ("W" | "L" | "D")[];
-    }>();
-
-    // Helper to ensure a team exists in the map
-    const getOrCreate = (name: string) => {
-        if (!stats.has(name)) {
-            stats.set(name, { wins: 0, losses: 0, draws: 0, results: [] });
-        }
-        return stats.get(name)!;
-    };
-
-    for (const match of matches) {
-        const slot1 = match.slots[0];
-        const slot2 = match.slots[1];
-
-        // Skip matches without two participants or without scores
-        if (!slot1?.seed?.team_name || !slot2?.seed?.team_name) continue;
-    
-        // if (slot1.score == null || slot2.score == null) continue;
-
-        const team1 = getOrCreate(slot1.seed.team_name);
-        const team2 = getOrCreate(slot2.seed.team_name);
-
-        const slot1Score = 5
-        const slot2Score = 4
-        // if (slot1.score > slot2.score) {
-        if (5 > 4) {
-            team1.wins++;
-            team1.results.push("W");
-            team2.losses++;
-            team2.results.push("L");
-        // } else if (slot2.score > slot1.score) {
-        } else if (slot2Score > slot1Score) {
-            team2.wins++;
-            team2.results.push("W");
-            team1.losses++;
-            team1.results.push("L");
-        } else {
-            team1.draws++;
-            team1.results.push("D");
-            team2.draws++;
-            team2.results.push("D");
-        }
-    }
-
-    // Also register teams that are seeded but haven't played yet
-    for (const match of matches) {
-        for (const slot of match.slots) {
-            if (slot.seed?.team_name) {
-                getOrCreate(slot.seed.team_name);
-            }
-        }
-    }
-
-    // Build standings array
-    const standings: TeamStanding[] = Array.from(stats.entries()).map(([name, s]) => {
-        // Calculate streak from the end of results array
-        let streak = "";
-        if (s.results.length > 0) {
-            const lastResult = s.results[s.results.length - 1];
-            let count = 0;
-            for (let i = s.results.length - 1; i >= 0; i--) {
-                if (s.results[i] === lastResult) count++;
-                else break;
-            }
-            streak = `${lastResult}${count}`;
-        }
-
-        return {
-            name,
-            wins: s.wins,
-            losses: s.losses,
-            draws: s.draws,
-            pts: s.wins * 3 + s.draws,
-            streak,
-            rank: 0, // assigned after sorting
-        };
-    });
-
-    // Sort by points desc, then wins desc, then losses asc
-    standings.sort((a, b) => {
-        if (b.pts !== a.pts) return b.pts - a.pts;
-        if (b.wins !== a.wins) return b.wins - a.wins;
-        return a.losses - b.losses;
-    });
-
-    // Assign ranks
-    standings.forEach((team, i) => {
-        team.rank = i + 1;
-    });
-
-    return standings;
-}
-
-function Standings({ showAdmin, bracketMatches }: { showAdmin: boolean; bracketMatches: BracketMatch[] }) {
-    const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
-
-    const teams = computeStandings(bracketMatches);
-
-    const selectedData = selectedTeam
-        ? teams.find((x) => x.name === selectedTeam)
-        : undefined;
-
-    return (
-        <div>
-            {teams.length === 0 ? (
-                <p className="text-gray-400 text-center py-8">No match results yet</p>
-            ) : (
-                <div className="overflow-x-auto">
-                    <table className="w-full border-separate border-spacing-y-1.5">
-                        <thead>
-                            <tr>
-                                {["#", "Team", "W", "L", "D", "PTS", "Streak", ""].map((h, i) => (
-                                    <th
-                                        key={i}
-                                        className={`px-3.5 py-2.5 font-jersey-25 text-base uppercase text-gray-700
-                                            font-normal ${i === 1 ? "text-left" : "text-center"}`}
-                                    >
-                                        {h}
-                                    </th>
-                                ))}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {teams.map((team) => {
-                                const sel = selectedTeam === team.name;
-
-                                return (
-                                    <tr
-                                        key={team.name}
-                                        onClick={() => setSelectedTeam(sel ? null : team.name)}
-                                        className={`cursor-pointer transition-colors ${rowBg(team, sel)} 
-                                            ${sel ? "shadow-[inset_3px_0_0_var(--color-primary)]" : ""}`}
-                                    >
-                                        <td className={`text-center px-3.5 py-4 rounded-l-lg text-lg font-extrabold ${rankClass(team.rank)}`}>
-                                            {team.rank}
-                                        </td>
-                                        <td className="px-3.5 py-4">
-                                            <p className="font-jersey-25 text-base md:text-lg lg:text-xl">{team.name}</p>
-                                        </td>
-                                        <td className="text-center px-3.5 py-4 font-jersey-25 text-xl text-black">{team.wins}</td>
-                                        <td className="text-center px-3.5 py-4 font-jersey-25 text-xl text-black">{team.losses}</td>
-                                        <td className="text-center px-3.5 py-4 font-jersey-25 text-xl text-gray-500">{team.draws}</td>
-                                        <td className="text-center px-3.5 py-4 font-jersey-25 text-2xl text-gray-900">{team.pts}</td>
-                                        <td className="text-center px-3.5 py-4">
-                                            <p className="text-sm font-bold px-2.5 py-0.5 rounded-md text-black">
-                                                {team.streak || "—"}
-                                            </p>
-                                        </td>
-                                        <td className="text-center px-2 py-4 rounded-r-lg text-base text-gray-800">
-                                            <ChevronRight className="size-5 hover:text-primary transition-colors duration-300" />
-                                        </td>
-                                    </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
-                </div>
-            )}
-
-            {/* Selected team detail */}
-            {selectedData && (
-                <div className="mt-5 p-5 rounded-xl bg-white border border-gray-200 shadow-sm">
-                    <div className="flex flex-wrap justify-between items-center gap-4">
-                        <div>
-                            <p className="text-2xl font-jersey-25">{selectedData.name}</p>
-                            <p className="text-base font-semibold text-gray-700">
-                                {selectedData.wins}W-{selectedData.losses}L-{selectedData.draws}D
-                            </p>
-                        </div>
-                        {showAdmin && (
-                            <button className={redButtonClassName}>
-                                <ShieldAlert className="size-5" />
-                                Disqualify
-                            </button>
-                        )}
-                    </div>
-
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-5">
-                        {[
-                            {
-                                label: "Win Rate",
-                                value: `${Math.round((selectedData.wins / Math.max(selectedData.wins + selectedData.losses + selectedData.draws, 1)) * 100)}%`
-                            },
-                            { label: "Points", value: String(selectedData.pts) },
-                            { label: "Streak", value: selectedData.streak || "—" },
-                        ].map((s, i) => (
-                            <div key={i} className="text-center py-3.5 px-3 bg-gray-50 rounded-lg border border-gray-200">
-                                <p className="font-jersey-25 uppercase text-gray-500 mb-1.5">{s.label}</p>
-                                <p className="text-2xl font-extrabold text-gray-900">{s.value}</p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
-        </div>
-    );
-}
-
-function Matches({ showAdmin }: { showAdmin: boolean }) {
-    return (
-        <div className="flex flex-col gap-2.5">
-            {RECENT_MATCHES.map((m) => (
-                <div
-                    key={m.id}
-                    className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 px-5 py-4
-                           bg-gray-50 border border-gray-100 rounded-xl shadow-sm"
-                >
-                    {/* Round and Time - side by side on mobile, split on desktop */}
-                    <div className="flex justify-between sm:contents">
-                        <p className="text-xs font-bold tracking-wider uppercase text-gray-700 sm:min-w-12">
-                            R{m.round}
-                        </p>
-                        <p className="text-sm text-gray-700 font-semibold sm:hidden">
-                            {m.time}
-                        </p>
-                    </div>
-
-                    {/* Scores and team results */}
-                    <div className="flex-1 flex items-center justify-center gap-3 sm:gap-4">
-                        {/* Left side team */}
-                        <div
-                            className={`flex-1 text-right font-jersey-25 text-base sm:text-xl ${m.score1 > m.score2 ? "" : "text-gray-500"
-                                }`}
-                        >
-                            <div className="flex justify-end gap-2">
-                                {m.score1 > m.score2 && (
-                                    <Crown
-                                        className="size-4 sm:size-5 text-yellow-500 place-self-center" />
-                                )}
-                                {m.team1}
-                            </div>
-                        </div>
-
-                        {/* Score divider */}
-                        <div
-                            className="flex items-center justify-center gap-2 px-3 sm:px-5 py-1.5 sm:py-2
-                                   rounded-lg bg-primary shrink-0"
-                        >
-                            <p className={`text-base sm:text-xl font-semibold ${m.score1 > m.score2 ? "text-white" : "text-white/70"
-                                }`}>
-                                {m.score1}
-                            </p>
-                            <p className="text-base sm:text-xl font-semibold text-white/25">:</p>
-                            <p className={`text-base sm:text-xl font-semibold ${m.score2 > m.score1 ? "text-white" : "text-white/50"
-                                }`}>
-                                {m.score2}
-                            </p>
-                        </div>
-
-                        {/* Right side team */}
-                        <div
-                            className={`flex-1 text-left font-jersey-25 text-base sm:text-xl ${m.score2 > m.score1 ? "" : "text-gray-500"
-                                }`}
-                        >
-                            <div className="flex justify-start gap-2">
-                                {m.team2}
-                                {m.score2 > m.score1 && (
-                                    <Crown
-                                        className="size-4 sm:size-5 text-yellow-500 place-self-center" />
-                                )}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Time - hidden on mobile (shown above), visible on desktop */}
-                    <p className="hidden sm:block text-sm text-gray-700 font-semibold min-w-28 text-right">
-                        {m.time}
-                    </p>
-
-                    {showAdmin && (
-                        <button
-                            className="text-base font-semibold bg-white border border-gray-300
-                                   text-gray-700 px-3.5 py-1 rounded-md cursor-pointer
-                                   hover:bg-gray-100 transition-colors duration-300
-                                   w-full sm:w-auto"
-                        >
-                            Edit
-                        </button>
-                    )}
-                </div>
-            ))}
-        </div>
-    )
-}
-
-function UpcomingMatches({ showAdmin }: { showAdmin: boolean }) {
-    return (
-        <div className="flex flex-col gap-2.5">
-            {UPCOMING.map((m) => (
-                <div
-                    key={m.id}
-                    className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 px-5 py-4
-                           bg-gray-50 border border-gray-100 rounded-xl shadow-sm"
-                >
-                    {/* Round and Time - side by side on mobile */}
-                    <div className="flex justify-between sm:contents">
-                        <p className="text-xs font-bold tracking-wider uppercase text-gray-700 sm:min-w-12">
-                            R{m.round}
-                        </p>
-                        <p className="text-sm text-gray-700 font-semibold sm:hidden">
-                            {m.time}
-                        </p>
-                    </div>
-
-                    {/* Team pairings */}
-                    <div className="flex-1 flex items-center justify-center gap-3 sm:gap-4">
-                        <p className="flex-1 text-right font-jersey-25 text-base sm:text-xl">
-                            {m.team1}
-                        </p>
-
-                        <p className="px-3 sm:px-5 py-1.5 rounded-lg text-sm font-extrabold tracking-widest
-                                  bg-red-50 border border-primary text-primary shrink-0">
-                            VS
-                        </p>
-
-                        <p className="flex-1 text-left font-jersey-25 text-base sm:text-xl">
-                            {m.team2}
-                        </p>
-                    </div>
-
-                    {/* Time - hidden on mobile, visible on desktop */}
-                    <p className="hidden sm:block text-sm text-gray-700 font-semibold min-w-28 text-right">
-                        {m.time}
-                    </p>
-
-                    {showAdmin && (
-                        <button className={`${redButtonClassName} w-full sm:w-auto`}>
-                            <CalendarSync className="size-5" />
-                            Reschedule
-                        </button>
-                    )}
-                </div>
-            ))}
-        </div>
-    )
-}
-
 export default function EventDetails({
     event,
-    bracketMatches
+    bracketPhases
 }: {
-    event: FetchEventFromEventIdResponse
-    bracketMatches: BracketMatch[]
+    event: FetchEventFromEventIdResponse,
+    bracketPhases: FetchBracketPhasesResponse
 }) {
-    const [activeTab, setActiveTab] = useState<"standings" | "bracket" | "matches" | "upcoming">("standings");
+    const [activeTab, setActiveTab] = useState<"brackets" | "standings" | "matches" | "upcoming">("brackets");
+    const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
     const [showAdmin, setShowAdmin] = useState(false);
 
-    const totalMatches = bracketMatches.length;
+    const selectedData: Team | undefined = selectedTeam
+        ? TEAMS.find((x) => x.name === selectedTeam)
+        : undefined;
 
-    // placeholder data
-    const playedMatches = totalMatches - 5;
-
-    const uniqueTeams = new Set(
-        bracketMatches.flatMap(m =>
-            m.slots.filter(s => s.seed?.team_name).map(s => s.seed!.team_name)
-        )
-    ).size;
-
-    const currentRound = Math.max(
-        ...bracketMatches
-            .filter(m => m.slots.some(s => s.seed_num != null))
-            .map(m => parseInt(m.identifier.match(/R(\d+)/)?.[1] ?? "0")),
-        0
-    );
-
-    const totalRounds = Math.max(
-        ...bracketMatches.map(m =>
-            parseInt(m.identifier.match(/R(\d+)/)?.[1] ?? "0")
-        ),
-        0
-    )
+    const redButtonClassName = `flex items-center justify-center gap-2 p-2 px-4 lg:mt-0
+                             rounded-md shadow-sm text-sm md:text-lg font-jersey-25
+                             text-white bg-primary hover:bg-secondary cursor-pointer
+                             disabled:opacity-50 transition-colors duration-200`
 
     return (
         <div className="overflow-y-auto mx-0 sm:mx-4 lg:mx-20 border-x-0 sm:border-x-2 border-gray-200">
             <div className="mx-auto p-4 sm:p-6 lg:p-8">
 
                 {/* HEADER */}
-                <header className="pt-6 pb-2">
+                <header className="pt-6">
                     <div className="flex flex-wrap justify-between items-start gap-4">
 
                         {/* Event Details */}
                         <div>
-                            <p className="text-xs font-bold tracking-widest uppercase text-white
-                                        bg-secondary px-3 py-1 rounded w-fit mb-3"
-                            >
-                                Organizer View
-                            </p>
-
+                            <div className="flex items-center gap-2.5 mb-3">
+                                <p
+                                    className="text-xs font-bold tracking-widest uppercase text-white
+                                    bg-secondary px-3 py-1 rounded"
+                                >
+                                    Organizer View
+                                </p>
+                            </div>
                             <h1 className="text-3xl lg:text-5xl font-jersey-25 text-primary">
                                 {event.name}
                             </h1>
-
-                            <div className="mt-2 flex flex-col gap-x-2 text-base text-gray-600">
-                                <span className="font-semibold text-gray-800 lg:text-lg">{event.video_game_name}</span>
-                                <span>
-                                    {formatDate(event.start_time, 'MMM d, yyyy')} — {formatDate(event.end_time, 'MMM d, yyyy')}
-                                </span>
-                            </div>
-
-                            <div className="mt-1.5 flex items-center gap-1.5 text-sm text-gray-500">
-                                <span>Bracket Type 1</span>
-                                <ChevronRight className="size-3.5" />
-                                <span>Bracket Type 2</span>
-                            </div>
+                            <p className="mt-2 text-base sm:text-lg font-semibold text-gray-700">
+                                {event.video_game_name} · BRACKET FORMAT
+                                · {formatDate(event.start_time, 'MMM d, yyyy')} — {formatDate(event.end_time, 'MMM d, yyyy')}
+                            </p>
                         </div>
 
                         {/* Admin tools button */}
@@ -693,49 +278,99 @@ export default function EventDetails({
                             onClick={() => setShowAdmin(!showAdmin)}
                             className={redButtonClassName}
                         >
-                            {showAdmin ? <X className="size-5" /> : <Wrench className="size-5" />}
+                            {!showAdmin && (
+                                <Wrench className="size-5"/>
+                            )}
+
+                            {showAdmin && (
+                                <X className="size-5"/>
+                            )}
+
                             {showAdmin ? "Close Admin Tools" : "Admin Tools"}
                         </button>
                     </div>
 
-                    {/* Stat cards */}
+                    {/* stat cards */}
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5 mt-6">
                         {[
-                            { label: "Round", value: totalRounds > 0 ? `${currentRound} / ${totalRounds}` : "—" },
-                            { label: "Teams", value: uniqueTeams > 0 ? String(uniqueTeams) : "—" },
-                            // replace with played matches
-                            { label: "Played", value: 0 },
-                            { label: "Remaining", value: String(totalMatches - 0) },
+                            {
+                                label: "Round",
+                                value: `${TOURNAMENT.currentRound} / ${TOURNAMENT.totalRounds}`,
+                                bar: "bg-primary"
+                            },
+                            {label: "Teams", value: String(TOURNAMENT.registeredTeams)},
+                            {label: "Played", value: String(TOURNAMENT.matchesPlayed)},
+                            {label: "Remaining", value: String(TOURNAMENT.matchesRemaining)},
                         ].map((s, i) => (
                             <div key={i}
-                                className="bg-white rounded-xl px-4 py-4 shadow-sm border border-gray-100"
+                                 className="relative overflow-hidden bg-white rounded-xl
+                                 px-4 py-4 shadow-md"
                             >
-                                <p className="font-jersey-25 text-base md:text-lg lg:text-xl text-gray-500">
-                                    {s.label}
-                                </p>
-                                <p className="font-semibold text-lg text-primary mt-0.5">
-                                    {s.value}
-                                </p>
+                                <p className="font-jersey-25 text-base md:text-lg lg:text-xl">{s.label}</p>
+                                <p className="font-semibold text-lg text-primary">{s.value}</p>
                             </div>
                         ))}
                     </div>
                 </header>
 
                 {/* ADMIN PANEL */}
-                <AdminPanel showAdmin={showAdmin} />
+                {showAdmin && (
+                    <div className="my-6 p-5 rounded-xl border border-zinc-700 bg-zinc-800 text-white">
+                        <p className="font-jersey-25 text-base md:text-lg lg:text-xl uppercase text-white mb-4">
+                            Admin Alerts & Actions
+                        </p>
+
+                        {/* Alerts placeholder info */}
+                        <div className="flex flex-col gap-2.5">
+                            {ALERTS.map((a, i) => (
+                                <div
+                                    key={i}
+                                    className="flex items-center gap-3 p-3 border border-zinc-600
+                                               bg-zinc-700/50 rounded-lg text-base"
+                                >
+                                    <p className="flex-1 font-semibold text-base">
+                                        {a.msg}
+                                    </p>
+                                    {a.type === "warning" && (
+                                        <button
+                                            className={redButtonClassName}
+                                        >
+                                            Review
+                                        </button>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Admin options */}
+                        <div className="flex flex-wrap gap-2.5 mt-5">
+                            {["Edit", "Override Result", "Reschedule Match", "Export Data"].map((a) => (
+                                <button
+                                    key={a}
+                                    className="bg-zinc-700 border border-zinc-600 px-4 py-2 rounded-lg
+                                                cursor-pointer hover:bg-zinc-600 transition-colors text-zinc-300
+                                                hover:text-white font-jersey-25 text-sm md:text-lg"
+                                >
+                                    {a}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
                 {/* TABS */}
                 <nav className="flex mt-7">
-                    {(["standings", "bracket", "matches", "upcoming"] as const).map((tab) => (
+                    {(["brackets", "standings", "matches", "upcoming"] as const).map((tab) => (
                         <button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
                             className={`flex-1 sm:flex-none px-2 sm:px-7 py-2 text-sm md:text-lg uppercase
                                         -mb-0.5 transition-colors cursor-pointer border-b-3 font-jersey-25
-                            ${activeTab === tab
+                            ${
+                                activeTab === tab
                                     ? "text-primary border-primary"
                                     : "text-gray-700 border-transparent"
-                                }`}
+                            }`}
                         >
                             {tab}
                         </button>
@@ -744,25 +379,351 @@ export default function EventDetails({
 
                 {/* CONTENT */}
                 <div className="py-7 pb-16">
+                    {/* BRACKETS */}
+                    {activeTab === "brackets" && (
+                        <div className="flex flex-col gap-2.5">
+                            {bracketPhases.map((bp) => (
+                                <Link key={bp.id} href={`/tournaments/${event.tournament_id}/events/${event.id}/brackets?bpid=${bp.id}`}>
+                                    <div
+                                        className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 px-5 py-4
+                               bg-gray-50 border border-gray-100 rounded-xl shadow-sm"
+                                    >
+
+
+                                        {/* Bracket Name */}
+                                        <div className="flex items-center justify-center gap-3 sm:gap-4">
+                                            <div
+                                                className={`text-right font-jersey-25 text-base sm:text-xl`}
+                                            >
+                                                <p>{bp.name}</p>
+                                            </div>
+
+
+                                        </div>
+
+                                        {/* Bracket Info */}
+                                        <div className="hidden sm:grid grid-cols-4 text-sm text-gray-700 font-semibold min-w-28">
+                                            <div className='min-w-28 text-center flex-col items-center justify-center'>
+                                                <p className="font-bold">Pools</p>
+                                                <p>{bp.num_pools}</p>
+                                            </div>
+                                            <div className='min-w-28 text-center flex-col items-center justify-center'>
+                                                <p className="font-bold">Entrants</p>
+                                                <p>{bp.num_entrants}</p>
+                                            </div>
+                                            <div className='min-w-28 text-center flex-col items-center justify-center'>
+                                                <p className="font-bold">Type</p>
+                                                <p>{bp.bracket_type_name}</p>
+                                            </div>
+                                            {bp.next_phase_name && <div className='min-w-28 text-center flex-col items-center justify-center'>
+                                                <p className="font-bold">Progression</p>
+                                                <p>{bp.next_phase_name}</p>
+                                            </div>}
+                                        </div>
+
+
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
+                    )}
 
                     {/* STANDINGS */}
                     {activeTab === "standings" && (
-                        <Standings showAdmin={showAdmin} bracketMatches={bracketMatches} />
-                    )}
+                        <div>
+                            <div className="overflow-x-auto">
+                                <table className="w-full border-separate border-spacing-y-1.5">
+                                    <thead>
+                                    <tr>
+                                        {["#", "Team", "W", "L", "D", "PTS", "Streak", ""].map((h, i) => (
+                                            <th
+                                                key={i}
+                                                className={`px-3.5 py-2.5 font-jersey-25 text-base uppercase text-gray-700
+                                                font-normal 
+                                                ${
+                                                    i === 1 ? "text-left" : "text-center"
+                                                }`}
+                                            >
+                                                {h}
+                                            </th>
+                                        ))}
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {TEAMS.map((team) => {
+                                        const sel = selectedTeam === team.name;
+                                        const isCut = team.rank === CUTOFF;
 
-                    {/* BRACKET */}
-                    {activeTab === "bracket" && (
-                        <SingleElimBracket matches={bracketMatches} />
+                                        return (
+                                            <Fragment key={team.name}>
+                                                <tr
+                                                    onClick={() => setSelectedTeam(sel ? null : team.name)}
+                                                    className={`cursor-pointer transition-colors ${rowBg(team, sel)} ${
+                                                        sel ? "shadow-[inset_3px_0_0_var(--color-primary)]" : ""
+                                                    }`}
+                                                >
+                                                    {/* Team Rank */}
+                                                    <td className={`text-center px-3.5 py-4 rounded-l-lg text-lg font-extrabold ${rankClass(team.rank)}`}>
+                                                        {team.rank}
+                                                    </td>
+
+                                                    {/* Team Name */}
+                                                    <td className="px-3.5 py-4">
+                                                        <div className="flex items-center gap-3">
+                                                            <p className="font-jersey-25 text-base md:text-lg lg:text-xl">{team.name}</p>
+                                                        </div>
+                                                    </td>
+
+                                                    {/* Team Stats */}
+                                                    <td className="text-center px-3.5 py-4 font-jersey-25 text-xl text-black">{team.wins}</td>
+                                                    <td className="text-center px-3.5 py-4 font-jersey-25 text-xl text-black">{team.losses}</td>
+                                                    <td className="text-center px-3.5 py-4 font-jersey-25 text-xl text-gray-500">{team.draws}</td>
+                                                    <td className="text-center px-3.5 py-4 font-jersey-25 text-2xl text-gray-900">{team.pts}</td>
+
+                                                    <td className="text-center px-3.5 py-4">
+                                                        <p
+                                                            className="text-sm font-bold px-2.5 py-0.5 rounded-md
+                                                            text-black"
+                                                        >
+                                                            {team.streak}
+                                                        </p>
+                                                    </td>
+
+                                                    <td className="text-center px-2 py-4 rounded-r-lg text-base text-gray-800">
+                                                        <ChevronRight
+                                                            className="size-5 hover:text-primary transition-colors duration-300"/>
+                                                    </td>
+                                                </tr>
+
+                                                {/* Cutoff line */}
+                                                {isCut && (
+                                                    <tr key="cutoff">
+                                                        <td colSpan={10} className="py-1">
+                                                            <div className="flex items-center gap-3 px-3">
+                                                                <div
+                                                                    className="flex-1 h-px border-t-2 border-dashed
+                                                                    border-primary"
+                                                                />
+                                                                <span
+                                                                    className="text-base font-extrabold rounded-xl
+                                                                     uppercase whitespace-nowrap px-3 py-1 bg-white
+                                                                     text-primary"
+                                                                >
+                                                                    Elimination Cutoff
+                                                                </span>
+                                                                <div
+                                                                    className="flex-1 h-px border-t-2 border-dashed
+                                                                    border-primary"
+                                                                />
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                )}
+                                            </Fragment>
+                                        );
+                                    })}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            {/* selected team detail */}
+                            {selectedData && (
+                                <div className="mt-5 p-5 rounded-xl bg-white border border-gray-200 shadow-sm">
+                                    <div className="flex flex-wrap justify-between items-center gap-4">
+                                        <div className="flex items-center gap-3.5">
+                                            <div>
+                                                <p className="text-2xl font-jersey-25">
+                                                    {selectedData.name}
+                                                </p>
+                                                <p className="text-base font-semibold text-gray-700">
+                                                    {selectedData.wins}W-{selectedData.losses}L-{selectedData.draws}D
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex gap-2">
+                                            {showAdmin && (
+                                                <>
+                                                    <button
+                                                        className={redButtonClassName}
+                                                    >
+                                                        <ShieldAlert className="size-5"/>
+                                                        Disqualify
+                                                    </button>
+                                                </>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-5 ">
+                                        {[
+                                            {
+                                                label: "Win Rate",
+                                                value: `${Math.round((selectedData.wins / Math.max(selectedData.wins + selectedData.losses + selectedData.draws, 1)) * 100)}%`
+                                            },
+                                            {label: "Points", value: String(selectedData.pts)},
+                                            {label: "Streak", value: selectedData.streak},
+                                        ].map((s, i) => (
+                                            <div
+                                                key={i}
+                                                className="text-center py-3.5 px-3 bg-gray-50 rounded-lg border
+                                                border-gray-200"
+                                            >
+                                                <p
+                                                    className="font-jersey-25 uppercase text-gray-500 mb-1.5"
+                                                >
+                                                    {s.label}
+                                                </p>
+                                                <p className="text-2xl font-extrabold text-gray-900">
+                                                    {s.value}
+                                                </p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     )}
 
                     {/* MATCHES */}
                     {activeTab === "matches" && (
-                        <Matches showAdmin={showAdmin} />
+                        <div className="flex flex-col gap-2.5">
+                            {RECENT_MATCHES.map((m) => (
+                                <div
+                                    key={m.id}
+                                    className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 px-5 py-4
+                           bg-gray-50 border border-gray-100 rounded-xl shadow-sm"
+                                >
+                                    {/* Round and Time - side by side on mobile, split on desktop */}
+                                    <div className="flex justify-between sm:contents">
+                                        <p className="text-xs font-bold tracking-wider uppercase text-gray-700 sm:min-w-12">
+                                            R{m.round}
+                                        </p>
+                                        <p className="text-sm text-gray-700 font-semibold sm:hidden">
+                                            {m.time}
+                                        </p>
+                                    </div>
+
+                                    {/* Scores and team results */}
+                                    <div className="flex-1 flex items-center justify-center gap-3 sm:gap-4">
+                                        {/* Left side team */}
+                                        <div
+                                            className={`flex-1 text-right font-jersey-25 text-base sm:text-xl ${
+                                                m.score1 > m.score2 ? "" : "text-gray-500"
+                                            }`}
+                                        >
+                                            <div className="flex justify-end gap-2">
+                                                {m.score1 > m.score2 && (
+                                                    <Crown
+                                                        className="size-4 sm:size-5 text-yellow-500 place-self-center"/>
+                                                )}
+                                                {m.team1}
+                                            </div>
+                                        </div>
+
+                                        {/* Score divider */}
+                                        <div
+                                            className="flex items-center justify-center gap-2 px-3 sm:px-5 py-1.5 sm:py-2
+                                   rounded-lg bg-primary shrink-0"
+                                        >
+                                            <p className={`text-base sm:text-xl font-semibold ${
+                                                m.score1 > m.score2 ? "text-white" : "text-white/70"
+                                            }`}>
+                                                {m.score1}
+                                            </p>
+                                            <p className="text-base sm:text-xl font-semibold text-white/25">:</p>
+                                            <p className={`text-base sm:text-xl font-semibold ${
+                                                m.score2 > m.score1 ? "text-white" : "text-white/50"
+                                            }`}>
+                                                {m.score2}
+                                            </p>
+                                        </div>
+
+                                        {/* Right side team */}
+                                        <div
+                                            className={`flex-1 text-left font-jersey-25 text-base sm:text-xl ${
+                                                m.score2 > m.score1 ? "" : "text-gray-500"
+                                            }`}
+                                        >
+                                            <div className="flex justify-start gap-2">
+                                                {m.team2}
+                                                {m.score2 > m.score1 && (
+                                                    <Crown
+                                                        className="size-4 sm:size-5 text-yellow-500 place-self-center"/>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Time - hidden on mobile (shown above), visible on desktop */}
+                                    <p className="hidden sm:block text-sm text-gray-700 font-semibold min-w-28 text-right">
+                                        {m.time}
+                                    </p>
+
+                                    {showAdmin && (
+                                        <button
+                                            className="text-base font-semibold bg-white border border-gray-300
+                                   text-gray-700 px-3.5 py-1 rounded-md cursor-pointer
+                                   hover:bg-gray-100 transition-colors duration-300
+                                   w-full sm:w-auto"
+                                        >
+                                            Edit
+                                        </button>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
                     )}
 
                     {/* UPCOMING */}
                     {activeTab === "upcoming" && (
-                        <UpcomingMatches showAdmin={showAdmin} />
+                        <div className="flex flex-col gap-2.5">
+                            {UPCOMING.map((m) => (
+                                <div
+                                    key={m.id}
+                                    className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 px-5 py-4
+                           bg-gray-50 border border-gray-100 rounded-xl shadow-sm"
+                                >
+                                    {/* Round and Time - side by side on mobile */}
+                                    <div className="flex justify-between sm:contents">
+                                        <p className="text-xs font-bold tracking-wider uppercase text-gray-700 sm:min-w-12">
+                                            R{m.round}
+                                        </p>
+                                        <p className="text-sm text-gray-700 font-semibold sm:hidden">
+                                            {m.time}
+                                        </p>
+                                    </div>
+
+                                    {/* Team pairings */}
+                                    <div className="flex-1 flex items-center justify-center gap-3 sm:gap-4">
+                                        <p className="flex-1 text-right font-jersey-25 text-base sm:text-xl">
+                                            {m.team1}
+                                        </p>
+
+                                        <p className="px-3 sm:px-5 py-1.5 rounded-lg text-sm font-extrabold tracking-widest
+                                  bg-red-50 border border-primary text-primary shrink-0">
+                                            VS
+                                        </p>
+
+                                        <p className="flex-1 text-left font-jersey-25 text-base sm:text-xl">
+                                            {m.team2}
+                                        </p>
+                                    </div>
+
+                                    {/* Time - hidden on mobile, visible on desktop */}
+                                    <p className="hidden sm:block text-sm text-gray-700 font-semibold min-w-28 text-right">
+                                        {m.time}
+                                    </p>
+
+                                    {showAdmin && (
+                                        <button className={`${redButtonClassName} w-full sm:w-auto`}>
+                                            <CalendarSync className="size-5"/>
+                                            Reschedule
+                                        </button>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
                     )}
                 </div>
 
