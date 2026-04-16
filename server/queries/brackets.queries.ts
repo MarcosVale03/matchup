@@ -22,9 +22,9 @@ export type MatchResponse = {
                 first_name: string,
                 last_name: string,
                 display_name: string,
-                prefix: string,
-                country: string,
-                state: string,
+                prefix: string | null,
+                country: string | null,
+                state: string | null,
             } | null
         }
     }[]
@@ -135,7 +135,7 @@ async function getPrereqCondition(tournamentId: number, eventId: number, phaseGr
         }
 
         if (!dataL) {
-            const {data: dataP, error: errorP} = await supabase.from('phase_groups').select('bracket_phase_id')
+            const {data: dataP, error: errorP} = await supabase.from('phase_groups').select('bracket_phases(id, name)')
                 .eq('tournament_id', tournamentId)
                 .eq('event_id', eventId)
                 .eq('identifier', phaseGroupIdentifier).maybeSingle()
@@ -149,28 +149,23 @@ async function getPrereqCondition(tournamentId: number, eventId: number, phaseGr
 
             const {data: dataBP, error: errorBP} = await supabase.from('bracket_phases').select(`
                 name,
-                next:bracket_phases(
-                    name
-                )
+                next_phase_id
             `)
                 .eq('tournament_id', tournamentId)
                 .eq('event_id', eventId)
-                .eq('id', dataP.bracket_phase_id).maybeSingle()
+                .eq('next_phase_id', dataP.bracket_phases.id).maybeSingle()
 
             if (errorBP) {
                 throw new Error("DB error while trying to query bracket_phases: " + errorBP.details + " " + errorBP.message)
             }
             if (!dataBP) {
-                throw new Error("Unexpected error while querying bracket_phases")
+                return `Entrant into ${dataP.bracket_phases.name}`
             }
 
-            if (!dataBP.next) {
-                return `Entrant into ${dataBP.name}`
-            }
             if (round_num < 0) {
-                return `${dataBP.next.name}: Losers`
+                return `${dataBP.name}: Losers`
             }
-            return `${dataBP.next.name}: Winners`
+            return `${dataBP.name}: Winners`
         }
 
         return `Loser of ${dataL.code}`
