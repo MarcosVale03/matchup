@@ -10,3 +10,15 @@ export type MutationResponse<Data, FieldErrors> = {
     fieldErrors?: FieldErrors,
     data?: Data
 }
+
+export enum BracketType {
+    SingleElimination,
+    DoubleElimination,
+    RoundRobin
+}
+
+const BracketTypeMap: Map<string, BracketType> = new Map()
+BracketTypeMap.set("Single Elimination", BracketType.SingleElimination)
+BracketTypeMap.set("Double Elimination", BracketType.DoubleElimination)
+BracketTypeMap.set("Round Robin", BracketType.RoundRobin)
+export {BracketTypeMap};

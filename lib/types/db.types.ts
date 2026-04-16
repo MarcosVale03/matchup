@@ -1,4 +1,4 @@
-﻿export type Json =
+export type Json =
   | string
   | number
   | boolean
@@ -97,7 +97,7 @@ export type Database = {
         Insert: {
           bracket_type_name: string
           event_id: number
-          id?: number
+          id: number
           name: string
           next_phase_id?: number | null
           num_progressing_per_group: number
@@ -113,6 +113,13 @@ export type Database = {
           tournament_id?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "bracket_phases_bracket_phases_fk_01"
+            columns: ["tournament_id", "event_id", "next_phase_id"]
+            isOneToOne: false
+            referencedRelation: "bp_detailed"
+            referencedColumns: ["tournament_id", "event_id", "id"]
+          },
           {
             foreignKeyName: "bracket_phases_bracket_phases_fk_01"
             columns: ["tournament_id", "event_id", "next_phase_id"]
@@ -392,27 +399,82 @@ export type Database = {
         }
         Relationships: []
       }
+      match_setups: {
+        Row: {
+          event_id: number
+          identifier: string
+          match_id: number | null
+          phase_group_identifier: string | null
+          tournament_id: number
+        }
+        Insert: {
+          event_id: number
+          identifier: string
+          match_id?: number | null
+          phase_group_identifier?: string | null
+          tournament_id: number
+        }
+        Update: {
+          event_id?: number
+          identifier?: string
+          match_id?: number | null
+          phase_group_identifier?: string | null
+          tournament_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_setups_matches_fk"
+            columns: [
+              "match_id",
+              "tournament_id",
+              "event_id",
+              "phase_group_identifier",
+            ]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: [
+              "id",
+              "tournament_id",
+              "event_id",
+              "phase_group_identifier",
+            ]
+          },
+          {
+            foreignKeyName: "match_setups_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       match_slots: {
         Row: {
           event_id: number
-          match_identifier: string
+          match_id: number
           phase_group_identifier: string
+          placement: number | null
+          score: number
           seed_num: number | null
           slot_num: number
           tournament_id: number
         }
         Insert: {
           event_id: number
-          match_identifier: string
+          match_id: number
           phase_group_identifier: string
+          placement?: number | null
+          score?: number
           seed_num?: number | null
           slot_num: number
           tournament_id: number
         }
         Update: {
           event_id?: number
-          match_identifier?: string
+          match_id?: number
           phase_group_identifier?: string
+          placement?: number | null
+          score?: number
           seed_num?: number | null
           slot_num?: number
           tournament_id?: number
@@ -421,53 +483,85 @@ export type Database = {
           {
             foreignKeyName: "match_slots_matches_fk_01"
             columns: [
+              "match_id",
               "tournament_id",
               "event_id",
-              "match_identifier",
               "phase_group_identifier",
             ]
             isOneToOne: false
             referencedRelation: "matches"
             referencedColumns: [
+              "id",
               "tournament_id",
               "event_id",
-              "identifier",
               "phase_group_identifier",
             ]
           },
           {
+            foreignKeyName: "match_slots_phase_groups_fk_01"
+            columns: ["tournament_id", "event_id", "phase_group_identifier"]
+            isOneToOne: false
+            referencedRelation: "phase_groups"
+            referencedColumns: ["tournament_id", "event_id", "identifier"]
+          },
+          {
             foreignKeyName: "match_slots_seeds_fk_01"
-            columns: ["tournament_id", "event_id", "seed_num"]
+            columns: [
+              "tournament_id",
+              "event_id",
+              "phase_group_identifier",
+              "seed_num",
+            ]
             isOneToOne: false
             referencedRelation: "seeds"
-            referencedColumns: ["tournament_id", "event_id", "seed_num"]
+            referencedColumns: [
+              "tournament_id",
+              "event_id",
+              "phase_group_identifier",
+              "seed_num",
+            ]
           },
         ]
       }
       matches: {
         Row: {
-          advance_match_identifier: string | null
-          advance_slot_num: number | null
+          code: string
           event_id: number
-          identifier: string
+          id: number
+          isComplete: boolean
+          l_advance_match_id: number | null
+          l_advance_slot_num: number | null
           phase_group_identifier: string
+          round_num: number
           tournament_id: number
+          w_advance_match_id: number | null
+          w_advance_slot_num: number | null
         }
         Insert: {
-          advance_match_identifier?: string | null
-          advance_slot_num?: number | null
+          code: string
           event_id: number
-          identifier: string
+          id?: number
+          isComplete?: boolean
+          l_advance_match_id?: number | null
+          l_advance_slot_num?: number | null
           phase_group_identifier: string
+          round_num: number
           tournament_id: number
+          w_advance_match_id?: number | null
+          w_advance_slot_num?: number | null
         }
         Update: {
-          advance_match_identifier?: string | null
-          advance_slot_num?: number | null
+          code?: string
           event_id?: number
-          identifier?: string
+          id?: number
+          isComplete?: boolean
+          l_advance_match_id?: number | null
+          l_advance_slot_num?: number | null
           phase_group_identifier?: string
+          round_num?: number
           tournament_id?: number
+          w_advance_match_id?: number | null
+          w_advance_slot_num?: number | null
         }
         Relationships: [
           {
@@ -476,8 +570,8 @@ export type Database = {
               "tournament_id",
               "event_id",
               "phase_group_identifier",
-              "advance_match_identifier",
-              "advance_slot_num",
+              "w_advance_match_id",
+              "w_advance_slot_num",
             ]
             isOneToOne: false
             referencedRelation: "match_slots"
@@ -485,16 +579,45 @@ export type Database = {
               "tournament_id",
               "event_id",
               "phase_group_identifier",
-              "match_identifier",
+              "match_id",
               "slot_num",
             ]
           },
           {
-            foreignKeyName: "matches_phase_groups_fk_01"
-            columns: ["tournament_id", "event_id", "phase_group_identifier"]
+            foreignKeyName: "matches_match_slots_fk_02"
+            columns: [
+              "tournament_id",
+              "event_id",
+              "phase_group_identifier",
+              "l_advance_match_id",
+              "l_advance_slot_num",
+            ]
             isOneToOne: false
-            referencedRelation: "phase_groups"
-            referencedColumns: ["tournament_id", "event_id", "identifier"]
+            referencedRelation: "match_slots"
+            referencedColumns: [
+              "tournament_id",
+              "event_id",
+              "phase_group_identifier",
+              "match_id",
+              "slot_num",
+            ]
+          },
+          {
+            foreignKeyName: "matches_rounds_fk_01"
+            columns: [
+              "tournament_id",
+              "event_id",
+              "phase_group_identifier",
+              "round_num",
+            ]
+            isOneToOne: false
+            referencedRelation: "rounds"
+            referencedColumns: [
+              "tournament_id",
+              "event_id",
+              "phase_group_identifier",
+              "round_num",
+            ]
           },
         ]
       }
@@ -543,6 +666,13 @@ export type Database = {
             foreignKeyName: "phase_groups_bracket_phases_fk_01"
             columns: ["tournament_id", "event_id", "bracket_phase_id"]
             isOneToOne: false
+            referencedRelation: "bp_detailed"
+            referencedColumns: ["tournament_id", "event_id", "id"]
+          },
+          {
+            foreignKeyName: "phase_groups_bracket_phases_fk_01"
+            columns: ["tournament_id", "event_id", "bracket_phase_id"]
+            isOneToOne: false
             referencedRelation: "bracket_phases"
             referencedColumns: ["tournament_id", "event_id", "id"]
           },
@@ -552,6 +682,35 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "waves"
             referencedColumns: ["identifier", "tournament_id"]
+          },
+        ]
+      }
+      rounds: {
+        Row: {
+          event_id: number
+          phase_group_identifier: string
+          round_num: number
+          tournament_id: number
+        }
+        Insert: {
+          event_id: number
+          phase_group_identifier: string
+          round_num: number
+          tournament_id: number
+        }
+        Update: {
+          event_id?: number
+          phase_group_identifier?: string
+          round_num?: number
+          tournament_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rounds_phase_groups_fk_01"
+            columns: ["tournament_id", "event_id", "phase_group_identifier"]
+            isOneToOne: false
+            referencedRelation: "phase_groups"
+            referencedColumns: ["tournament_id", "event_id", "identifier"]
           },
         ]
       }
@@ -598,6 +757,7 @@ export type Database = {
         Row: {
           entrant_user_id: string | null
           event_id: number
+          phase_group_identifier: string
           seed_num: number
           team_name: string | null
           tournament_id: number
@@ -605,6 +765,7 @@ export type Database = {
         Insert: {
           entrant_user_id?: string | null
           event_id: number
+          phase_group_identifier: string
           seed_num: number
           team_name?: string | null
           tournament_id: number
@@ -612,6 +773,7 @@ export type Database = {
         Update: {
           entrant_user_id?: string | null
           event_id?: number
+          phase_group_identifier?: string
           seed_num?: number
           team_name?: string | null
           tournament_id?: number
@@ -625,11 +787,11 @@ export type Database = {
             referencedColumns: ["tournament_id", "event_id", "user_id"]
           },
           {
-            foreignKeyName: "seeds_events_fk_01"
-            columns: ["tournament_id", "event_id"]
+            foreignKeyName: "seeds_phase_groups_fk_01"
+            columns: ["tournament_id", "event_id", "phase_group_identifier"]
             isOneToOne: false
-            referencedRelation: "events"
-            referencedColumns: ["tournament_id", "id"]
+            referencedRelation: "phase_groups"
+            referencedColumns: ["tournament_id", "event_id", "identifier"]
           },
           {
             foreignKeyName: "seeds_teams_fk_01"
@@ -637,6 +799,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "teams"
             referencedColumns: ["tournament_id", "event_id", "name"]
+          },
+          {
+            foreignKeyName: "seeds_users_fk_01"
+            columns: ["entrant_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["user_id"]
           },
         ]
       }
@@ -799,13 +968,59 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      bp_detailed: {
+        Row: {
+          bracket_type_name: string | null
+          event_id: number | null
+          id: number | null
+          name: string | null
+          next_phase_id: number | null
+          next_phase_name: string | null
+          num_entrants: number | null
+          num_pools: number | null
+          num_progressing_per_group: number | null
+          tournament_id: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bracket_phases_bracket_phases_fk_01"
+            columns: ["tournament_id", "event_id", "next_phase_id"]
+            isOneToOne: false
+            referencedRelation: "bp_detailed"
+            referencedColumns: ["tournament_id", "event_id", "id"]
+          },
+          {
+            foreignKeyName: "bracket_phases_bracket_phases_fk_01"
+            columns: ["tournament_id", "event_id", "next_phase_id"]
+            isOneToOne: false
+            referencedRelation: "bracket_phases"
+            referencedColumns: ["tournament_id", "event_id", "id"]
+          },
+          {
+            foreignKeyName: "bracket_phases_bracket_types_fk_01"
+            columns: ["bracket_type_name"]
+            isOneToOne: false
+            referencedRelation: "bracket_types"
+            referencedColumns: ["name"]
+          },
+          {
+            foreignKeyName: "bracket_phases_events_fk_01"
+            columns: ["tournament_id", "event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["tournament_id", "id"]
+          },
+        ]
+      }
     }
     Functions: {
+      get_email_from_user_id: { Args: { uid: string }; Returns: string }
+      getuserfromemail: { Args: { user_email: string }; Returns: string }
       has_permission_level: {
         Args: { plevel: number; tid: number; uid: string }
         Returns: boolean
       }
+      inc_code: { Args: { string: string }; Returns: string }
       insert_admin: {
         Args: {
           a_permission_level: number
@@ -841,6 +1056,16 @@ export type Database = {
         }
         Returns: undefined
       }
+      insert_setups: {
+        Args: {
+          s_event_id: number
+          s_identifier: string
+          s_match_id?: number
+          s_phase_group_identifier?: string
+          s_tournament_id: number
+        }
+        Returns: undefined
+      }
       insert_thread: {
         Args: { t_content: string; t_title: string }
         Returns: undefined
@@ -864,6 +1089,14 @@ export type Database = {
       }
       insert_wave: {
         Args: { w_identifier: string; w_tournament_id: number }
+        Returns: undefined
+      }
+      recreate_bracket: {
+        Args: { eid: number; pgid: string; tid: number }
+        Returns: undefined
+      }
+      register_user_for_tournament: {
+        Args: { eids: number[]; tid: number; uid: string }
         Returns: undefined
       }
       update_admins: {
@@ -900,6 +1133,16 @@ export type Database = {
           s_start_time: string
           s_tournament_id: number
           s_user_id: string
+        }
+        Returns: undefined
+      }
+      update_setup: {
+        Args: {
+          s_event_id: number
+          s_identifier: string
+          s_match_id?: number
+          s_phase_group_identifier?: string
+          s_tournament_id: number
         }
         Returns: undefined
       }
