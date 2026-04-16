@@ -4,6 +4,7 @@ import {createClient} from "@/server/db/server";
 import { cookies } from 'next/headers'
 import * as z from "zod"
 import {MutationResponse} from "@/lib/types/types";
+import { sendNotification } from "@/features/notifications/send-notification";
 
 // creating insert schema with table objects
 const ForumThreadInsertSchema = z.object({
@@ -103,12 +104,42 @@ export async function insertPost(thread_id : string, content : string) : Promise
         throw new Error("Post Insert Transaction Failed: " + error.details + " " + error.message)
     }
 
+    // Fire off a notification to the thread owner
+    await notifyThreadOwnerOfReply(supabase, result.data.thread_id)
 
     // returning success
     return {
         success: true,
         data: data
     }
+}
+
+async function notifyThreadOwnerOfReply(
+    supabase: Awaited<ReturnType<typeof createClient>>,
+    threadId: string
+) {
+    const [{ data: thread }, { data: { user } }] = await Promise.all([
+        supabase.from('forum_thread').select('author_id, title').eq('id', threadId).single(),
+        supabase.auth.getUser(),
+    ])
+
+    if (!thread || !user) return
+    // Don't notify on self-replies
+    if (thread.author_id === user.id) return
+
+    const replierName =
+        (user.user_metadata?.display_name as string | undefined) ??
+        user.email ??
+        'Someone'
+
+    await sendNotification(thread.author_id, {
+        type: 'thread_reply',
+        threadId,
+        threadTitle: thread.title,
+        replierName,
+        replierId: user.id,
+        timestamp: new Date().toISOString(),
+    })
 }
 
 // creating our shema for editing posts

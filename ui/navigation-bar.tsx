@@ -1,6 +1,6 @@
 'use client'
 import Link from "next/link";
-import { useNotifications } from "@/features/notifications/get-notifications";
+import { useNotifications } from "@/features/notifications/use-notifications";
 import { usePathname, useRouter } from "next/navigation";
 import { useProfile } from "@/app/client-layout";
 import { signOut } from "@/lib/auth";
