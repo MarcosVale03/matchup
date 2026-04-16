@@ -54,7 +54,7 @@ export default function EditPost({
             onSubmit={handleSubmit}
             className="space-y-2 p-1"
         >
-            <h2 className="text-lg sm:text-xl font-jersey-25">
+            <h2 className="text-lg sm:text-xl font-jersey">
                 Editing Post
             </h2>
 
@@ -74,7 +74,7 @@ export default function EditPost({
                 disabled={isSubmitting}
                 className="w-full px-4 py-2 min-h-[50px] leading-relaxed border border-gray-300
                            rounded-lg resize-y focus:outline-none focus:ring-2 focus:ring-primary
-                           focus:border-transparent transition duration-200 font-[Poppins] bg-white"
+                           focus:border-transparent transition duration-200 font-poppins bg-white"
             />
 
             {/* Cancel/Save Buttons */}
@@ -84,7 +84,7 @@ export default function EditPost({
                     onClick={onCancelAction}
                     disabled={isSubmitting}
                     className="flex items-center justify-center gap-2 py-1 px-4
-                               rounded-md shadow-sm text-base md:text-lg font-jersey-25
+                               rounded-md shadow-sm text-base md:text-lg font-jersey
                                text-white bg-primary hover:bg-secondary disabled:opacity-50
                                transition-colors"
                 >
@@ -95,7 +95,7 @@ export default function EditPost({
                     type="submit"
                     disabled={!content.trim() || isSubmitting}
                     className="flex items-center justify-center gap-2 py-1 px-4
-                               rounded-md shadow-sm text-base md:text-lg font-jersey-25
+                               rounded-md shadow-sm text-base md:text-lg font-jersey
                                text-white bg-primary hover:bg-secondary disabled:opacity-50
                                transition-colors"
                 >

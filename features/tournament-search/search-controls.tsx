@@ -66,7 +66,7 @@ export default function SearchControls() {
                     htmlFor="startDateFilter"
                     className="block bg-transparent text-zinc-600 rounded-md
                              peer-focus:text-primary transition duration-400
-                             absolute -top-5 px-1 text-sm font-[Poppins] font-semibold"
+                             absolute -top-5 px-1 text-sm font-poppins font-semibold"
                 >
                     Start Date Filter
                 </label>

@@ -26,12 +26,12 @@ function InfoCells({ tournament }: { tournament: FetchTournamentFromIdResponse }
         <div className="bg-primary text-white flex flex-col lg:flex-row tracking-wide wrap-break-word text-lg lg:text-2xl">
             {/* Visibility */}
             <div className={infoCellContainerClass}>
-                <h2 className="mb-1 text-base lg:text-lg font-jersey-25">
+                <h2 className="mb-1 text-base lg:text-lg font-jersey">
                     Visibility
                 </h2>
                 <div className="flex flex-row items-center">
                     <Globe size={22} />
-                    <div className="ml-2 text-sm md:text-base font-[Poppins] font-semibold tracking-normal">
+                    <div className="ml-2 text-sm md:text-base font-poppins font-semibold tracking-normal">
                         <p>{tournament.is_public ? "PUBLIC" : "PRIVATE"}</p>
                     </div>
                 </div>
@@ -39,12 +39,12 @@ function InfoCells({ tournament }: { tournament: FetchTournamentFromIdResponse }
 
             {/* Contact */}
             <div className={infoCellContainerClass}>
-                <h2 className="mb-1 text-base lg:text-lg font-jersey-25">
+                <h2 className="mb-1 text-base lg:text-lg font-jersey">
                     Contact
                 </h2>
                 <div className="flex flex-row items-center">
                     <Mail size={22} />
-                    <div className="ml-2 text-sm md:text-base font-[Poppins] font-semibold tracking-normal">
+                    <div className="ml-2 text-sm md:text-base font-poppins font-semibold tracking-normal">
                         {/* if not discord, show not provided */}
                         {tournament.email_contact ? (
                             <p>{tournament.email_contact}</p>
@@ -57,7 +57,7 @@ function InfoCells({ tournament }: { tournament: FetchTournamentFromIdResponse }
 
             {/* Discord */}
             <div className={infoCellContainerClass}>
-                <h2 className="mb-1 text-base lg:text-lg font-jersey-25">
+                <h2 className="mb-1 text-base lg:text-lg font-jersey">
                     Community
                 </h2>
                 <div className="flex flex-row items-center">
@@ -68,7 +68,7 @@ function InfoCells({ tournament }: { tournament: FetchTournamentFromIdResponse }
                         height={22}
                         style={{ width: '22px', height: '22px' }}
                     />
-                    <div className="ml-2 text-sm md:text-base font-[Poppins] font-semibold tracking-normal">
+                    <div className="ml-2 text-sm md:text-base font-poppins font-semibold tracking-normal">
                         {/* if not discord, show not provided */}
                         {tournament.discord_invite ? (
                             <a
@@ -89,7 +89,7 @@ function InfoCells({ tournament }: { tournament: FetchTournamentFromIdResponse }
 
             {/* Status */}
             <div className="flex flex-col w-full p-4 place-content-center">
-                <h2 className="mb-1 text-base lg:text-lg font-jersey-25">
+                <h2 className="mb-1 text-base lg:text-lg font-jersey">
                     Status
                 </h2>
                 {/* Badges */}
@@ -106,7 +106,7 @@ function InfoCells({ tournament }: { tournament: FetchTournamentFromIdResponse }
 
                     return (
                         <div
-                            className={`flex items-center w-fit gap-2 px-2 py-1 font-[Poppins] font-semibold text-sm rounded-lg ${colorClass}`}>
+                            className={`flex items-center w-fit gap-2 px-2 py-1 font-poppins font-semibold text-sm rounded-lg ${colorClass}`}>
                             {started && !ended && (
                                 <span className="relative flex h-2.5 w-2.5 shrink-0">
                                     <span
@@ -160,7 +160,7 @@ export function TournamentDetails({
     };
 
     return (
-        <div className="flex flex-row">
+        <div className="flex-1 flex flex-row font-poppins text-black">
             {/* Left side, tournament information and events  */}
             <div className="w-full border-x-2 border-gray-300">
 
@@ -171,7 +171,7 @@ export function TournamentDetails({
                         className="flex flex-col lg:flex-row items-start lg:items-center gap-3 mb-2 lg:gap-0 justify-between">
 
                         {/* Tournament Name */}
-                        <h1 className="text-2xl lg:text-4xl font-jersey-25 break-all min-w-0 flex-1"
+                        <h1 className="text-2xl lg:text-4xl font-jersey break-all min-w-0 flex-1"
                             title={tournament.name}
                         >
                             {tournament.name}
@@ -183,7 +183,7 @@ export function TournamentDetails({
                                 <button
                                     onClick={handleEditClick}
                                     className="flex items-center justify-center gap-2 p-2 px-4 lg:mt-0
-                                           rounded-md shadow-sm text-sm md:text-lg font-jersey-25
+                                           rounded-md shadow-sm text-sm md:text-lg font-jersey
                                            text-white bg-primary hover:bg-secondary cursor-pointer
                                            disabled:opacity-50 transition-colors duration-200"
                                 >
@@ -195,7 +195,7 @@ export function TournamentDetails({
                                 <button
                                     onClick={() => setShowDeleteModal(true)}
                                     className="flex items-center justify-center gap-2 p-2 px-4 lg:mt-0
-                                           rounded-md shadow-sm text-sm md:text-lg font-jersey-25
+                                           rounded-md shadow-sm text-sm md:text-lg font-jersey
                                            text-white bg-primary hover:bg-secondary cursor-pointer
                                            disabled:opacity-50 transition-colors duration-200"
                                 >
@@ -220,7 +220,7 @@ export function TournamentDetails({
                                     className="rounded-full mr-2"
                                 />
                                 <div>
-                                    <h2 className="font-jersey-25 text-lg">
+                                    <h2 className="font-jersey text-lg">
                                         Organized by
                                     </h2>
                                     <p className="truncate min-w-0 text-sm md:text-base lg:text-lg">
@@ -233,11 +233,11 @@ export function TournamentDetails({
 
                         {/* Start date */}
                         <div className="w-full p-2">
-                            <h2 className="font-jersey-25 text-lg">
+                            <h2 className="font-jersey text-lg">
                                 Starts
                             </h2>
                             <div className="flex flex-row">
-                                <p className="truncate min-w-0 font-[Poppins] text-sm md:text-base lg:text-lg">
+                                <p className="truncate min-w-0 font-poppins text-sm md:text-base lg:text-lg">
                                     {formatDate(tournament.start_time, "MMM d, yyyy @ h:mm a")}
                                 </p>
                             </div>
@@ -245,11 +245,11 @@ export function TournamentDetails({
 
                         {/* End date */}
                         <div className="w-full p-2">
-                            <h2 className="font-jersey-25 text-lg">
+                            <h2 className="font-jersey text-lg">
                                 Ends
                             </h2>
                             <div className="flex flex-row">
-                                <p className="truncate min-w-0 font-[Poppins] text-sm md:text-base lg:text-lg">
+                                <p className="truncate min-w-0 font-poppins text-sm md:text-base lg:text-lg">
                                     {formatDate(tournament.end_time, "MMM d, yyyy @ h:mm a")}
                                 </p>
                             </div>
@@ -277,9 +277,9 @@ export function TournamentDetails({
                 <EventList events={events} />
             </div>
 
-            {/* RIght side, participants list */}
+            {/* Right side, participants list */}
             <div className="p-5 mx-5">
-                <h1 className="text-2xl lg:text-4xl text-primary font-jersey-25 min-w-0 flex-1">
+                <h1 className="text-2xl lg:text-4xl text-primary font-jersey min-w-0 flex-1">
                     Participants
                 </h1>
             </div>

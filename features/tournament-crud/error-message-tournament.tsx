@@ -19,7 +19,7 @@ export function     ErrorMessageForTournament({ field, fieldErrors }: {
     if (!errors?.length) return null;
 
     return (
-        <div className="text-errors text-sm sm:text-base mt-1 flex font-jersey-25">
+        <div className="text-errors text-sm sm:text-base mt-1 flex font-jersey">
             <div className="flex flex-col place-content-center">
                 {errors.map((msg, i) => (
                     <p key={i} className="flex">

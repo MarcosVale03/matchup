@@ -105,11 +105,11 @@ export default function TournamentInsertForm() {
                             text-black p-2 2xl:p-4 2xl:text-xl focus:outline-none 
                             focus:border-primary shadow-sm transition duration-400 font-normal`;
 
-    const legendClass = "text-sm md:text-base lg:text-lg font-[Poppins] text-gray-700 px-2 -mb-3 tracking-tight"
+    const legendClass = "text-sm md:text-base lg:text-lg font-poppins text-gray-700 px-2 -mb-3 tracking-tight"
 
     return (
         <div className="mt-4 mx-4 sm:mx-auto w-full max-w-[calc(100%-2rem)] sm:max-w-2xl md:max-w-3xl lg:max-w-5xl 2xl:max-w-7xl">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-jersey-25">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-jersey">
                 Create Tournament
             </h1>
 
@@ -126,7 +126,7 @@ export default function TournamentInsertForm() {
                     <div
                         role="alert"
                         className="bg-errors/20 text-sm lg:text-base px-3 py-2 rounded-xl mb-4 text-primary
-                                   font-[Poppins] font-semibold"
+                                   font-poppins font-semibold"
                     >
                         {formError}
                     </div>
@@ -357,7 +357,7 @@ export default function TournamentInsertForm() {
                         type="submit"
                         disabled={isSubmitting}
                         className="w-full flex items-center justify-center gap-2 py-2.5 px-4
-                                   rounded-md shadow-sm text-base md:text-lg lg:text-xl font-jersey-25
+                                   rounded-md shadow-sm text-base md:text-lg lg:text-xl font-jersey
                                    text-white bg-primary hover:bg-secondary disabled:opacity-50
                                    transition-colors"
                     >

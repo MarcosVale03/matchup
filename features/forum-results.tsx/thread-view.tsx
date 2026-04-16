@@ -25,7 +25,7 @@ export function ThreadView({
     const toast = useToast();
 
     return (
-        <main className="bg-main-bg font-[Poppins] text-black p-4 md:px-8 3xl:px-16">
+        <main className="bg-main-bg font-poppins text-black p-4 md:px-8 3xl:px-16">
             <div className="max-w-3xl mx-auto py-6">
                 <Link
                     href="/forums"
@@ -66,7 +66,7 @@ export function ThreadView({
 
                         {/* Title and delete*/}
                         <div className="flex items-center justify-between">
-                            <h1 className="text-2xl sm:text-3xl font-jersey-25 text-primary mb-3">
+                            <h1 className="text-2xl sm:text-3xl font-jersey text-primary mb-3">
                                 {title ?? 'Untitled Thread'}
                             </h1>
                         </div>
