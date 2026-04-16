@@ -1,3 +1,5 @@
+'use server'
+
 import {z} from "zod";
 import {doesTournamentExist} from "@/server/queries/tournaments.queries";
 import {doesEventExist} from "@/server/queries/events.queries";
@@ -40,7 +42,7 @@ export async function registerUserForTournament(tournamentId: number, eventIds: 
     const {error} = await supabase.rpc("register_user_for_tournament", {
         tid: tournamentId,
         eids: eventIds,
-        userId: userId
+        uid: userId
     })
 
     // Throws error if something goes wrong
