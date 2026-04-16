@@ -58,9 +58,8 @@ function Slot({
     );
 }
 
-function MatchNode({ match, roundIndex, isLast, showSeeds }: {
+function MatchNode({ match, isLast, showSeeds }: {
     match: MatchResponse;
-    roundIndex: number;
     isLast: boolean;
     showSeeds: boolean
 }) {
@@ -69,10 +68,9 @@ function MatchNode({ match, roundIndex, isLast, showSeeds }: {
 
     // TODO: winner detection is hardcoded — should compare slot scores
     // once scoring is wired up 
-    const hasResult = true;
-    const winner = hasResult ? slot1 : slot2
-    // ? (slot1!.score! > slot2!.score! ? 1 : 2)
-    // : null;
+    const isComplete = match.isComplete;
+    const winner = isComplete && slot1.score != slot2.score ? (slot1.score > slot2.score ? 1 : 2) : null;
+    console.log(winner)
 
     return (
         <div className="flex items-center relative ml-4">
@@ -81,19 +79,19 @@ function MatchNode({ match, roundIndex, isLast, showSeeds }: {
 
             <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden w-[200px]">
                 <Slot
-                    name={slot1.seed?.user?.display_name ?? "TBD"}
+                    name={slot1.seed?.user?.display_name ?? slot1.prereqCondition ?? "Error"}
                     prefix={slot1.seed?.user?.prefix ?? ""}
-                    score={2}
-                    isWinner={true}
+                    score={slot1.score}
+                    isWinner={winner == 1}
                     seed={slot1.seed?.seed_num ?? null}
                     showSeed={showSeeds}
                 />
                 <div className="h-px bg-gray-200" />
                 <Slot
-                    name={slot2.seed?.user?.display_name ?? "TBD"}
+                    name={slot2.seed?.user?.display_name ?? slot2.prereqCondition ?? "Error"}
                     prefix={slot2.seed?.user?.prefix ?? ""}
-                    score={1}
-                    isWinner={false}
+                    score={slot2.score}
+                    isWinner={winner == 2}
                     seed={slot2.seed?.seed_num ?? null}
                     showSeed={showSeeds}
                 />
@@ -131,7 +129,6 @@ export default function SingleElimBracket({ rounds, showSeeds = true }: { rounds
                             <MatchNode
                                 key={match.code}
                                 match={match}
-                                roundIndex={roundIndex}
                                 isLast={roundIndex === rounds.length - 1}
                                 showSeeds={showSeeds}
                             />

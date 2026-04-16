@@ -47,7 +47,21 @@ alter table "public"."match_slots" add column "match_id" int not null;
 
 alter table "public"."matches" drop column "advance_match_identifier";
 
-alter table "public"."matches" add column "advance_match_id" int;
+alter table "public"."matches" drop column "advance_slot_num";
+
+alter table "public"."matches" add column "w_advance_match_id" int;
+
+alter table "public"."matches" add column "w_advance_slot_num" smallint;
+
+alter table "public"."matches" add column "l_advance_match_id" int;
+
+alter table "public"."matches" add column "l_advance_slot_num" smallint;
+
+alter table "public"."match_slots" add column "score" smallint default 0 not null;
+
+alter table "public"."match_slots" add column "placement" smallint default null;
+
+alter table "public"."matches" add column "isComplete" boolean default false not null;
 
 CREATE UNIQUE INDEX match_slots_pk ON public.match_slots USING btree (match_id, tournament_id, phase_group_identifier, slot_num, event_id);
 
@@ -69,7 +83,9 @@ alter table "public"."match_slots" add constraint "match_slots_seeds_fk_01" FORE
 
 alter table "public"."match_slots" add constraint "match_slots_phase_groups_fk_01" FOREIGN KEY (tournament_id, event_id, phase_group_identifier) REFERENCES public.phase_groups(tournament_id, event_id, identifier) NOT DEFERRABLE INITIALLY IMMEDIATE;
 
-alter table "public"."matches" add constraint "matches_match_slots_fk_01" FOREIGN KEY (tournament_id, event_id, phase_group_identifier, advance_match_id, advance_slot_num) REFERENCES public.match_slots(tournament_id, event_id, phase_group_identifier, match_id, slot_num) ON UPDATE CASCADE ON DELETE SET NULL NOT DEFERRABLE INITIALLY IMMEDIATE;
+alter table "public"."matches" add constraint "matches_match_slots_fk_01" FOREIGN KEY (tournament_id, event_id, phase_group_identifier, w_advance_match_id, w_advance_slot_num) REFERENCES public.match_slots(tournament_id, event_id, phase_group_identifier, match_id, slot_num) ON UPDATE CASCADE ON DELETE SET NULL NOT DEFERRABLE INITIALLY IMMEDIATE;
+
+alter table "public"."matches" add constraint "matches_match_slots_fk_02" FOREIGN KEY (tournament_id, event_id, phase_group_identifier, l_advance_match_id, l_advance_slot_num) REFERENCES public.match_slots(tournament_id, event_id, phase_group_identifier, match_id, slot_num) ON UPDATE CASCADE ON DELETE SET NULL NOT DEFERRABLE INITIALLY IMMEDIATE;
 
 alter table "public"."matches" add constraint "matches_rounds_fk_01" FOREIGN KEY (tournament_id, event_id, phase_group_identifier, round_num) REFERENCES public.rounds(tournament_id, event_id, phase_group_identifier, round_num) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE;
 
@@ -281,7 +297,7 @@ IF btype = 'Single Elimination' THEN
             WHERE tournament_id = curr_slot.tournament_id AND event_id = curr_slot.event_id AND phase_group_identifier = curr_slot.phase_group_identifier
               AND match_id = curr_slot.match_id AND slot_num = curr_slot.slot_num;
 
-            INSERT INTO public.matches (tournament_id, event_id, phase_group_identifier, round_num, code, advance_match_id, advance_slot_num)
+            INSERT INTO public.matches (tournament_id, event_id, phase_group_identifier, round_num, code, w_advance_match_id, w_advance_slot_num)
             VALUES (tid, eid, pgid, rnum, 'A', curr_slot.match_id, curr_slot.slot_num)
                 RETURNING id
             INTO mid;
