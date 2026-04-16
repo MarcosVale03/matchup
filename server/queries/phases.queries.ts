@@ -1,20 +1,10 @@
+'use server'
 import {cookies} from "next/headers";
 import {createClient} from "@/server/db/server";
 import {Database} from "@/lib/types/db.types";
 import {BracketType, BracketTypeMap} from "@/lib/types/types";
 
-export type FetchBracketPhasesResponse = {
-    bracket_type_name: string
-    event_id: number
-    id: number
-    name: string
-    next_phase_id: number | null
-    next_phase_name: string | null
-    num_progressing_per_group: number
-    tournament_id: number
-    num_pools: number
-    num_entrants: number
-}[]
+export type FetchBracketPhasesResponse = Database["public"]["Views"]["bp_detailed"]["Row"][]
 
 export async function fetchBracketPhasesFromEventId(tournamentId: number, eventId: number):
     Promise<FetchBracketPhasesResponse> {
@@ -26,6 +16,13 @@ export async function fetchBracketPhasesFromEventId(tournamentId: number, eventI
 
     if (error) {
         throw new Error("DB error while trying to query bracket_phases: " + error.details + " " + error.message)
+    }
+
+    for (const bp of data) {
+        if (bp.bracket_type_name === null || bp.event_id === null || bp.id === null || bp.name === null || bp.num_progressing_per_group === null
+            || bp.tournament_id === null || bp.num_pools === null || bp.num_entrants === null) {
+            throw new Error("Unintentional null value occurred while querying view bp_detailed.")
+        }
     }
 
     return data
@@ -80,7 +77,7 @@ export async function fetchPhaseGroupsFromBracketPhase(tournamentId: number, eve
     return data
 }
 
-export async function doesBracketPhaseExist(tournamentId: number, eventId: number, bracketPhaseId): Promise<boolean> {
+export async function doesBracketPhaseExist(tournamentId: number, eventId: number, bracketPhaseId: number): Promise<boolean> {
     const cookieStore = await cookies()
     const supabase = await createClient(cookieStore)
 
