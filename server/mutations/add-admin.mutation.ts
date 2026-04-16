@@ -4,7 +4,6 @@ import * as z from "zod"
 import { createClient } from "@/server/db/server"
 import { cookies } from 'next/headers'
 import { MutationResponse } from "@/lib/types/types"
-import { StringFormatParams } from "better-auth"
 
 // creating admins insert schema with objects
 const AdminInsertSchema = z.object({
