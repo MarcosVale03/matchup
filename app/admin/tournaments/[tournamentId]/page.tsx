@@ -1,6 +1,6 @@
 import {fetchTournamentFromId} from "@/server/queries/tournaments.queries";
 import {notFound} from "next/navigation";
-import {TournamentDetails} from "@/features/tournament-search/tournament-details";
+import {TournamentDetails} from "@/features/tournament-search/admin-tournament-details";
 import {Trophy} from "lucide-react";
 import Link from "next/link";
 import {fetchEventsFromTournamentId} from "@/server/queries/events.queries";
@@ -42,16 +42,20 @@ export default async function TournamentDetailsPage({ params }: { params: { tour
         );
     }
 
-    // getting the permissions for editing and deleting
+    // Kicks user out if they don't have permission to view the page
     const user = await getUser();
-
     const permissions = await hasPermissionLevel(user.id, id, PermissionLevel.Reporter)
+    if (!permissions) {
+        notFound()
+    }
+
+    const hasPermissions = await hasPermissionLevel(user.id, id, PermissionLevel.Admin)
 
     return (
         <main className="bg-main-bg flex flex-col font-[Poppins] text-black">
             <TournamentDetails
                 tournament={tournament}
-                hasPermissions={permissions}
+                hasPermissions={hasPermissions}
                 events={events}
             />
         </main>
