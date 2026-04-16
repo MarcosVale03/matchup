@@ -54,7 +54,7 @@ export default function ForumThreadList({threads}: {
                         type="button"
                         onClick={() => setIsFormOpen(!isFormOpen)}
                         className="flex flex-row items-center justify-center gap-2 w-full md:w-auto py-2.5 text-center
-                                 bg-primary text-sm md:text-base font-jersey-25 tracking-wide px-6
+                                 bg-primary text-sm md:text-base font-jersey tracking-wide px-6
                                   rounded-lg hover:bg-secondary text-white hover:cursor-pointer
                                   transition duration-200 whitespace-nowrap"
                     >
@@ -64,7 +64,7 @@ export default function ForumThreadList({threads}: {
                 ) : (
                     <div
                         className="flex flex-row items-center justify-center gap-2 w-full md:w-auto py-2.5 text-center
-                                 bg-primary text-sm md:text-base font-jersey-25 tracking-wide px-6
+                                 bg-primary text-sm md:text-base font-jersey tracking-wide px-6
                                   rounded-lg text-white transition duration-200 whitespace-nowrap"
                     >
                         <CircleAlert className={iconClassName}/>
@@ -130,7 +130,7 @@ export default function ForumThreadList({threads}: {
                                             </div>
 
                                             {/* Title */}
-                                            <h3 className="text-2xl sm:text-3xl font-jersey-25 text-primary">
+                                            <h3 className="text-2xl sm:text-3xl font-jersey text-primary">
                                                 {thread.title}
                                             </h3>
                                         </div>

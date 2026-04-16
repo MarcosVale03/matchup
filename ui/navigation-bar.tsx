@@ -61,7 +61,7 @@ export default function NavigationBar() {
 
 	return (
 		<>
-			<nav className="bg-primary p-2 px-4 sticky w-full top-0 z-10 font-jersey-25 text-base lg:text-xl">
+			<nav className="bg-primary p-2 px-4 sticky w-full top-0 z-10 font-jersey text-base lg:text-xl">
 				<ul className="flex justify-between items-center list-none">
 
 					{/* Left: Logo */}
@@ -156,7 +156,7 @@ export default function NavigationBar() {
 
 										<div className={`absolute top-12 right-1 ${showNotifications ? "block" : "hidden"} bg-white rounded-lg shadow-lg overflow-hidden max-h-[70vh] flex flex-col`}>
 											<div className="flex items-center justify-between p-3 border-b border-gray-200">
-												<p className="text-lg font-semibold text-gray-800 font-[Poppins]">Notifications</p>
+												<p className="text-lg font-semibold text-gray-800 font-poppins">Notifications</p>
 												<button
 													onClick={toggleNotifications}
 													className="p-1 rounded-full hover:bg-gray-100 text-gray-500"
@@ -197,7 +197,7 @@ export default function NavigationBar() {
 
 			{/* Side Panel */}
 			<div className={`fixed top-0 right-0 h-full w-64 bg-primary z-30 md:hidden shadow-2xl
-                            transform transition-transform duration-300 ease-in-out font-jersey-25 text-lg
+                            transform transition-transform duration-300 ease-in-out font-jersey text-lg
                             ${menuOpen ? 'translate-x-0' : 'translate-x-full'}`}
 			>
 				{/* Panel Header */}
@@ -293,7 +293,7 @@ export default function NavigationBar() {
 					>
 						{/* Header */}
 						<div className="flex items-center justify-between p-3 border-b border-gray-200">
-							<p className="text-lg font-semibold text-gray-800 font-[Poppins]">Notifications</p>
+							<p className="text-lg font-semibold text-gray-800 font-poppins">Notifications</p>
 							<button
 								onClick={toggleNotifications}
 								className="p-1 rounded-full hover:bg-gray-100 text-gray-500"

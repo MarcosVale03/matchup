@@ -4,7 +4,7 @@ import { formatDistanceToNow } from "date-fns";
 
 export default function NotificationsList({ notifications = [] }: { notifications: Notification[] }) {
     return (
-        <ul className="text-black bg-white rounded-lg shadow-md font-[Poppins] font-semibold text-base md:min-w-xs overflow-hidden">
+        <ul className="text-black bg-white rounded-lg shadow-md font-poppins font-semibold text-base md:min-w-xs overflow-hidden">
             {notifications.length === 0 ? (
                 <li className="p-2 text-gray-400 text-sm text-center">No notifications yet</li>
             ) : (

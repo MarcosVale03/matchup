@@ -24,7 +24,7 @@ export default async function EditTournamentPage({ params }: { params: { tournam
     }
 
     return (
-            <main className="bg-main-bg flex flex-col text-black font-[Poppins]">
+            <main className="bg-main-bg flex flex-col text-black font-poppins">
                 <div className="flex">
                     <TournamentEditForm initialData={{...tournament}} />
                 </div>

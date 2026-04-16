@@ -71,18 +71,18 @@ export type PostInsertErrors = {
 
 // this function inserts the post into the Post table in our DB
 export async function insertPost(thread_id : string, content : string) : Promise<MutationResponse<void, PostInsertErrors>> {
-    
-    // creating our client 
+
+    // creating our client
     const cookieStore = await cookies()
     const supabase = await createClient(cookieStore)
 
-    // parsing our post insert schema 
+    // parsing our post insert schema
     const result = PostInsertSchema.safeParse({
         thread_id : thread_id,
         content : content
     })
 
-    // checking for any errors 
+    // checking for any errors
     if (!result.success) {
         const err = z.flattenError(result.error)
         return {
@@ -92,13 +92,13 @@ export async function insertPost(thread_id : string, content : string) : Promise
         }
     }
 
-    // inserting our post data into the db table, other data done by supabase 
+    // inserting our post data into the db table, other data done by supabase
     const {data, error} = await supabase.rpc('insert_post', {
         p_thread_id : result.data.thread_id,
         p_content : result.data.content
     })
 
-    // checking if inserting gave any errros 
+    // checking if inserting gave any errros
     if (error) {
         throw new Error("Post Insert Transaction Failed: " + error.details + " " + error.message)
     }
@@ -107,7 +107,7 @@ export async function insertPost(thread_id : string, content : string) : Promise
     // returning success
     return {
         success: true,
-        data: data 
+        data: data
     }
 }
 

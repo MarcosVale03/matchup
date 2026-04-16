@@ -46,7 +46,7 @@ export default function BracketDetails({bracketPhases, currBP, phaseGroups}: {
                         key={0}
                         onClick={() => handleClick(0)}
                         className={`flex-1 sm:flex-none px-2 sm:px-7 py-2 text-sm md:text-lg uppercase
-                                            -mb-0.5 transition-colors cursor-pointer border-b-3 font-jersey-25
+                                            -mb-0.5 transition-colors cursor-pointer border-b-3 font-jersey
                                 ${
                             currBP === 0
                                 ? "text-primary border-primary"
@@ -60,7 +60,7 @@ export default function BracketDetails({bracketPhases, currBP, phaseGroups}: {
                             key={bp.id}
                             onClick={() => handleClick(bp.id)}
                             className={`flex-1 sm:flex-none px-2 sm:px-7 py-2 text-sm md:text-lg uppercase
-                                            -mb-0.5 transition-colors cursor-pointer border-b-3 font-jersey-25
+                                            -mb-0.5 transition-colors cursor-pointer border-b-3 font-jersey
                                 ${
                                 currBP === bp.id
                                     ? "text-primary border-primary"
@@ -75,7 +75,7 @@ export default function BracketDetails({bracketPhases, currBP, phaseGroups}: {
                     {phaseGroups.map(bp => {
                         return (
                             <div key={bp.bp.id} className="flex flex-col gap-2">
-                                <h3 className='font-jersey-25 text-base sm:text-3xl'>{bp.bp.name}</h3>
+                                <h3 className='font-jersey text-base sm:text-3xl'>{bp.bp.name}</h3>
                                 <p>{`${bp.bp.num_entrants} Entrants • ${bp.bp.num_pools} Pools • ${bp.bp.bracket_type_name}
                                 ${bp.bp.next_phase_id !== null ? ` • ${bp.bp.num_progressing_per_group}/Pool to ${bp.bp.next_phase_name}` : ''}`}</p>
 
@@ -91,7 +91,7 @@ export default function BracketDetails({bracketPhases, currBP, phaseGroups}: {
                                                 {/* Bracket Name */}
                                                 <div className="flex items-center justify-center gap-3 sm:gap-4">
                                                     <div
-                                                        className={`text-right font-jersey-25 text-base sm:text-xl`}
+                                                        className={`text-right font-jersey text-base sm:text-xl`}
                                                     >
                                                         <p>Pool {pg.identifier}</p>
                                                     </div>

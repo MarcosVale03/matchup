@@ -9,7 +9,7 @@ export async function GET(req: Request) {
     const { data: { user } } = await supabase.auth.getUser();
 
     const organizerId = user?.id
-    
+
     if (!organizerId) {
         return new Response("Missing organizerId", { status: 400 });
     }

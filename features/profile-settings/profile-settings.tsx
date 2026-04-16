@@ -48,7 +48,7 @@ export default function ProfileSettingsPage({profile} : {profile : User}) {
     }
 
 return (
-    <main className="bg-white flex flex-col min-h-screen font-[Poppins]">
+    <main className="bg-white flex flex-col min-h-screen font-poppins">
         <div className="px-4 sm:px-6 lg:px-8 py-5 sm:py-6 lg:py-8 mx-auto w-full max-w-7xl">
             <form onSubmit={handleUserEdit} className='bg-white rounded-xl border border-gray-200 shadow-sm p-5 sm:p-6 lg:p-7 space-y-5 sm:space-y-6'>
                 <div className="flex items-center justify-center md:justify-start gap-4 mb-20">

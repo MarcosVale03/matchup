@@ -8,7 +8,7 @@ export type Notification = {
     eventId: number;
     eventName: string;
     playerName: string;
-    playerId: string;   
+    playerId: string;
     timestamp: string;
 };
 

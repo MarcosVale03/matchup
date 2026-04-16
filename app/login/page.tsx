@@ -38,7 +38,7 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="bg-primary font-[Poppins] absolute h-full inset-0 flex items-center justify-center p-4">
+        <div className="bg-primary font-poppins absolute h-full inset-0 flex items-center justify-center p-4">
             <div className="w-full max-w-xl flex flex-col sm:flex-row rounded-lg overflow-hidden shadow-lg/40 sm:py-10 bg-main-bg">
                 <AuthCard
                     email={email}
