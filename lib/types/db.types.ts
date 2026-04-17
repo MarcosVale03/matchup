@@ -16,19 +16,16 @@ export type Database = {
     Tables: {
       admins: {
         Row: {
-          email: string
           permission_level: number
           tournament_id: number
           user_id: string
         }
         Insert: {
-          email?: string
           permission_level: number
           tournament_id: number
           user_id: string
         }
         Update: {
-          email?: string
           permission_level?: number
           tournament_id?: number
           user_id?: string
@@ -1026,7 +1023,6 @@ export type Database = {
       inc_code: { Args: { string: string }; Returns: string }
       insert_admin: {
         Args: {
-          a_admin_email: string
           a_permission_level: number
           a_tournament_id: number
           a_user_id: string
@@ -1105,7 +1101,6 @@ export type Database = {
       }
       update_admins: {
         Args: {
-          a_admin_email: string
           a_permission_level: number
           a_tournament_id: number
           a_user_id: string

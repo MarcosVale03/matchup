@@ -1,10 +1,20 @@
-'use server'
 import {cookies} from "next/headers";
 import {createClient} from "@/server/db/server";
 import {Database} from "@/lib/types/db.types";
 import {BracketType, BracketTypeMap} from "@/lib/types/types";
 
-export type FetchBracketPhasesResponse = Database["public"]["Views"]["bp_detailed"]["Row"][]
+export type FetchBracketPhasesResponse = {
+    bracket_type_name: string
+    event_id: number
+    id: number
+    name: string
+    next_phase_id: number | null
+    next_phase_name: string | null
+    num_progressing_per_group: number
+    tournament_id: number
+    num_pools: number
+    num_entrants: number
+}[]
 
 export async function fetchBracketPhasesFromEventId(tournamentId: number, eventId: number):
     Promise<FetchBracketPhasesResponse> {
@@ -18,14 +28,24 @@ export async function fetchBracketPhasesFromEventId(tournamentId: number, eventI
         throw new Error("DB error while trying to query bracket_phases: " + error.details + " " + error.message)
     }
 
-    for (const bp of data) {
+    return data.map(bp => {
         if (bp.bracket_type_name === null || bp.event_id === null || bp.id === null || bp.name === null || bp.num_progressing_per_group === null
             || bp.tournament_id === null || bp.num_pools === null || bp.num_entrants === null) {
             throw new Error("Unintentional null value occurred while querying view bp_detailed.")
         }
-    }
-
-    return data
+        return {
+            bracket_type_name: bp.bracket_type_name,
+            event_id: bp.event_id,
+            id: bp.id,
+            name: bp.name,
+            next_phase_id: bp.next_phase_id,
+            next_phase_name: bp.next_phase_name,
+            num_progressing_per_group: bp.num_progressing_per_group,
+            tournament_id: bp.tournament_id,
+            num_pools: bp.num_pools,
+            num_entrants: bp.num_entrants
+        }
+    })
 }
 
 export async function fetchBracketTypeFromBracketPhase(tournamentId: number, eventId: number, bracketPhaseId: number): Promise<{
