@@ -13,12 +13,12 @@ export default function EventList({
     return (
         <div className="p-4 sm:p-6 lg:p-8 mt-2">
             <div className="pb-3 border-b border-zinc-300 mb-4">
-                <h1 className="text-xl lg:text-3xl wrap-break-word font-jersey">
+                <h3 className="">
                     Tournament Events
-                </h1>
-                <h2 className="text-base text-gray-600">
+                </h3>
+                <h5 className="text-gray-600">
                     Select an event below to view its details
-                </h2>
+                </h5>
             </div>
 
             {events && events.length > 0 ? (
@@ -125,7 +125,7 @@ export default function EventList({
                     ))}
                 </div>
             ) : (
-                <div className="p-8 text-center font-semibold text-zinc-600 text-base md:text-lg">
+                <div className="p-4 text-center text-zinc-600 text-base md:text-lg">
                     No events have been added to this tournament.
                 </div>
             )}

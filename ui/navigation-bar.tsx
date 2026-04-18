@@ -51,7 +51,8 @@ export default function NavigationBar() {
 
 	// for screens that show the buttons on the nav bar
 	const generalButtonClass = `flex flex-row items-center justify-center rounded-2xl 
-                                hover:bg-white hover:text-primary transition duration-200 p-1 px-2 gap-2`;
+                                hover:bg-white hover:text-primary transition duration-200 p-1 px-2 gap-2
+								hover:cursor-pointer`;
 
 	// for screens that show the button on the side panel when expanded
 	const sidebarButtonClass = `flex flex-row items-center gap-3 w-full px-4 py-3 rounded-md 
@@ -156,10 +157,12 @@ export default function NavigationBar() {
 
 										<div className={`absolute top-12 right-1 ${showNotifications ? "block" : "hidden"} bg-white rounded-lg shadow-lg overflow-hidden max-h-[70vh] flex flex-col`}>
 											<div className="flex items-center justify-between p-3 border-b border-gray-200">
-												<p className="text-lg font-semibold text-gray-800 font-poppins">Notifications</p>
+												<p className="text-lg font-semibold text-gray-800 font-poppins">
+													Notifications
+												</p>
 												<button
 													onClick={toggleNotifications}
-													className="p-1 rounded-full hover:bg-gray-100 text-gray-500"
+													className="p-1 rounded-full hover:bg-gray-100 text-gray-500 hover:cursor-pointer"
 												>
 													<X className="size-4" />
 												</button>

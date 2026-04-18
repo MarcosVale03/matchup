@@ -55,7 +55,7 @@ export function ThreadView({
                                         Author Name
                                     </p>
                                     <p>•</p>
-                                    <p>{formatDate(mainThread.created_at, "MMM d, yyyy @ h:mm a")}</p>
+                                    <p className="text-gray-600">{formatDate(mainThread.created_at, "MMM d, yyyy @ h:mm a")}</p>
                                 </div>
 
                             </div>
@@ -66,13 +66,13 @@ export function ThreadView({
 
                         {/* Title and delete*/}
                         <div className="flex items-center justify-between">
-                            <h1 className="text-2xl sm:text-3xl font-jersey text-primary mb-3">
+                            <h4 className="mb-3">
                                 {title ?? 'Untitled Thread'}
-                            </h1>
+                            </h4>
                         </div>
 
-                        <div className="border-t border-gray-100 pt-5">
-                            <p className="text-gray-700 leading-relaxed whitespace-pre-wrap text-[15px] sm:text-base font-normal">
+                        <div className="border-t border-gray-200 pt-5">
+                            <p className="text-gray-700 leading-relaxed whitespace-pre-wrap text-[15px] sm:text-base font-normal wrap-break-word">
                                 {mainThread.content}
                             </p>
                         </div>
@@ -93,9 +93,9 @@ export function ThreadView({
                 <div className="space-y-4">
                     <div className="flex items-center gap-2 text-gray-600">
                         <MessageCircle className="size-5" />
-                        <h2 className="text-lg font-semibold">
+                        <h5 className="">
                             {posts.length}
-                        </h2>
+                        </h5>
                     </div>
 
                     <ForumPostsList posts={posts} toastControl={toast} />

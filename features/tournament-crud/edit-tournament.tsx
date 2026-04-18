@@ -82,28 +82,29 @@ export default function TournamentEditForm({ initialData }: { initialData: Fetch
 
 
     // general classNames used in most of the inputs on this page
-    const pageLabelClass = "block text-zinc-600 2xl:text-xl rounded-md peer-focus:text-primary transition duration-400";
+    const pageLabelClass = "block text-zinc-600 2xl:text-xl peer-focus:text-primary transition duration-400 tracking-tight";
 
 
     const pageInputClass = `peer block bg-white w-full rounded-xl border-2 border-white 
                             text-black p-2 2xl:p-4 2xl:text-xl focus:outline-none 
-                            focus:border-primary shadow-sm transition duration-400 font-normal`;
+                            focus:border-primary shadow-sm transition duration-400 font-normal
+                            tracking-tight`;
 
-    const legendClass = "text-sm md:text-base lg:text-lg font-poppins text-gray-700 px-2 -mb-3 tracking-tight"
+    const legendClass = "2xl:text-2xl text-zinc-600 mb-1 tracking-tight"
 
     return (
         <div className="mt-4 mx-4 sm:mx-auto w-full max-w-[calc(100%-2rem)] sm:max-w-2xl md:max-w-3xl lg:max-w-5xl 2xl:max-w-7xl">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-jersey">
+            <h3>
                 Updating Tournament: <span className="text-primary">{initialData.name}</span>
-            </h1>
+            </h3>
 
             <form
                 onSubmit={handleSubmit}
                 className="mb-6"
             >
-                <h2 className="text-base mb-4 pb-1 text-gray-600 border-b border-gray-300 font-semibold">
-                    Tournament ID: <span className="">{formData.id}</span>
-                </h2>
+                <h4 className="mb-4 pb-1 text-gray-600 border-b border-gray-300">
+                    Tournament ID: <span className="">{initialData.id}</span>
+                </h4>
 
                 {/* Error Message */}
                 {formError && (
@@ -117,13 +118,13 @@ export default function TournamentEditForm({ initialData }: { initialData: Fetch
                 )}
 
                 {/* General Details */}
-                <fieldset className="space-y-4 mb-6">
+                <fieldset className="space-y-4 mb-2">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* Name */}
                         <div className="mb-2">
                             <BasicInputWithLabel
                                 labelClassName={pageLabelClass}
-                                labelText="Tournament Name (Required)"
+                                labelText="Tournament Name - Required"
                                 inputType='text'
                                 inputName="name"
                                 inputId="name"
@@ -140,7 +141,7 @@ export default function TournamentEditForm({ initialData }: { initialData: Fetch
                         <div className="">
                             <BasicInputWithLabel
                                 labelClassName={pageLabelClass}
-                                labelText="Slug (Optional, for URL)"
+                                labelText="Slug - Optional, for URL"
                                 inputType="text"
                                 inputName="slug"
                                 inputId="slug"
@@ -157,7 +158,7 @@ export default function TournamentEditForm({ initialData }: { initialData: Fetch
                         <div className="mb-2">
                             <BasicInputWithLabel
                                 labelClassName={pageLabelClass}
-                                labelText="Start Time (Required)"
+                                labelText="Start Date - Required"
                                 inputType="datetime-local"
                                 inputName="startTime"
                                 inputId="startTime"
@@ -174,7 +175,7 @@ export default function TournamentEditForm({ initialData }: { initialData: Fetch
                         <div>
                             <BasicInputWithLabel
                                 labelClassName={pageLabelClass}
-                                labelText="End Time (Required)"
+                                labelText="End Date - Required"
                                 inputType="datetime-local"
                                 inputName="endTime"
                                 inputId="endTime"
@@ -188,9 +189,9 @@ export default function TournamentEditForm({ initialData }: { initialData: Fetch
                     </div>
                 </fieldset>
 
-                {/* Type and Location */}
-                <fieldset className="p-2 px-5 border-2 border-zinc-600 rounded-lg mb-6 w-full">
-                    <legend className={`${legendClass} mb-0`}>
+                {/* Location Type */}
+                <fieldset className="mb-2 w-full">
+                    <legend className={legendClass}>
                         Location Type
                     </legend>
 
@@ -202,11 +203,11 @@ export default function TournamentEditForm({ initialData }: { initialData: Fetch
                         onChange={handleChange}
                         label="Online tournament"
                         boxClassName="group h-4 w-4 rounded-sm border-2 border-primary flex items-center
-                        justify-center transition-all duration-200 hover:bg-white"
+                                      justify-center transition-all duration-200 hover:bg-white"
                         checkedBoxClassName="bg-primary text-black"
                         iconSize={18}
                         iconClassName="group-hover:text-primary text-white"
-                        labelClassName=" text-sm md:text-base tracking-tight font-semibold"
+                        labelClassName="text-sm md:text-base tracking-tight font-semibold"
                     />
 
 
@@ -220,10 +221,10 @@ export default function TournamentEditForm({ initialData }: { initialData: Fetch
                             }
                         `}
                     >
-                        <div className="p-2 overflow-hidden">
+                        <div className="py-1 overflow-hidden">
                             <BasicInputWithLabel
                                 labelClassName={pageLabelClass}
-                                labelText="Physical Address (Required)"
+                                labelText="Physical Address - Required"
                                 inputType="text"
                                 inputName="locationAddress"
                                 inputId="locationAddress"
@@ -231,7 +232,8 @@ export default function TournamentEditForm({ initialData }: { initialData: Fetch
                                 inputOnChange={handleChange}
                                 required={!formData.isOnline}
                                 inputPlaceholder="e.g., 123 Main St, Anytown"
-                                inputClassName={`${pageInputClass}`}
+                                inputClassName={pageInputClass}
+                                tabIndex={formData.isOnline ? -1 : 0}
                             />
                             <ErrorMessageForTournament field='location' fieldErrors={fieldErrors} />
                         </div>
@@ -239,13 +241,13 @@ export default function TournamentEditForm({ initialData }: { initialData: Fetch
                 </fieldset>
 
                 {/* Tournament Visibility */}
-                <fieldset className="p-4 px-5 border-2 border-zinc-600 rounded-lg mb-6 w-full">
+                <fieldset className="mb-2 w-full">
                     <legend className={legendClass}>
                         Tournament Visibility
                     </legend>
 
                     {/* Public */}
-                    <div className="flex items-center mb-2">
+                    <div className="flex items-center mb-1">
                         <input
                             type="radio"
                             id="tournament-public"
@@ -283,17 +285,17 @@ export default function TournamentEditForm({ initialData }: { initialData: Fetch
                 </fieldset>
 
                 {/* Contact Information */}
-                <fieldset className="p-4 px-5 border-2 border-zinc-600 rounded-lg mb-6 w-full">
+                <fieldset className="mb-2 mt-4 w-full">
                     <legend className={legendClass}>
-                        Contact Information (At least one required)
+                        Contact Information - At least one required
                     </legend>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* Email */}
-                        <div className="mt-2">
+                        <div className="">
                             <BasicInputWithLabel
                                 labelClassName={pageLabelClass}
-                                labelText={`Email (Optional) ${initialData.email_contact ? "" : " - Was not provided"}`}
+                                labelText={`Email - Optional ${initialData.email_contact ? "" : " (Was not provided)"}`}
                                 inputType='email'
                                 inputName='email'
                                 inputId='email'
@@ -309,7 +311,7 @@ export default function TournamentEditForm({ initialData }: { initialData: Fetch
                         <div className="mt-2">
                             <BasicInputWithLabel
                                 labelClassName={pageLabelClass}
-                                labelText={`Discord Link (Optional) ${initialData.discord_invite ? "" : " - Was not provided"}`}
+                                labelText={`Discord Link - Optional ${initialData.discord_invite ? "" : " (Was not provided)"}`}
                                 inputType='text'
                                 inputName='discord'
                                 inputId='discord'
@@ -325,7 +327,7 @@ export default function TournamentEditForm({ initialData }: { initialData: Fetch
                 </fieldset>
 
                 {/* Back/Submit Button */}
-                <div className="pt-4 sm:pt-6 mt-4 border-t-2 border-gray-400 flex gap-2">
+                <div className="pt-4 sm:pt-6 mt-4 border-t border-gray-300 flex gap-2">
                     <button
                         type="button"
                         onClick={() => router.back()}

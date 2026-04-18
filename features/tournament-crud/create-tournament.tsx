@@ -98,24 +98,23 @@ export default function TournamentInsertForm() {
     };
 
     // general classNames used in most of the inputs on this page
-    const pageLabelClass = "block text-zinc-600 2xl:text-xl rounded-md peer-focus:text-primary transition duration-400";
+    const pageLabelClass = "block text-zinc-600 2xl:text-xl peer-focus:text-primary transition duration-400 tracking-tight";
 
 
     const pageInputClass = `peer block bg-white w-full rounded-xl border-2 border-white 
                             text-black p-2 2xl:p-4 2xl:text-xl focus:outline-none 
-                            focus:border-primary shadow-sm transition duration-400 font-normal`;
+                            focus:border-primary shadow-sm transition duration-400 font-normal
+                            tracking-tight`;
 
-    const legendClass = "text-sm md:text-base lg:text-lg font-poppins text-gray-700 px-2 -mb-3 tracking-tight"
+    const legendClass = "2xl:text-2xl text-zinc-600 mb-1 tracking-tight"
 
     return (
         <div className="mt-4 mx-4 sm:mx-auto w-full max-w-[calc(100%-2rem)] sm:max-w-2xl md:max-w-3xl lg:max-w-5xl 2xl:max-w-7xl">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-jersey">
-                Create Tournament
-            </h1>
+            <h3>Create Tournament</h3>
 
-            <h2 className="text-base mb-4 pb-1 text-gray-600 border-b border-gray-300">
+            <h4 className="mb-4 pb-1 text-gray-600 border-b border-gray-300">
                 Fill in the details below to create your tournament
-            </h2>
+            </h4>
 
             <form
                 onSubmit={handleSubmit}
@@ -134,13 +133,13 @@ export default function TournamentInsertForm() {
 
 
                 {/* General Details */}
-                <fieldset className="space-y-4 mb-4">
+                <fieldset className="space-y-4 mb-2">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* Name */}
                         <div className="mb-2">
                             <BasicInputWithLabel
                                 labelClassName={pageLabelClass}
-                                labelText="Tournament Name (Required)"
+                                labelText="Tournament Name - Required"
                                 inputType='text'
                                 inputName="name"
                                 inputId="name"
@@ -157,7 +156,7 @@ export default function TournamentInsertForm() {
                         <div className="">
                             <BasicInputWithLabel
                                 labelClassName={pageLabelClass}
-                                labelText="Slug (Optional, for URL)"
+                                labelText="Slug - Optional, for URL"
                                 inputType="text"
                                 inputName="slug"
                                 inputId="slug"
@@ -174,7 +173,7 @@ export default function TournamentInsertForm() {
                         <div className="mb-2">
                             <BasicInputWithLabel
                                 labelClassName={pageLabelClass}
-                                labelText="Start Date (Required)"
+                                labelText="Start Date - Required"
                                 inputType="datetime-local"
                                 inputName="startTime"
                                 inputId="startTime"
@@ -195,7 +194,7 @@ export default function TournamentInsertForm() {
                         <div>
                             <BasicInputWithLabel
                                 labelClassName={pageLabelClass}
-                                labelText="End Date (Required)"
+                                labelText="End Date - Required"
                                 inputType="datetime-local"
                                 inputName="endTime"
                                 inputId="endTime"
@@ -212,10 +211,10 @@ export default function TournamentInsertForm() {
                         </div>
                     </div>
                 </fieldset>
-
+                                
                 {/* Location Type */}
-                <fieldset className="p-2 px-5 border-2 border-zinc-600 rounded-lg mb-6 w-full">
-                    <legend className={`${legendClass} mb-0`}>
+                <fieldset className="mb-2 w-full">
+                    <legend className={legendClass}>
                         Location Type
                     </legend>
 
@@ -231,7 +230,7 @@ export default function TournamentInsertForm() {
                         checkedBoxClassName="bg-primary text-black"
                         iconSize={18}
                         iconClassName="group-hover:text-primary text-white"
-                        labelClassName=" text-sm md:text-base tracking-tight font-semibold"
+                        labelClassName="text-sm md:text-base tracking-tight font-semibold"
                     />
 
 
@@ -245,10 +244,10 @@ export default function TournamentInsertForm() {
                         `}
                         aria-hidden={formData.isOnline}
                     >
-                        <div className="p-2 overflow-hidden">
+                        <div className="py-1 overflow-hidden">
                             <BasicInputWithLabel
                                 labelClassName={pageLabelClass}
-                                labelText="Physical Location Address (Required)"
+                                labelText="Physical Location Address - Required"
                                 inputType="text"
                                 inputName="locationAddress"
                                 inputId="locationAddress"
@@ -256,7 +255,7 @@ export default function TournamentInsertForm() {
                                 inputOnChange={handleChange}
                                 required={!formData.isOnline}
                                 inputPlaceholder="e.g., 123 Main St, Anytown"
-                                inputClassName={`${pageInputClass}`}
+                                inputClassName={pageInputClass}
                                 tabIndex={formData.isOnline ? -1 : 0}
                             />
                             <ErrorMessageForTournament field='location' fieldErrors={fieldErrors} />
@@ -265,13 +264,13 @@ export default function TournamentInsertForm() {
                 </fieldset>
 
                 {/* Tournament Visibility */}
-                <fieldset className="p-4 px-5 border-2 border-zinc-600 rounded-lg mb-6 w-full">
+                <fieldset className="mb-2 w-full">
                     <legend className={legendClass}>
                         Tournament Visibility
                     </legend>
 
                     {/* Public */}
-                    <div className="flex items-center mb-2">
+                    <div className="flex items-center mb-1">
                         <input
                             type="radio"
                             id="tournament-public"
@@ -310,17 +309,17 @@ export default function TournamentInsertForm() {
                 </fieldset>
 
                 {/* Contact Information */}
-                <fieldset className="p-4 px-5 border-2 border-zinc-600 rounded-lg mb-6 w-full">
+                <fieldset className="mb-2 mt-4 w-full">
                     <legend className={legendClass}>
-                        Contact Information (At least one required)
+                        Contact Information - At least one required
                     </legend>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* Email */}
-                        <div className="mt-2">
+                        <div className="">
                             <BasicInputWithLabel
                                 labelClassName={pageLabelClass}
-                                labelText='Email (Optional)'
+                                labelText='Email - Optional'
                                 inputType='email'
                                 inputName='email'
                                 inputId='email'
@@ -336,7 +335,7 @@ export default function TournamentInsertForm() {
                         <div className="mt-2">
                             <BasicInputWithLabel
                                 labelClassName={pageLabelClass}
-                                labelText='Discord Link (Optional)'
+                                labelText='Discord Link - Optional'
                                 inputType='text'
                                 inputName='discord'
                                 inputId='discord'
@@ -352,7 +351,7 @@ export default function TournamentInsertForm() {
                 </fieldset>
 
                 {/* Submit Button */}
-                <div className="pt-4 sm:pt-6 mt-4 border-t-2 border-gray-400 flex gap-2">
+                <div className="pt-4 sm:pt-6 mt-4 border-t border-gray-300 flex gap-2">
                     <button
                         type="submit"
                         disabled={isSubmitting}

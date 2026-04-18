@@ -91,7 +91,7 @@ export default function ForumThreadList({threads}: {
                     {/* Loading or empty state */}
                     {filteredThreads.length === 0 ? (
                         // Show different messages based on whether there's a search query
-                        <div className="p-8 text-center text-gray-500">
+                        <div className="p-4 text-center text-zinc-600 text-base md:text-lg">
                             {searchQuery.trim()
                                 ? `No results for "${searchQuery.trim()}"`
                                 : "No forum threads found."}
@@ -104,7 +104,7 @@ export default function ForumThreadList({threads}: {
                                     key={thread.id}
                                     className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm
                                                hover:shadow-md mb-4 hover:border-primary
-                                               transition duration-500"
+                                               transition duration-400"
                                 >
                                     {/* Post Title, Author, Tournament, Timestamp */}
                                     <Link
@@ -126,13 +126,13 @@ export default function ForumThreadList({threads}: {
                                                     <p className="font-semibold">Author Name</p>
                                                 </div>
                                                 <p className="hidden sm:inline">•</p>
-                                                <p className="font-medium">{formatDate(thread.created_at, "MMM d, yyyy @ h:mm a")}</p>
+                                                <p className="text-gray-600">{formatDate(thread.created_at, "MMM d, yyyy @ h:mm a")}</p>
                                             </div>
 
                                             {/* Title */}
-                                            <h3 className="text-2xl sm:text-3xl font-jersey text-primary">
+                                            <h4 className="">
                                                 {thread.title}
-                                            </h3>
+                                            </h4>
                                         </div>
 
                                         {/* Thread content */}

@@ -2,7 +2,7 @@
 import { FetchTournamentFromIdResponse } from "@/server/queries/tournaments.queries";
 import { getTimeUntilStart } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { Mail, Pencil, Globe, Trash, Info, Torus } from "lucide-react";
+import { Mail, Pencil, Globe, Trash2 } from "lucide-react";
 import Image from "next/image";
 import React, { useState } from "react";
 import { deleteTournament } from "@/server/mutations/tournaments.mutations";
@@ -126,10 +126,12 @@ function InfoCells({ tournament }: { tournament: FetchTournamentFromIdResponse }
 export function TournamentDetails({
     tournament,
     events,
+    eventsSuccess,
     permissions
 }: {
     tournament: FetchTournamentFromIdResponse;
     events?: FetchEventsFromTournamentIdResponse;
+    eventsSuccess: boolean;
     permissions: TournamentPermissions;
 }) {
     const router = useRouter();
@@ -191,7 +193,6 @@ export function TournamentDetails({
                                     Edit
                                 </button>
 
-                                {/* Will throw an error if an event is tied to the tournament */}
                                 <button
                                     onClick={() => setShowDeleteModal(true)}
                                     className="flex items-center justify-center gap-2 p-2 px-4 lg:mt-0
@@ -199,7 +200,7 @@ export function TournamentDetails({
                                            text-white bg-primary hover:bg-secondary cursor-pointer
                                            disabled:opacity-50 transition-colors duration-200"
                                 >
-                                    <Trash className="size-5" />
+                                    <Trash2 className="size-5" />
                                     Delete
                                 </button>
                             </div>
@@ -220,9 +221,9 @@ export function TournamentDetails({
                                     className="rounded-full mr-2"
                                 />
                                 <div>
-                                    <h2 className="font-jersey text-lg">
+                                    <h5 className="">
                                         Organized by
-                                    </h2>
+                                    </h5>
                                     <p className="truncate min-w-0 text-sm md:text-base lg:text-lg">
                                         {tournament.owner.display_name}
                                     </p>
@@ -233,9 +234,9 @@ export function TournamentDetails({
 
                         {/* Start date */}
                         <div className="w-full p-2">
-                            <h2 className="font-jersey text-lg">
+                            <h5 className="">
                                 Starts
-                            </h2>
+                            </h5>
                             <div className="flex flex-row">
                                 <p className="truncate min-w-0 font-poppins text-sm md:text-base lg:text-lg">
                                     {formatDate(tournament.start_time, "MMM d, yyyy @ h:mm a")}
@@ -245,9 +246,9 @@ export function TournamentDetails({
 
                         {/* End date */}
                         <div className="w-full p-2">
-                            <h2 className="font-jersey text-lg">
+                            <h5 className="">
                                 Ends
-                            </h2>
+                            </h5>
                             <div className="flex flex-row">
                                 <p className="truncate min-w-0 font-poppins text-sm md:text-base lg:text-lg">
                                     {formatDate(tournament.end_time, "MMM d, yyyy @ h:mm a")}
@@ -273,8 +274,9 @@ export function TournamentDetails({
                         setDeleteError(null);
                     }}
                 />
-
-                <EventList events={events} />
+                {eventsSuccess && (
+                    <EventList events={events} />
+                )}
             </div>
 
             {/* Right side, participants list */}

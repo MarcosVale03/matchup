@@ -16,9 +16,9 @@ export default async function TournamentSearchPage({searchParams}: {
 
             {/* Header */}
             <div className="text-center mb-6 mt-4 w-fit place-self-center">
-                <h1 className="text-3xl md:text-4xl 3xl:text-5xl font-jersey tracking-wide font-normal">
+                <h2 className="">
                     The Arena Awaits: Find Your Competition
-                </h1>
+                </h2>
                 <p className="text-sm 3xl:text-base text-zinc-500 text-center min-w-0">
                     Browse upcoming tournaments and register to compete
                 </p>
@@ -29,14 +29,14 @@ export default async function TournamentSearchPage({searchParams}: {
                 <SearchControls/>
                 <div className="flex flex-col gap-1">
                     {tournaments.length > 1 && (
-                        <h2 className="text-base md:text-lg font-poppins">
+                        <h4>
                             Found {tournaments.length} Tournaments:
-                        </h2>
+                        </h4>
                     )}
                     {tournaments.length === 1 && (
-                        <h2 className="text-base md:text-lg font-poppins">
+                        <h4 className="">
                             Found 1 Tournament:
-                        </h2>
+                        </h4>
                     )}
                     <SearchResults tournaments={tournaments}/>
                 </div>

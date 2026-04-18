@@ -1,5 +1,5 @@
 import { fetchTournamentFromId } from "@/server/queries/tournaments.queries";
-import {notFound, redirect} from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/server/db/server";
 import { cookies } from "next/headers";
 import TournamentEditForm from "@/features/tournament-crud/edit-tournament";
@@ -24,10 +24,8 @@ export default async function EditTournamentPage({ params }: { params: { tournam
     }
 
     return (
-            <main className="bg-main-bg flex flex-col text-black font-poppins">
-                <div className="flex">
-                    <TournamentEditForm initialData={{...tournament}} />
-                </div>
-            </main>
+        <div className="bg-main-bg flex flex-col text-black font-poppins justify-center">
+            <TournamentEditForm initialData={{ ...tournament }} />
+        </div>
     );
 }

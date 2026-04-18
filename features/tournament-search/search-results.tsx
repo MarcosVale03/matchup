@@ -56,19 +56,18 @@ export const SearchResults = ({
                                 })()}
 
                                 {/* Tournament Name */}
-                                <h1
-                                    className="text-primary font-jersey font-normal text-lg lg:text-2xl
-                                                truncate text-left min-w-0">
+                                <h4
+                                    className="text-primary truncate text-left min-w-0">
                                     {tournament.name}
-                                </h1>
+                                </h4>
                             </div>
 
                             {/* Tournament Start and End Time */}
                             <div className="place-self-start">
-                                <p className="font-jersey text-sm lg:text-lg font-normal">
+                                <p className="font-jersey text-base lg:text-lg font-normal">
                                    Starts: <span className="font-poppins text-xs md:text-sm">{formatDate(tournament.start_time, "MMM d, yyyy @ h:mm a")}</span>
                                 </p>
-                                <p className="font-jersey text-sm lg:text-lg font-normal">
+                                <p className="font-jersey text-base lg:text-lg font-normal -mt-1">
                                     Ends: <span className="font-poppins text-xs md:text-sm">{formatDate(tournament.end_time, "MMM d, yyyy @ h:mm a")}</span>
                                 </p>
                             </div>

@@ -39,7 +39,7 @@ export default async function RootLayout({
     const {data: {user}} = await supabase.auth.getUser();
 
     return (
-        <html lang="en">
+        <html lang="en" className="bg-main-bg">
         <head>
             <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
             <title></title>

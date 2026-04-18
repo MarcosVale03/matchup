@@ -17,6 +17,7 @@ export default async function TournamentDetailsPage({params}: { params: { tourna
 
     const {success: tournamentSuccess, tournament} = await fetchTournamentFromId(id);
     const {success: eventsSuccess, events} = await fetchEventsFromTournamentId(id);
+    // const {success: participantsSuccess, participants}
 
 
     if (!tournamentSuccess || !tournament) {
@@ -55,6 +56,7 @@ export default async function TournamentDetailsPage({params}: { params: { tourna
             tournament={tournament}
             permissions={permissions}
             events={events}
+            eventsSuccess={eventsSuccess}
         />
     );
 }
