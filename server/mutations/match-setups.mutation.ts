@@ -152,5 +152,11 @@ export async function deleteMatchSetup(identifier: string, tournament_id : numbe
     }   
 }
 
+export async function createMatchSetups(tournament_id : number, count: number) {
 
+    // creating client
+    const cookieStore = await cookies()
+    const supabase = await createClient(cookieStore)
+    
+}
 
