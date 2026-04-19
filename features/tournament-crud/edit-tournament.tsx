@@ -36,7 +36,7 @@ export default function TournamentEditForm({initialData, currAdmins}: { initialD
     const [admin, setAdmin] = useState(
         // using filter to not display the owner (owner technically an admin through perm level 0) we only want 2-4 perms
         currAdmins.filter(admin => admin.permission_levels.id !== 0).map(admin => ({
-            adminEmail : admin.email,
+            adminEmail : admin.email ?? '',
             adminPermissionLevel : admin.permission_levels.id
         }))
     )
@@ -122,7 +122,7 @@ export default function TournamentEditForm({initialData, currAdmins}: { initialD
                     if (admins.adminEmail.trim()) {
                         const user = await getUserIdfromEmail(admins.adminEmail)
                         if (user.success && user.data) {
-                            await insertAdmin(response.data, user.data, admins.adminPermissionLevel, admins.adminEmail);
+                            await insertAdmin(response.data, user.data, admins.adminPermissionLevel);
                         }
                     }
                 }

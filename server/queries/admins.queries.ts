@@ -2,6 +2,7 @@
 
 import {cookies} from "next/headers";
 import {createClient} from "@/server/db/server";
+import { add } from "date-fns";
 
 
 /**
@@ -109,8 +110,7 @@ export async function fetchAdminsFromTournament(tournamentId: number): Promise<A
     // DB Query
     const {data, error} = await supabase
         .from('admins')
-        .select(`
-            email,   
+        .select(`   
             permission_levels (
                 id,
                 name,
@@ -130,6 +130,15 @@ export async function fetchAdminsFromTournament(tournamentId: number): Promise<A
         throw new Error("Tournament Query Failed: " + error.details + " " + error.message)
     }
 
-    return data
-}
+    const addEmails = await Promise.all(
+        data.map(async (admin) => {
+            const {data : email} = await supabase.rpc('get_email_from_user_id', {uid : admin.users.user_id})
 
+        return {
+            ...admin,   
+            email : email ?? undefined
+        }
+    })
+)
+    return addEmails
+}

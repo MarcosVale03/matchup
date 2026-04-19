@@ -136,13 +136,20 @@ export default function TournamentInsertForm() {
             if (response.success && response.data) {
 
                 for (const admins of admin) {
-                    if (admins.adminEmail.trim()) {
-                        const user = await getUserIdfromEmail(admins.adminEmail)
-                        if (user.success && user.data) {
-                            await insertAdmin(response.data, user.data, admins.adminPermissionLevel, admins.adminEmail);
-                        }
+                if (admins.adminEmail.trim()) {
+                    const user = await getUserIdfromEmail(admins.adminEmail)
+                    console.log('email tried:', admins.adminEmail)
+                    console.log('user lookup result:', JSON.stringify(user))
+                    if (user.success && user.data) {
+                        const result = await insertAdmin(response.data, user.data, admins.adminPermissionLevel)
+                        console.log('insert result:', JSON.stringify(result))
+                    } else {
+                        console.log('user lookup failed or returned no data')
                     }
-                }           
+                } else {
+                    console.log('skipped empty email at index', admin.indexOf(admins))
+                }
+            }     
             
                 alert(`Tournament "${formData.name}" created successfully!`);
                 // Redirect to the new tournament's detail page

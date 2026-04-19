@@ -10,7 +10,7 @@ const AdminInsertSchema = z.object({
     tournament_id : z.number().int().positive(),
     user_id : z.string().uuid(),
     permission_level : z.number().int().min(0).max(4),
-    email : z.string().email()
+    //email : z.string().email()
 })
 
 // init the admin insert errors
@@ -18,11 +18,11 @@ export type AdminInsertErrors = {
     tournament_id? : string[],
     user_id? : string[],
     permission_level? : string[]
-    email? : string[]
+    //email? : string[]
 }
 
 // function inserts adminds into the table in the db
-export async function insertAdmin(tournament_id : number, user_id : string, permission_level : number, email : string) : Promise<MutationResponse<void, AdminInsertErrors>> {
+export async function insertAdmin(tournament_id : number, user_id : string, permission_level : number) : Promise<MutationResponse<void, AdminInsertErrors>> {
     
     // creating client 
     const cookieStore = await cookies()
@@ -33,7 +33,7 @@ export async function insertAdmin(tournament_id : number, user_id : string, perm
         tournament_id : tournament_id,
         user_id : user_id,
         permission_level : permission_level,
-        email : email
+        //email : email
     })
 
     // check for any errors
@@ -51,7 +51,7 @@ export async function insertAdmin(tournament_id : number, user_id : string, perm
         a_tournament_id : result.data.tournament_id,
         a_user_id : result.data.user_id,
         a_permission_level : result.data.permission_level,
-        a_admin_email : result.data.email
+        //a_admin_email : result.data.email
     })
 
     // checks if inserting gave any errors 
@@ -71,7 +71,7 @@ const AdminUpdateSchema = z.object({
     tournament_id : z.number().int().positive(),
     user_id : z.string().uuid(),
     permission_level : z.number().int().min(0).max(4),
-    email : z.string().email()
+    //email : z.string().email()
 })
 
 // init the admin udpate errors
@@ -79,7 +79,7 @@ export type AdminUpdateErrors = {
     tournament_id? : string[],
     user_id? : string[],
     permission_level? : string[]
-    email? : string[]
+    //email? : string[]
 }
 
 // this function allows us to update the adminds data
@@ -94,7 +94,7 @@ export async function updateAdmin(tournament_id : number, user_id : string, perm
         tournament_id : tournament_id,
         user_id : user_id,
         permission_level : permission_level,
-        email : email
+        //email : email
     })
 
     // check for any errors
@@ -112,7 +112,7 @@ export async function updateAdmin(tournament_id : number, user_id : string, perm
         a_tournament_id : result.data.tournament_id,
         a_user_id : result.data.user_id,
         a_permission_level : result.data.permission_level,
-        a_admin_email : email,
+        //a_admin_email : email,
     })
 
     // checking if the insert gave any errors 
