@@ -12,6 +12,7 @@ type BasicInputProps = {
     inputPlaceholder?: string,
     inputClassName: string
     maxDateTime?: string;
+    tabIndex?: number;
 }
 
 export default function BasicInputWithLabel({ 
@@ -26,6 +27,7 @@ export default function BasicInputWithLabel({
     inputPlaceholder, 
     inputClassName,
     maxDateTime,
+    tabIndex
 }: BasicInputProps) {
     return (
         <div className="rounded-xl flex flex-col-reverse">
@@ -39,6 +41,7 @@ export default function BasicInputWithLabel({
                 placeholder={inputPlaceholder}
                 className={inputClassName}
                 max={maxDateTime}
+                tabIndex={tabIndex}
             />
             <label
                 htmlFor={inputId}

@@ -13,31 +13,16 @@ const geistSans = Geist({
 });
 
 const geistMono = Geist_Mono({
-    weight: [
-        "100", "200", "300",
-        "400", "500", "600",
-        "700", "800", "900"
-    ],
     variable: "--font-geist-mono",
     subsets: ["latin"],
 });
 
 const poppins = Poppins({
-  subsets: ["latin"],         
-  weight: [
-    "100", "200", "300",       
-    "600", "700", "800", "900" 
-  ],
-  variable: "--font-poppins", 
-  display: "swap",            
-});
-
-const oswald = Oswald({
     subsets: ["latin"],
-    weight: ["200", "300", "400", "500", "600" , "700"],
-    variable: "--font-jersey-10",
+    weight: ["400", "500", "600", "700"],
+    variable: "--font-poppins",
     display: "swap",
-})
+});;
 
 const jersey25 = Jersey_25({
     subsets: ["latin"],
@@ -70,7 +55,7 @@ export default async function RootLayout({
             <title></title>
         </head>
             <body
-                className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable} ${oswald.variable} ${jersey25.variable} antialiased`}
+                className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable} ${jersey25.variable} antialiased`}
             >
             <ClientLayout
                 initialUser={user}

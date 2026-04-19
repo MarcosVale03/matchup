@@ -58,15 +58,15 @@ export async function reportMatchResult(
     }
 
     // if this match feeds into another match, update the next match slot with the advancing seedn
-    if (match.advance_match_identifier && match.advance_slot_num) {
+    if (match.w_advance_match_id && match.w_advance_slot_num) {
         const { error: advanceError } = await supabase
             .from('match_slots')
             .update({ seed_num: winnerSlot.seed_num })
-            .eq('match_identifier', match.advance_match_identifier)
+            .eq('match_identifier', match.w_advance_match_id)
             .eq('tournament_id', tournamentId)
             .eq('event_name', eventName)
             .eq('phase_group_identifier', phaseGroupId)
-            .eq('slot_num', match.advance_slot_num)
+            .eq('slot_num', match.w_advance_slot_num)
 
         if (advanceError) {
             return {

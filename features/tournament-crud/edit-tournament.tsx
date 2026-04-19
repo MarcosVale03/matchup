@@ -139,18 +139,18 @@ export default function TournamentEditForm({initialData, currAdmins}: { initialD
 
 
     // general classNames used in most of the inputs on this page
-    const pageLabelClass = `block text-sm text-zinc-600 rounded-md peer-focus:text-primary transition
-                            duration-400 font-[Poppins] font-semibold`
+    const pageLabelClass = "block text-zinc-600 2xl:text-xl rounded-md peer-focus:text-primary transition duration-400";
+
 
     const pageInputClass = `peer block bg-white w-full rounded-xl border-2 border-white 
-                            text-black text-sm lg:text-base p-2.5 focus:outline-none 
-                            focus:border-primary shadow-sm transition duration-400 font-[Poppins]`
+                            text-black p-2 2xl:p-4 2xl:text-xl focus:outline-none 
+                            focus:border-primary shadow-sm transition duration-400 font-normal`;
 
-    const legendClass = "text-base lg:text-lg font-jersey-25 text-primary px-2 -mb-3"
+    const legendClass = "text-sm md:text-base lg:text-lg font-[Poppins] text-gray-700 px-2 -mb-3 tracking-tight"
 
     return (
-        <div className="mt-4 mx-4 xs:mx-auto xs:max-w-xs sm:max-w-lg md:max-w-2xl lg:max-w-4xl 2xl:max-w-6xl w-full">
-            <h1 className="text-xl md:text-2xl lg:text-3xl font-jersey-25">
+        <div className="mt-4 mx-4 sm:mx-auto w-full max-w-[calc(100%-2rem)] sm:max-w-2xl md:max-w-3xl lg:max-w-5xl 2xl:max-w-7xl">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-jersey-25">
                 Updating Tournament: <span className="text-primary">{initialData.name}</span>
             </h1>
 
@@ -158,7 +158,7 @@ export default function TournamentEditForm({initialData, currAdmins}: { initialD
                 onSubmit={handleSubmit}
                 className="mb-6"
             >
-                <h2 className="text-base md:text-lg lg:text-xl font-jersey-25 mb-3 border-b border-gray-300">
+                <h2 className="text-base mb-4 pb-1 text-gray-600 border-b border-gray-300 font-semibold">
                     Tournament ID: <span className="">{formData.id}</span>
                 </h2>
 
@@ -190,7 +190,7 @@ export default function TournamentEditForm({initialData, currAdmins}: { initialD
                                 inputPlaceholder="Enter tournament name"
                                 inputClassName={pageInputClass}
                             />
-                            <ErrorMessageForTournament field='name' fieldErrors={fieldErrors}/>
+                            <ErrorMessageForTournament field='name' fieldErrors={fieldErrors} />
                         </div>
 
                         {/* Slug */}
@@ -207,7 +207,7 @@ export default function TournamentEditForm({initialData, currAdmins}: { initialD
                                 inputPlaceholder="e.g., mytourney2025"
                                 inputClassName={pageInputClass}
                             />
-                            <ErrorMessageForTournament field='slug' fieldErrors={fieldErrors}/>
+                            <ErrorMessageForTournament field='slug' fieldErrors={fieldErrors} />
                         </div>
 
                         {/* Start Time */}
@@ -224,7 +224,7 @@ export default function TournamentEditForm({initialData, currAdmins}: { initialD
                                 inputPlaceholder=""
                                 inputClassName={pageInputClass}
                             />
-                            <ErrorMessageForTournament field='times' fieldErrors={fieldErrors}/>
+                            <ErrorMessageForTournament field='times' fieldErrors={fieldErrors} />
                         </div>
 
                         {/* End Time */}
@@ -246,7 +246,7 @@ export default function TournamentEditForm({initialData, currAdmins}: { initialD
                 </fieldset>
 
                 {/* Type and Location */}
-                <fieldset className="p-2 px-5 border-2 border-zinc-600 rounded-2xl mb-6 w-full">
+                <fieldset className="p-2 px-5 border-2 border-zinc-600 rounded-lg mb-6 w-full">
                     <legend className={`${legendClass} mb-0`}>
                         Location Type
                     </legend>
@@ -263,7 +263,7 @@ export default function TournamentEditForm({initialData, currAdmins}: { initialD
                         checkedBoxClassName="bg-primary text-black"
                         iconSize={18}
                         iconClassName="group-hover:text-primary text-white"
-                        labelClassName="text-sm md:text-base lg:text-lg font-jersey-25"
+                        labelClassName=" text-sm md:text-base tracking-tight font-semibold"
                     />
 
 
@@ -290,13 +290,13 @@ export default function TournamentEditForm({initialData, currAdmins}: { initialD
                                 inputPlaceholder="e.g., 123 Main St, Anytown"
                                 inputClassName={`${pageInputClass}`}
                             />
-                            <ErrorMessageForTournament field='location' fieldErrors={fieldErrors}/>
+                            <ErrorMessageForTournament field='location' fieldErrors={fieldErrors} />
                         </div>
                     </div>
                 </fieldset>
 
                 {/* Tournament Visibility */}
-                <fieldset className="p-4 px-5 border-2 border-zinc-600 rounded-2xl mb-6 w-full">
+                <fieldset className="p-4 px-5 border-2 border-zinc-600 rounded-lg mb-6 w-full">
                     <legend className={legendClass}>
                         Tournament Visibility
                     </legend>
@@ -310,11 +310,11 @@ export default function TournamentEditForm({initialData, currAdmins}: { initialD
                             value="public"
                             checked={formData.isPublic}
                             className="h-4 w-4 accent-primary shrink-0"
-                            onChange={() => setFormData({...formData, isPublic: true})}
+                            onChange={() => setFormData({ ...formData, isPublic: true })}
                         />
                         <label
                             htmlFor="tournament-public"
-                            className="ml-2 text-sm md:text-base lg:text-lg font-jersey-25"
+                            className="ml-2 text-sm md:text-base tracking-tight font-semibold"
                         >
                             Public
                         </label>
@@ -328,11 +328,11 @@ export default function TournamentEditForm({initialData, currAdmins}: { initialD
                             name="visibility"
                             value="private"
                             className="h-4 w-4 accent-primary shrink-0"
-                            onChange={() => setFormData({...formData, isPublic: false})}
+                            onChange={() => setFormData({ ...formData, isPublic: false })}
                         />
                         <label
                             htmlFor="tournament-private"
-                            className="ml-2 text-sm md:text-base lg:text-lg font-jersey-25"
+                            className="ml-2 text-sm md:text-base tracking-tight font-semibold"
                         >
                             Private
                         </label>
@@ -340,7 +340,7 @@ export default function TournamentEditForm({initialData, currAdmins}: { initialD
                 </fieldset>
 
                 {/* Contact Information */}
-                <fieldset className="p-4 px-5 border-2 border-zinc-600 rounded-2xl mb-6 w-full">
+                <fieldset className="p-4 px-5 border-2 border-zinc-600 rounded-lg mb-6 w-full">
                     <legend className={legendClass}>
                         Contact Information (At least one required)
                     </legend>
@@ -378,7 +378,7 @@ export default function TournamentEditForm({initialData, currAdmins}: { initialD
                             />
                         </div>
                     </div>
-                    <ErrorMessageForTournament field='contact' fieldErrors={fieldErrors}/>
+                    <ErrorMessageForTournament field='contact' fieldErrors={fieldErrors} />
                 </fieldset>
                 <fieldset className="p-4 px-5 border-2 border-zinc-600 rounded-2xl mb-6 w-full">
                                     <legend className={legendClass}>
@@ -437,7 +437,7 @@ export default function TournamentEditForm({initialData, currAdmins}: { initialD
                                    text-white bg-primary hover:bg-secondary disabled:opacity-50
                                    transition-colors"
                     >
-                        <ArrowLeft className="size-5"/>
+                        <ArrowLeft className="size-5" />
                         Back to details
                     </button>
                     <button
@@ -449,7 +449,7 @@ export default function TournamentEditForm({initialData, currAdmins}: { initialD
                                    transition-colors"
                     >
                         <span>{isSubmitting ? 'Saving...' : 'Save Changes'}</span>
-                        <Save className="size-5"/>
+                        <Save className="size-5" />
                     </button>
                 </div>
             </form>

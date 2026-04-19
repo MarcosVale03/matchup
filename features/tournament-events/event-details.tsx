@@ -3,6 +3,8 @@ import {Fragment, useState} from "react";
 import {FetchEventFromEventIdResponse} from "@/server/queries/events.queries";
 import {formatDate} from "date-fns";
 import {CalendarSync, ChevronRight, Crown, ShieldAlert, Wrench, X} from "lucide-react";
+import {FetchBracketPhasesResponse} from "@/server/queries/phases.queries";
+import Link from "next/link";
 
 interface Team {
     rank: number;
@@ -225,11 +227,13 @@ function rowBg(team: Team, selected: boolean): string {
 }
 
 export default function EventDetails({
-    event
+    event,
+    bracketPhases
 }: {
-    event: FetchEventFromEventIdResponse
+    event: FetchEventFromEventIdResponse,
+    bracketPhases: FetchBracketPhasesResponse
 }) {
-    const [activeTab, setActiveTab] = useState<"standings" | "matches" | "upcoming">("standings");
+    const [activeTab, setActiveTab] = useState<"brackets" | "standings" | "matches" | "upcoming">("brackets");
     const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
     const [showAdmin, setShowAdmin] = useState(false);
 
@@ -356,7 +360,7 @@ export default function EventDetails({
 
                 {/* TABS */}
                 <nav className="flex mt-7">
-                    {(["standings", "matches", "upcoming"] as const).map((tab) => (
+                    {(["brackets", "standings", "matches", "upcoming"] as const).map((tab) => (
                         <button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
@@ -375,6 +379,54 @@ export default function EventDetails({
 
                 {/* CONTENT */}
                 <div className="py-7 pb-16">
+                    {/* BRACKETS */}
+                    {activeTab === "brackets" && (
+                        <div className="flex flex-col gap-2.5">
+                            {bracketPhases.map((bp) => (
+                                <Link key={bp.id} href={`/tournaments/${event.tournament_id}/events/${event.id}/brackets?bpid=${bp.id}`}>
+                                    <div
+                                        className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 px-5 py-4
+                               bg-gray-50 border border-gray-100 rounded-xl shadow-sm"
+                                    >
+
+
+                                        {/* Bracket Name */}
+                                        <div className="flex items-center justify-center gap-3 sm:gap-4">
+                                            <div
+                                                className={`text-right font-jersey-25 text-base sm:text-xl`}
+                                            >
+                                                <p>{bp.name}</p>
+                                            </div>
+
+
+                                        </div>
+
+                                        {/* Bracket Info */}
+                                        <div className="hidden sm:grid grid-cols-4 text-sm text-gray-700 font-semibold min-w-28">
+                                            <div className='min-w-28 text-center flex-col items-center justify-center'>
+                                                <p className="font-bold">Pools</p>
+                                                <p>{bp.num_pools}</p>
+                                            </div>
+                                            <div className='min-w-28 text-center flex-col items-center justify-center'>
+                                                <p className="font-bold">Entrants</p>
+                                                <p>{bp.num_entrants}</p>
+                                            </div>
+                                            <div className='min-w-28 text-center flex-col items-center justify-center'>
+                                                <p className="font-bold">Type</p>
+                                                <p>{bp.bracket_type_name}</p>
+                                            </div>
+                                            {bp.next_phase_name && <div className='min-w-28 text-center flex-col items-center justify-center'>
+                                                <p className="font-bold">Progression</p>
+                                                <p>{bp.next_phase_name}</p>
+                                            </div>}
+                                        </div>
+
+
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
+                    )}
 
                     {/* STANDINGS */}
                     {activeTab === "standings" && (

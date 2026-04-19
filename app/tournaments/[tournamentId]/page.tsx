@@ -1,9 +1,9 @@
-import {fetchTournamentFromId} from "@/server/queries/tournaments.queries";
-import {notFound} from "next/navigation";
-import {cookies} from "next/headers";
-import {createClient} from "@/server/db/server";
-import {TournamentDetails} from "@/features/tournament-search/tournament-details";
-import {Trophy} from "lucide-react";
+import { fetchTournamentFromId } from "@/server/queries/tournaments.queries";
+import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
+import { createClient } from "@/server/db/server";
+import { TournamentDetails } from "@/features/tournament-search/tournament-details";
+import { Trophy } from "lucide-react";
 import Link from "next/link";
 import {fetchEventsFromTournamentId} from "@/server/queries/events.queries";
 import {FetchEventsFromTournamentIdResponse} from "@/server/queries/events.queries";
@@ -13,16 +13,16 @@ import { fetchAdminsFromTournament } from "@/server/queries/admins.queries";
 class fetchEventsFromTournamentIdResponse {
 }
 
-export default async function TournamentDetailsPage({params}: { params: { tournamentId: string } }) {
-    const {tournamentId: idStr} = await params;
+export default async function TournamentDetailsPage({ params }: { params: { tournamentId: string } }) {
+    const { tournamentId: idStr } = await params;
     const id = Number(idStr);
 
     if (isNaN(id) || id <= 0) {
         notFound();
     }
 
-    const {success: tournamentSuccess, tournament} = await fetchTournamentFromId(id);
-    const {success: eventsSuccess, events} = await fetchEventsFromTournamentId(id);
+    const { success: tournamentSuccess, tournament } = await fetchTournamentFromId(id);
+    const { success: eventsSuccess, events } = await fetchEventsFromTournamentId(id);
 
 
     if (!tournamentSuccess || !tournament) {
@@ -49,7 +49,7 @@ export default async function TournamentDetailsPage({params}: { params: { tourna
     // getting the permissions for editing and deleting
     const cookieStore = await cookies();
     const supabase = await createClient(cookieStore);
-    const {data: {user}} = await supabase.auth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
 
     // get admins
     const admins = await fetchAdminsFromTournament(id)
