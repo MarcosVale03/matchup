@@ -6,6 +6,7 @@ import {TournamentDetails} from "@/features/tournament-search/tournament-details
 import {Trophy} from "lucide-react";
 import Link from "next/link";
 import {fetchEventsFromTournamentId} from "@/server/queries/events.queries";
+import {QueryParamToast} from "@/ui/toast/query-param-toast";
 
 export default async function TournamentDetailsPage({params}: { params: { tournamentId: string } }) {
     const {tournamentId: idStr} = await params;
@@ -52,11 +53,21 @@ export default async function TournamentDetailsPage({params}: { params: { tourna
     };
 
     return (
-        <TournamentDetails
-            tournament={tournament}
-            permissions={permissions}
-            events={events}
-            eventsSuccess={eventsSuccess}
-        />
+        <>
+            <TournamentDetails
+                tournament={tournament}
+                permissions={permissions}
+                events={events}
+                eventsSuccess={eventsSuccess}
+            />
+            <QueryParamToast
+                paramKey="created"
+                message="Tournament created successfully"
+            />
+            <QueryParamToast
+                paramKey="updated"
+                message="Changes saved"
+            />
+        </>
     );
 }

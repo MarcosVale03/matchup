@@ -231,8 +231,8 @@ export default function EventDetails({
         return () => clearInterval(id);
     }, []);
 
-    function formatSyncedAgo(date: Date): string {
-        const mins = Math.floor((Date.now() - date.getTime()) / 60_000);
+    function formatSyncedAgo(date: Date, now: Date = new Date()): string {
+        const mins = Math.floor((now.getTime() - date.getTime()) / 60_000);
         if (mins < 1) return "JUST NOW";
         if (mins === 1) return "1 MIN AGO";
         return `${mins} MINS AGO`;

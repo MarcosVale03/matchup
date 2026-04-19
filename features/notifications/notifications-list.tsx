@@ -18,7 +18,9 @@ export default function NotificationsList({ notifications = [] }: { notification
                             <NotificationBody notification={item} />
 
                             <p className="text-xs text-gray-400 font-light">
-                                {formatDistanceToNow(new Date(item.timestamp), { addSuffix: true })}
+                                {item.timestamp && !isNaN(new Date(item.timestamp).getTime())
+                                    ? formatDistanceToNow(new Date(item.timestamp), { addSuffix: true })
+                                    : "just now"}
                             </p>
                         </div>
                     </li>

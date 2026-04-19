@@ -2,7 +2,6 @@
 import React, {useState} from 'react';
 import {X, Send} from "lucide-react";
 import {insertPost} from '@/server/mutations/forum.mutation';
-import {Toast} from "@/ui/toast/toast";
 import {useRouter} from "next/navigation";
 
 type Toast = {

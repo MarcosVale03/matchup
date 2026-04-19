@@ -5,8 +5,8 @@ import {CircleAlert, Plus, X} from "lucide-react";
 import SearchBar from "@/ui/search-bar";
 import AddForumThread from '../forum-crud/add-thread';
 import {useProfile} from "@/app/client-layout";
-import {useToast} from "@/ui/toast/use-toast";
-import {Toast} from "@/ui/toast/toast";
+import {useForumToast} from "@/ui/toast/forum-use-toast";
+import {ForumToast} from "@/ui/toast/forum-toast";
 import Link from "next/link";
 import Image from "next/image";
 import {formatDate} from "date-fns";
@@ -19,7 +19,7 @@ export default function ForumThreadList({threads}: {
     const [searchQuery, setSearchQuery] = useState('');
     const [isFormOpen, setIsFormOpen] = useState(false);
 
-    const toast = useToast();
+    const toast = useForumToast();
 
     const handleThreadAdded = () => {
         toast.show("Thread created successfully!");
@@ -85,7 +85,7 @@ export default function ForumThreadList({threads}: {
             <div className="flex flex-col gap-2">
 
                 {/* Success Message */}
-                <Toast message={toast.message}/>
+                <ForumToast message={toast.message}/>
 
                 <div className="">
                     {/* Loading or empty state */}

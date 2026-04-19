@@ -6,8 +6,8 @@ import DeleteThread from "@/features/forum-crud/delete-thread";
 import Image from "next/image";
 import ForumPostsList from "@/features/forum-results.tsx/forum-post-list";
 import AddThreadPost from "@/features/forum-crud/add-post";
-import { useToast } from "@/ui/toast/use-toast";
-import { Toast } from "@/ui/toast/toast";
+import { useForumToast } from "@/ui/toast/forum-use-toast";
+import { ForumToast } from "@/ui/toast/forum-toast";
 import { formatDate } from "date-fns";
 
 export function ThreadView({
@@ -22,7 +22,7 @@ export function ThreadView({
     isOwner: boolean;
 }) {
 
-    const toast = useToast();
+    const toast = useForumToast();
 
     return (
         <main className="bg-main-bg font-poppins text-black p-4 md:px-8 3xl:px-16">
@@ -86,7 +86,7 @@ export function ThreadView({
                 />
 
                 <div className="mb-2">
-                    <Toast message={toast.message} />
+                    <ForumToast message={toast.message} />
                 </div>
 
                 {/* Posts under thread */}

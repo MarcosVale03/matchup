@@ -26,23 +26,21 @@ export function useNotifications() {
 
         const supabase = createClient();
         const channel = supabase.channel(channelForUser(userId), {
-            config: { broadcast: { self: true } },
+            config: { private: true, broadcast: { self: false } },
         });
 
-        console.log(channel)
-
         channel
-            .on("broadcast", { event: "Test message" }, ({ payload }) => {
+            .on("broadcast", { event: NOTIFICATION_EVENT }, ({ payload }) => {
                 const notification = payload as Notification;
                 setNotifications((prev) => [notification, ...prev]);
                 setUnreadCount((prev) => prev + 1);
             })
             .subscribe();
 
-        // return () => {
-        //     subscribedRef.current = null;
-        //     supabase.removeChannel(channel);
-        // };
+        return () => {
+            subscribedRef.current = null;
+            supabase.removeChannel(channel);
+        };
     }, [userId]);
 
     const markAllRead = () => setUnreadCount(0);
