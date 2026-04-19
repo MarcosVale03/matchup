@@ -7,7 +7,7 @@ export default async function ForumsPage() {
 
 
     return (
-        <main className="flex-col bg-main-bg font-poppins text-black justify-center items-center p-4 md:px-8 3xl:px-32">
+        <main className="flex flex-col bg-main-bg font-poppins text-black justify-center items-center p-4 md:px-8 3xl:px-32">
             <div className="text-center mb-6 mt-4 w-fit place-self-center">
                 <h2 className="">
                     Welcome to the Matchup Forums: Connect and Share!
