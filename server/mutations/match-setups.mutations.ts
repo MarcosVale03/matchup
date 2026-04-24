@@ -188,27 +188,18 @@ export async function createSetupsFromInput(tournament_id : number, event_id : n
 }
 
 
-export async function assignMatchToSetup(tournament_id : number, event_id : number, phase_group_identifier : string, match_id : number) {
+export async function assignMatchToSetup(identifier : string, tournament_id : number, event_id : number, phase_group_identifier : string, match_id : number) {
 
     // creating client
     const cookieStore = await cookies()
     const supabase = await createClient(cookieStore)
 
-    // find a single available station with from the same tournament/event
-    const {error : FindError, data : FindData} = await supabase.from('match_setups').select('identifier').eq('tournament_id', tournament_id)
-    .eq('event_id', event_id).is('match_id', null).limit(1).single()
-    
-    if (FindError) {
-        throw new Error("DB Error while trying to delete from Match Setups" + FindError.details + " " + FindError.message)
-    }
-
-    // assign match to the setup we found
-    const {error : UpdateError, data : UpdateData} =  await supabase.from('match_setups').update({'phase_group_identifier' : phase_group_identifier, match_id : match_id})
-    .eq('identifier', FindData.identifier).eq('tournament_id', tournament_id).eq('event_id', event_id)
+    // assign match to the setup TO picks
+    const {error, data} =  await supabase.from('match_setups').update({'phase_group_identifier' : phase_group_identifier, match_id : match_id}).eq('identifier', identifier).eq('tournament_id', tournament_id).eq('event_id', event_id)
 
 
-    if (UpdateError) {
-        throw new Error("DB Error while trying to update from Match Setups" + UpdateError.details + " " + UpdateError.message)
+    if (error) {
+        throw new Error("DB Error while trying to update from Match Setups" + error.details + " " + error.message)
     }
 
     // returns sucess
@@ -236,3 +227,4 @@ export async function freeUpSetup(identifier : string, tournament_id : number, e
         success : true
     }   
 }
+

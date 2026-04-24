@@ -101,7 +101,7 @@ export async function fetchFutureTournaments(user_id: string): Promise<QueryResp
         data : data
     }
 }
-
+    
 export async function fetchPastTournaments(user_id : string): Promise<QueryResponse<PastTournamentsResponse>> {
 
     // creating client
