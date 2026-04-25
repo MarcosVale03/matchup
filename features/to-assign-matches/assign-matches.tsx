@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react';
+import { act, useState } from 'react';
 import { createSetupsFromInput } from '@/server/mutations/match-setups.mutations';
 import {useRouter} from 'next/navigation'
 import { DndContext, DragEndEvent, useDraggable, useDroppable } from '@dnd-kit/core';
@@ -9,6 +9,7 @@ import { assignMatchToSetup } from '@/server/mutations/match-setups.mutations';
 function Draggable({match} : {match : any}) {
         const {attributes, listeners, setNodeRef, transform} = useDraggable({
             id : match.id,
+            data : {id : match.id, phase_group_identifier : match.phase_group_identifier}
         })
         const style = transform? {transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,} : undefined;
 
@@ -26,6 +27,7 @@ function Droppable({id} : {id : string}) {
 
     const {isOver, setNodeRef} = useDroppable({
         id: id,
+        data : {identifier : id}
     });
 
     const style = {
@@ -48,10 +50,12 @@ export default function AssignMatchesForm({matches, stations, tournament_id, eve
         router.refresh()
     }
 
-    const [isDropped, setIsDropped] = useState(false);
-    function handleDragEnd(event : DragEndEvent) {
-        if (event.over && event.over.id === 'droppable') {
-            setIsDropped(true);
+    async function handleDragEnd(event : DragEndEvent) {
+        const {active, over} = event;
+        if (over && active.data.current && over.data.current) {
+            console.log("DROPPED:", active.data.current, over.data.current);
+            await assignMatchToSetup(String(over.id), tournament_id, event_id, active.data.current.phase_group_identifier, active.data.current.id)
+            router.refresh()
         }
     }
 
@@ -117,7 +121,7 @@ export default function AssignMatchesForm({matches, stations, tournament_id, eve
                             </div> 
                         </div> 
                     </div>
-                </DndContext>
+                </DndContext>   
             </div>
         </>           
     )

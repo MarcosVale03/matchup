@@ -61,32 +61,6 @@ export async function fetchAvailableMatchSetups(tournament_id : number, event_id
     }
 }
 
-
-// export type MatchesFromPhaseGroupResponse = {
-//     matches : {
-//         tournament_id : number,
-//         phase_group_identifier : string,
-//         event_id : number,
-//         round_num : number,
-//         code : string,
-//         id : number,
-//         w_advance_slot_num : number,
-//         w_advance_slot_id : number,
-//         l_advance_slot_num : number,
-//         l_advance_slot_id : number,
-//         isComplete : boolean
-//     },
-//     match_slots : {
-//         slot_num : number
-//     },
-//     seeds : {
-//         entrant_user_id : number
-//     },
-//     users : {
-//         display_name : string
-//     }
-// }
-
 // this function gets matches per phase group
 export async function fetchMatchPerPhaseGroup(tournament_id : number, event_id : number, phase_group_identifier : string): Promise<QueryResponse<any[]>> {
 
