@@ -94,7 +94,7 @@ export async function fetchMatchPerPhaseGroup(tournament_id : number, event_id :
     const cookieStore = await cookies()
     const supabase = await createClient(cookieStore)
     
-    // looks fo wave based on a tournament id 
+    // looks for matches based on phase group 
     const {data, error} = await supabase.from('matches').select('*, match_slots!match_slots_matches_fk_01( slot_num, seeds (entrant_user_id, users (display_name)))').eq('tournament_id', tournament_id).eq('event_id', event_id).eq('phase_group_identifier', phase_group_identifier)
 
     // checks if we got any error doing that
@@ -104,7 +104,7 @@ export async function fetchMatchPerPhaseGroup(tournament_id : number, event_id :
             message : error.message 
         }
     }
-
+    
 
     // returns data
     return {

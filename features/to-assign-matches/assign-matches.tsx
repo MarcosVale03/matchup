@@ -1,16 +1,60 @@
 'use client'
-import BasicInputWithLabel from '@/ui/basic-input-with-label';
+import { useState } from 'react';
+import { createSetupsFromInput } from '@/server/mutations/match-setups.mutations';
+import {useRouter} from 'next/navigation'
+import { DndContext, DragEndEvent, useDraggable, useDroppable } from '@dnd-kit/core';
+import { assignMatchToSetup } from '@/server/mutations/match-setups.mutations';
 
-export default function AssignMatchesForm({ matches }: { matches: any[] }) {
-    
+
+function Draggable({match} : {match : any}) {
+        const {attributes, listeners, setNodeRef, transform} = useDraggable({
+            id : match.id,
+        })
+        const style = transform? {transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,} : undefined;
+
+        return (
+            <div key={match.id} ref={setNodeRef} style={style} {...listeners} {...attributes} className='peer block bg-white w-full rounded-xl border-2 border-white 
+                text-black p-2 2xl:p-4 2xl:text-xl focus:outline-none 
+                focus:border-primary shadow-sm cursor-grab font-normal'>
+                <p className='text-sm'>{match.code} - {match.phase_group_identifier}- Round {match.round_num}</p>
+                <p className='font-semibold'>{match.match_slots?.[0]?.seeds?.users?.display_name} vs {match.match_slots?.[1]?.seeds?.users?.display_name}</p>
+            </div>
+        )
+    }
+
+function Droppable({id} : {id : string}) {
+
+    const {isOver, setNodeRef} = useDroppable({
+        id: id,
+    });
+
+    const style = {
+        color: isOver ? 'green' : undefined,
+    };  
+
+    return (
+    <div ref={setNodeRef} className='flex items-center justify-center border-1 border-dashed border-gray-500 py-3 px-3 mt-2 mb-3' style={style}>
+        DROP MATCH HERE
+    </div>
+    );
+}
+
+export default function AssignMatchesForm({matches, stations, tournament_id, event_id}: {matches: any[], stations : any[], tournament_id: number, event_id : number}) {
     const pageLabelClass = "block text-zinc-600 2xl:text-xl rounded-md peer-focus:text-primary transition duration-400";
-    const matchess = [
-        { id: 1, player1: 'test', player2: 'test2', round: 1, code: 'R1M1' },
-        { id: 2, player1: 'player3', player2: 'player4', round: 1, code: 'R1M2' },
-        { id: 3, player1: 'player5', player2: 'player6', round: 2, code: 'R2M1' },
-    ]
+    const [station, setStation] = useState(1)
+    const router = useRouter()
+    const handleStationGenerate = async () => {
+        await createSetupsFromInput(tournament_id, event_id, station)
+        router.refresh()
+    }
 
-    const stations = [1, 2, 3]
+    const [isDropped, setIsDropped] = useState(false);
+    function handleDragEnd(event : DragEndEvent) {
+        if (event.over && event.over.id === 'droppable') {
+            setIsDropped(true);
+        }
+    }
+
     return (    
         <>
             {/* Top Section */}
@@ -27,55 +71,54 @@ export default function AssignMatchesForm({ matches }: { matches: any[] }) {
                     <div className='flex gap-2 mt-3'>
                         <input className='peer block bg-white rounded-xl border-2 border-white
                         text-black p- 2xl:p-4 2xl:text-xl focus:outline-none focus:border-primary 
-                        shadow-sm transition duration-400 font-normal' type="number"min="1" max="30"/>
-                        <button className='py-2 px-3 bg-primary rounded text-white'>Submit</button>
+                        shadow-sm transition duration-400 font-normal' type="number"min="1" max="30"
+                        value={station} onChange={(e) => setStation(Number(e.target.value))}/>
+                        <button className='py-2 px-3 bg-primary rounded text-white hover:border-red-50 hover:bg-red-500 transition-colors' onClick={handleStationGenerate}>Submit</button>
                     </div>
                 </div>
                 {/* Columns */}
-                <div className="space-y-4 mb-4">
-                    <div className="grid grid-cols-2 gap-4">
-                        {/* Matches */}
-                        <div className="mb-2 rounded-xl">
-                            <span className={pageLabelClass}>Matches</span>
-                            <div className='flex flex-col mt-3 gap-2'>
-                                {/* {matchess.map((match) => ( */}
-                                    <div className='peer block bg-white w-full rounded-xl border-2 border-white 
-                            text-black p-2 2xl:p-4 2xl:text-xl focus:outline-none 
-                            focus:border-primary shadow-sm transition duration-400 font-normal'>
-                                    <p>player1 vs player2</p>
-                                
+                <DndContext onDragEnd={handleDragEnd}>
+                    <div className="space-y-4 mb-4">
+                        <div className="grid grid-cols-2 gap-4">
+                            {/* Matches */}
+                            <div className="mb-2 rounded-xl">
+                                <span className={pageLabelClass}>Matches</span>
+                                <div className='flex flex-col mt-3 gap-2'>
+                                    {matches.map((match) => (
+                                        <Draggable key={match.id} match={match}/>
+                                    ))}
                                 </div>
-                                {/* ))} */}
-                                
-                            </div>
-                        </div> 
-                        {/* Stations */}
-                        <div className="mb-2 rounded-xl">
-                           <span className={pageLabelClass}>Stations</span>
-                            <div className='flex flex-col mt-3 gap-2'>
-                                {/* {stations.map((station) => ( */}
-                                    <div className='peer block bg-white w-full rounded-xl border-2 border-white 
-                                        text-black p-2 2xl:p-4 2xl:text-xl focus:outline-none 
-                                        focus:border-primary shadow-sm transition duration-400 font-normal'>
-                                        <p>Station {1}</p>
-                                        {/* Winner */}
-                                        <div className='flex gap-2'>
-                                            <button className=''>
-                                                Player 1 Wins
-                                            </button>
-                                            <button className=''>
-                                                Player 2 Wins
-                                            </button>
+                            </div> 
+                            {/* Stations */}
+                            <div className="mb-2 rounded-xl">
+                            <span className={pageLabelClass}>Stations</span>
+                                <div className='flex flex-col mt-3 gap-2'>
+                                    {stations.map((station) => (
+                                        <div key={station.identifier} className='peer block bg-white w-full rounded-xl border-2 border-white 
+                                            text-black p-2 2xl:p-4 2xl:text-xl focus:outline-none 
+                                            focus:border-primary shadow-sm transition duration-400 font-normal'>
+                                            <div className='flex justify-between items-start'>
+                                                <p>{station.identifier}</p>
+                                                <button className='px-2 py-0.5 text-sm rounded-md border border-red-500 text-red-600 hover:bg-red-500 hover:text-white transition-colors'>Release</button>
+                                            </div>
+                                            <Droppable id={station.identifier}/>
+                                            {/* Winner */}
+                                            <div className='flex gap-2'>
+                                                <button className='w-full text-sm rounded border rounded-md hover:border-red-50 hover:bg-red-400 transition-colors'>
+                                                    Player 1 Wins
+                                                </button>
+                                                <button className='w-full text-sm rounded border rounded-md hover:border-red-50 hover:bg-red-400 transition-colors'>
+                                                    Player 2 Wins
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
-                                    
-                                {/* ))} */}
-                            </div>
+                                    ))}
+                                </div>
+                            </div> 
                         </div> 
-                    </div> 
-                </div>
+                    </div>
+                </DndContext>
             </div>
-
         </>           
     )
 }
