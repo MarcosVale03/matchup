@@ -134,7 +134,7 @@ export function TournamentDetails({
     const [isDeleting, setIsDeleting] = useState(false);
     const [deleteError, setDeleteError] = useState<string | null>(null);
 
-    const handleEditClick = () => router.push(`/tournaments/${tournament.id}/edit`);
+    const handleEditClick = () => router.push(`/admin/tournaments/${tournament.id}/edit`);
 
     const handleDeleteConfirm = async () => {
         setIsDeleting(true);
