@@ -19,7 +19,7 @@ export default function NavigationBar() {
 	const handleSignOut = async () => {
 		const { success } = await signOut();
 		if (success) {
-			router.push("/");
+			router.push("/tournaments");
 			router.refresh();
 		}
 	}
@@ -78,9 +78,11 @@ export default function NavigationBar() {
 					{/*    />*/}
 					{/*</Link>*/}
 
-					<Link href='/'><h1 className="text-3xl lg:text-4xl text-white">
-						Matchup
-					</h1></Link>
+					<Link href='/tournaments'>
+						<h1 className="text-3xl lg:text-4xl text-white">
+							Matchup
+						</h1>
+					</Link>
 
 					{/* Desktop: Navigation Buttons (hidden on small screens) */}
 					{!isAuthPage && (
