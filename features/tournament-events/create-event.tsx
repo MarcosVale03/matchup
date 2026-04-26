@@ -6,7 +6,7 @@ import {useRouter} from 'next/navigation';
 import {insertEvent, EventInsertErrors} from '@/server/mutations/events.mutations';
 import {fetchPlatformsFromVideoGame} from '@/server/queries/video_games.queries';
 import {dateToInputString} from '@/lib/utils';
-import {ArrowRight, Check, Plus, X} from 'lucide-react';
+import {ArrowRight, Check, Plus} from 'lucide-react';
 import {FormSection} from '@/ui/form-section';
 import {SegmentedToggle} from '@/ui/segmented-toggle';
 import {ErrorMessageForEvent} from '@/features/tournament-events/error-message-event';
@@ -163,7 +163,7 @@ export default function EventInsertForm({
         handleSubmit({andFinish: true});
     };
 
-    const handleSkip = () => {
+    const handleDone = () => {
         router.push(`/tournaments/${tournamentId}?created=1`);
     };
 
@@ -192,16 +192,16 @@ export default function EventInsertForm({
                             Events created so far ({createdEvents.length})
                         </h5>
                         <ul className="flex flex-col gap-1.5">
-                            {createdEvents.map((ev) => (
+                            {createdEvents.map((event) => (
                                 <li
-                                    key={ev.id}
+                                    key={event.id}
                                     className="flex flex-wrap items-center gap-x-2 gap-y-0.5
                                                text-sm md:text-base text-gray-700 font-poppins"
                                 >
                                     <Check size={16} className="shrink-0 text-primary"/>
-                                    <span className="font-jersey text-base md:text-lg text-primary">{ev.name}</span>
+                                    <span className="font-jersey text-base md:text-lg text-primary">{event.name}</span>
                                     <span className="text-gray-600 tracking-tight text-xs md:text-sm">
-                                        {ev.videoGame} · {ev.platform}
+                                        {event.videoGame} · {event.platform}
                                     </span>
 
                                 </li>
@@ -424,51 +424,45 @@ export default function EventInsertForm({
 
                     {/* Action buttons */}
                     <div className="border-t border-gray-300 pt-3 pb-3 mt-6 -mx-4 px-4 sm:mx-0 sm:px-0
-                                flex flex-col sm:flex-row gap-2">
+                                flex flex-col sm:flex-row sm:items-center gap-2">
                         <button
                             type="button"
-                            onClick={handleSkip}
-                            disabled={isSubmitting}
-                            className="w-full sm:w-auto sm:flex-1 flex items-center justify-center gap-2 py-2.5 px-4
-                                   rounded-md shadow-sm text-base md:text-lg lg:text-xl font-jersey
-                                   text-white bg-primary hover:bg-secondary disabled:opacity-50
+                            onClick={handleDone}
+                            disabled={isSubmitting || createdEvents.length === 0}
+                            className="w-full sm:w-auto flex items-center justify-center gap-2 py-2.5 px-4
+                                   rounded-md text-base md:text-xl font-jersey tracking-tight
+                                   text-gray-600 hover:text-primary hover:bg-gray-100 disabled:opacity-40
                                    disabled:cursor-not-allowed transition-colors cursor-pointer"
                         >
-                            {createdEvents.length > 0 ? (
-                                <>
-                                    <Check size={18} className="shrink-0"/>
-                                    Done - create events
-                                </>
-                            ) : (
-                                <>
-                                    <X size={18} className="shrink-0"/>
-                                    Skip — add events later
-                                </>
-                            )}
+                            <Check size={18} className="shrink-0"/>
+                            Finish
                         </button>
-                        <button
-                            type="submit"
-                            disabled={isSubmitting}
-                            className="w-full sm:w-auto sm:flex-1 flex items-center justify-center gap-2 py-2.5 px-4
-                                   rounded-md shadow-sm text-base md:text-lg lg:text-xl font-jersey
-                                   text-white bg-primary hover:bg-secondary disabled:opacity-50
-                                   disabled:cursor-not-allowed transition-colors cursor-pointer"
-                        >
-                            <Plus size={18} className="shrink-0"/>
-                            {isSubmitting ? 'Saving...' : 'Save & Add Another'}
-                        </button>
-                        <button
-                            type="button"
-                            onClick={onFinishClick}
-                            disabled={isSubmitting}
-                            className="w-full sm:w-auto sm:flex-1 flex items-center justify-center gap-2 py-2.5 px-4
-                                   rounded-md shadow-sm text-base md:text-lg lg:text-xl font-jersey
-                                   text-white bg-primary hover:bg-secondary disabled:opacity-50
-                                   disabled:cursor-not-allowed transition-colors cursor-pointer"
-                        >
-                            {isSubmitting ? 'Saving...' : 'Save & Finish'}
-                            <ArrowRight size={18} className="shrink-0"/>
-                        </button>
+
+                        <div className="sm:ml-auto flex flex-col sm:flex-row gap-2">
+                            <button
+                                type="submit"
+                                disabled={isSubmitting}
+                                className="w-full sm:w-auto flex items-center justify-center gap-2 py-2.5 px-4
+                                       rounded-md text-base md:text-lg lg:text-xl font-jersey
+                                       text-primary bg-white border-2 border-primary hover:bg-gray-200
+                                       disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                            >
+                                <Plus size={18} className="shrink-0"/>
+                                {isSubmitting ? 'Saving...' : 'Save & Add Another'}
+                            </button>
+                            <button
+                                type="button"
+                                onClick={onFinishClick}
+                                disabled={isSubmitting}
+                                className="w-full sm:w-auto flex items-center justify-center gap-2 py-2.5 px-4
+                                       rounded-md shadow-sm text-base md:text-lg lg:text-xl font-jersey
+                                       text-white bg-primary hover:bg-secondary disabled:opacity-50
+                                       disabled:cursor-not-allowed transition-colors cursor-pointer"
+                            >
+                                {isSubmitting ? 'Saving...' : 'Save & Finish'}
+                                <ArrowRight size={18} className="shrink-0"/>
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
