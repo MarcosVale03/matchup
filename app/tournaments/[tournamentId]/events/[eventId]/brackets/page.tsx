@@ -5,6 +5,8 @@ import {
 } from "@/server/queries/phases.queries";
 import {notFound} from "next/navigation";
 import BracketDetails from "@/features/event-brackets/BracketDetails";
+import {ArrowLeft} from "lucide-react";
+import Link from "next/link";
 
 export default async function Page({ params, searchParams }: {
     params: Promise<{ tournamentId: string, eventId: string }>
@@ -37,7 +39,16 @@ export default async function Page({ params, searchParams }: {
         }]
 
     return (
-        <div className="bg-main-bg font-[Poppins] text-black">
+        <div className="flex-1 bg-main-bg font-poppins text-black overflow-y-auto overflow-x-scroll mx-0 sm:mx-4 lg:mx-20 border-x-0 sm:border-x-2 border-gray-200">
+            <Link
+                href={`/tournaments/${tournamentId}/events/${eventId}`}
+                className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-primary
+                           transition-colors ml-4 mt-6"
+            >
+                <ArrowLeft className="size-4" />
+                Back to event details
+            </Link>
+
             <BracketDetails bracketPhases={bracketPhases} currBP={bpid} phaseGroups={phaseGroups} />
         </div>
     )

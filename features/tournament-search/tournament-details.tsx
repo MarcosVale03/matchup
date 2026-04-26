@@ -1,5 +1,5 @@
 'use client';
-import { FetchTournamentFromIdResponse } from "@/server/queries/tournaments.queries";
+import { FetchTournamentFromIdResponse, FetchTournamentParticipantsResponse } from "@/server/queries/tournaments.queries";
 import { getTimeUntilStart } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { Mail, Pencil, Globe, Trash2 } from "lucide-react";
@@ -127,12 +127,14 @@ export function TournamentDetails({
     tournament,
     events,
     eventsSuccess,
-    permissions
+    permissions,
+    participants,
 }: {
     tournament: FetchTournamentFromIdResponse;
     events?: FetchEventsFromTournamentIdResponse;
     eventsSuccess: boolean;
     permissions: TournamentPermissions;
+    participants: FetchTournamentParticipantsResponse;
 }) {
     const router = useRouter();
 
@@ -164,7 +166,7 @@ export function TournamentDetails({
     return (
         <div className="flex-1 flex flex-row font-poppins text-black">
             {/* Left side, tournament information and events  */}
-            <div className="w-full border-x-2 border-gray-300">
+            <div className="w-full border-r border-gray-300">
 
                 {/* Container for tournament name, edit/delete button, owner, and start/end time */}
                 <div className="p-4 sm:p-6 lg:p-8">
@@ -280,11 +282,53 @@ export function TournamentDetails({
             </div>
 
             {/* Right side, participants list */}
-            <div className="p-5 mx-5">
-                <h1 className="text-2xl lg:text-4xl text-primary font-jersey min-w-0 flex-1">
-                    Participants
-                </h1>
-            </div>
+            <aside className="hidden lg:block w-72 shrink-0 p-5 self-start max-h-screen overflow-y-auto">
+                <div className="flex items-baseline justify-between mb-3">
+                    <h1 className="text-2xl lg:text-3xl text-primary">
+                        Participants
+                    </h1>
+                    <span className="text-sm text-gray-500 font-semibold tabular-nums">
+                        {participants.length}
+                    </span>
+                </div>
+
+                {participants.length === 0 ? (
+                    <p className="text-sm text-gray-500">No participants yet.</p>
+                ) : (
+                    <ul className="flex flex-col gap-1.5 pr-1">
+                        {participants.map((p) => (
+                            <li
+                                key={p.user_id}
+                                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-50
+                                           border border-gray-100 hover:bg-gray-100 transition-colors"
+                            >
+                                <Image
+                                    src="/random-pfp.png"
+                                    alt=""
+                                    width={32}
+                                    height={32}
+                                    className="rounded-full shrink-0"
+                                />
+                                <div className="min-w-0 flex-1">
+                                    <div className="flex items-center gap-1 min-w-0">
+                                        {p.prefix && (
+                                            <span className="text-xs font-bold opacity-70 shrink-0">
+                                                {p.prefix}
+                                            </span>
+                                        )}
+                                        <p className="truncate text-sm font-semibold">
+                                            {p.display_name}
+                                        </p>
+                                    </div>
+                                    <p className="text-xs text-gray-500">
+                                        {p.event_count} {p.event_count === 1 ? "event" : "events"}
+                                    </p>
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </aside>
         </div>
     );
 }

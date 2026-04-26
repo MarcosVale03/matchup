@@ -40,9 +40,15 @@ export type FetchTournamentsForSearchResponse = {
  *
  * @throws - Will throw an exception if an error occurs while querying the database.
  */
+export type FetchTournamentsForSearchResult = {
+    tournaments: FetchTournamentsForSearchResponse;
+    // added this so we can know how many results in total
+    totalCount: number;
+}
+
 export async function fetchTournamentsForSearch(searchQuery: string = "", startAfter: Date = new Date(0),
                                                 videoGame: string = "", page: number = 0, perPage: number = 10):
-    Promise<FetchTournamentsForSearchResponse> {
+    Promise<FetchTournamentsForSearchResult> {
     const cookieStore = await cookies()
     const supabase = await createClient(cookieStore)
 
@@ -76,7 +82,7 @@ export async function fetchTournamentsForSearch(searchQuery: string = "", startA
         )`/*,
         events!inner (
             video_game_name
-        )`*/)
+        )`*/, { count: 'exact' })
         .range(pageStart, pageEnd).gt('start_time', startAfter.toISOString()).order('start_time')
 
     // query = videoGame ? query.eq('events.video_game_name', videoGame) : query
@@ -88,16 +94,14 @@ export async function fetchTournamentsForSearch(searchQuery: string = "", startA
             config: "english"
         }) : query
 
-    const {data, error} = await query
+    const {data, error, count} = await query
 
     // Throws error if something goes wrong
     if (error) {
         throw new Error("Tournament Query Failed: " + error.details + " " + error.message)
     }
 
-    // console.log(data)
-
-    return data
+    return { tournaments: data, totalCount: count ?? 0 }
 }
 
 
@@ -223,6 +227,45 @@ export async function fetchTournamentFromId(id: number): Promise<{
     }
 }
 
+
+export type FetchTournamentParticipantsResponse = {
+    user_id: string,
+    display_name: string,
+    prefix: string | null,
+    event_count: number,
+}[]
+
+/**
+ * Returns the distinct list of users registered across any event in the tournament,
+ * with the number of events each user is in.
+ */
+export async function fetchTournamentParticipants(tournamentId: number): Promise<FetchTournamentParticipantsResponse> {
+    const cookieStore = await cookies()
+    const supabase = await createClient(cookieStore)
+
+    const {data, error} = await supabase
+        .from('attendees')
+        .select(`
+            user_id,
+            user:attendees_users_fk_01(display_name, prefix),
+            entrants:entrants_attendees_fk_01(count)
+        `)
+        .eq('tournament_id', tournamentId)
+
+    if (error) {
+        throw new Error("DB error while querying participants: " + error.details + " " + error.message)
+    }
+
+    return data
+        .filter(row => row.user)
+        .map(row => ({
+            user_id: row.user_id,
+            display_name: row.user!.display_name,
+            prefix: row.user!.prefix,
+            event_count: row.entrants[0]?.count ?? 0,
+        }))
+        .sort((a, b) => a.display_name.localeCompare(b.display_name))
+}
 
 export async function doesTournamentExist(tournamentId: number): Promise<boolean> {
     const cookieStore = await cookies()

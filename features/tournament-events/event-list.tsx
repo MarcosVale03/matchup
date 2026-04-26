@@ -75,7 +75,7 @@ export default function EventList({
                                             Entry Fee
                                         </h3>
                                         <p className="text-sm lg:text-md font-poppins tracking-tight">
-                                            ${event.price}
+                                            {event.price === 0 ? "Free" : `$${event.price}` }
                                         </p>
                                     </div>
 

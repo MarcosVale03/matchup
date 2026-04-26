@@ -45,6 +45,5 @@ export function useNotifications() {
 
     const markAllRead = () => setUnreadCount(0);
 
-    console.log(notifications)
     return { notifications, unreadCount, markAllRead };
 }

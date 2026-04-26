@@ -1,4 +1,4 @@
-import {fetchTournamentFromId} from "@/server/queries/tournaments.queries";
+import {fetchTournamentFromId, fetchTournamentParticipants} from "@/server/queries/tournaments.queries";
 import {notFound} from "next/navigation";
 import {cookies} from "next/headers";
 import {createClient} from "@/server/db/server";
@@ -16,9 +16,11 @@ export default async function TournamentDetailsPage({params}: { params: { tourna
         notFound();
     }
 
-    const {success: tournamentSuccess, tournament} = await fetchTournamentFromId(id);
-    const {success: eventsSuccess, events} = await fetchEventsFromTournamentId(id);
-    // const {success: participantsSuccess, participants}
+    const [{success: tournamentSuccess, tournament}, {success: eventsSuccess, events}, participants] = await Promise.all([
+        fetchTournamentFromId(id),
+        fetchEventsFromTournamentId(id),
+        fetchTournamentParticipants(id),
+    ]);
 
 
     if (!tournamentSuccess || !tournament) {
@@ -59,6 +61,7 @@ export default async function TournamentDetailsPage({params}: { params: { tourna
                 permissions={permissions}
                 events={events}
                 eventsSuccess={eventsSuccess}
+                participants={participants}
             />
             <QueryParamToast
                 paramKey="created"
