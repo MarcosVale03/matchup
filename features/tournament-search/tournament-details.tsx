@@ -2,7 +2,8 @@
 import { FetchTournamentFromIdResponse } from "@/server/queries/tournaments.queries";
 import { getTimeUntilStart } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { Mail, Pencil, Globe, Trash, Info, Torus } from "lucide-react";
+import Link from "next/link";
+import { Mail, Pencil, Globe, Trash, Info, Torus, Trophy } from "lucide-react";
 import Image from "next/image";
 import React, { useState } from "react";
 import { deleteTournament } from "@/server/mutations/tournaments.mutations";
@@ -273,6 +274,19 @@ export function TournamentDetails({
                         setDeleteError(null);
                     }}
                 />
+
+                {/* Register button */}
+                <div className="px-4 sm:px-6 lg:px-8 py-4 border-b border-zinc-200">
+                    <Link
+                        href={`/tournaments/${tournament.id}/register`}
+                        className="inline-flex items-center gap-2 bg-primary text-white px-5 py-2.5
+                                   rounded-md font-jersey-25 text-lg hover:bg-secondary
+                                   transition-colors duration-150"
+                    >
+                        <Trophy className="size-5" />
+                        Register for this Tournament
+                    </Link>
+                </div>
 
                 <EventList events={events} />
             </div>
