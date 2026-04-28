@@ -4,6 +4,7 @@ import {createClient} from "@/server/db/server";
 import { cookies } from 'next/headers'
 import * as z from "zod"
 import {MutationResponse} from "@/lib/types/types";
+import { sendNotification } from "@/features/notifications/send-notification";
 
 // creating insert schema with table objects
 const ForumThreadInsertSchema = z.object({
@@ -71,18 +72,18 @@ export type PostInsertErrors = {
 
 // this function inserts the post into the Post table in our DB
 export async function insertPost(thread_id : string, content : string) : Promise<MutationResponse<void, PostInsertErrors>> {
-    
-    // creating our client 
+
+    // creating our client
     const cookieStore = await cookies()
     const supabase = await createClient(cookieStore)
 
-    // parsing our post insert schema 
+    // parsing our post insert schema
     const result = PostInsertSchema.safeParse({
         thread_id : thread_id,
         content : content
     })
 
-    // checking for any errors 
+    // checking for any errors
     if (!result.success) {
         const err = z.flattenError(result.error)
         return {
@@ -92,23 +93,53 @@ export async function insertPost(thread_id : string, content : string) : Promise
         }
     }
 
-    // inserting our post data into the db table, other data done by supabase 
+    // inserting our post data into the db table, other data done by supabase
     const {data, error} = await supabase.rpc('insert_post', {
         p_thread_id : result.data.thread_id,
         p_content : result.data.content
     })
 
-    // checking if inserting gave any errros 
+    // checking if inserting gave any errros
     if (error) {
         throw new Error("Post Insert Transaction Failed: " + error.details + " " + error.message)
     }
 
+    // Fire off a notification to the thread owner
+    await notifyThreadOwnerOfReply(supabase, result.data.thread_id)
 
     // returning success
     return {
         success: true,
-        data: data 
+        data: data
     }
+}
+
+async function notifyThreadOwnerOfReply(
+    supabase: Awaited<ReturnType<typeof createClient>>,
+    threadId: string
+) {
+    const [{ data: thread }, { data: { user } }] = await Promise.all([
+        supabase.from('forum_thread').select('author_id, title').eq('id', threadId).single(),
+        supabase.auth.getUser(),
+    ])
+
+    if (!thread || !user) return
+    // Don't notify on self-replies
+    if (thread.author_id === user.id) return
+
+    const replierName =
+        (user.user_metadata?.display_name as string | undefined) ??
+        user.email ??
+        'Someone'
+
+    await sendNotification(thread.author_id, {
+        type: 'thread_reply',
+        threadId,
+        threadTitle: thread.title,
+        replierName,
+        replierId: user.id,
+        timestamp: new Date().toISOString(),
+    })
 }
 
 // creating our shema for editing posts

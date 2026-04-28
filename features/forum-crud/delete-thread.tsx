@@ -48,7 +48,8 @@ export default function DeleteThread({ threadId }: {threadId: string}) {
                 aria-label="Delete thread"
                 className="p-2.5 sm:p-2 text-gray-600 hover:text-primary
                                    hover:bg-gray-100 rounded-lg transition-colors 
-                                   active:bg-gray-200"
+                                   active:bg-gray-200 hover:cursor-pointer
+                                   duration-250"
                 
             >
                 <Trash2 className="w-5 h-5 sm:w-4 sm:h-4" />

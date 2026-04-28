@@ -1,5 +1,5 @@
 'use client'
-import {Fragment, useState} from "react";
+import {Fragment, useEffect, useState} from "react";
 import {FetchEventFromEventIdResponse} from "@/server/queries/events.queries";
 import {formatDate} from "date-fns";
 import {CalendarSync, ChevronRight, Crown, ShieldAlert, Wrench, X} from "lucide-react";
@@ -40,19 +40,6 @@ interface Alert {
     type: "warning" | "info" | "success";
     msg: string;
 }
-
-const TOURNAMENT = {
-    name: "Test Event",
-    game: "Valorant",
-    format: "Round Robin → Single Elim",
-    startDate: "Mar 1, 2026",
-    endDate: "Mar 14, 2026",
-    currentRound: 3,
-    totalRounds: 5,
-    registeredTeams: 12,
-    matchesPlayed: 18,
-    matchesRemaining: 12,
-};
 
 const TEAMS: Team[] = [
     {
@@ -236,41 +223,68 @@ export default function EventDetails({
     const [activeTab, setActiveTab] = useState<"brackets" | "standings" | "matches" | "upcoming">("brackets");
     const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
     const [showAdmin, setShowAdmin] = useState(false);
+    const [syncedAt, setSyncedAt] = useState<Date>(() => new Date());
+    const [, setTick] = useState(0);
 
-    const selectedData: Team | undefined = selectedTeam
-        ? TEAMS.find((x) => x.name === selectedTeam)
-        : undefined;
+    useEffect(() => {
+        const id = setInterval(() => setTick(t => t + 1), 60_000);
+        return () => clearInterval(id);
+    }, []);
+
+    function formatSyncedAgo(date: Date, now: Date = new Date()): string {
+        const mins = Math.floor((now.getTime() - date.getTime()) / 60_000);
+        if (mins < 1) return "JUST NOW";
+        if (mins === 1) return "1 MIN AGO";
+        return `${mins} MINS AGO`;
+    }
+
+    const totalMatches = bracketPhases.length;
 
     const redButtonClassName = `flex items-center justify-center gap-2 p-2 px-4 lg:mt-0
-                             rounded-md shadow-sm text-sm md:text-lg font-jersey-25
+                             rounded-md shadow-sm text-sm md:text-lg font-jersey
                              text-white bg-primary hover:bg-secondary cursor-pointer
                              disabled:opacity-50 transition-colors duration-200`
 
     return (
-        <div className="overflow-y-auto mx-0 sm:mx-4 lg:mx-20 border-x-0 sm:border-x-2 border-gray-200">
+        <>
             <div className="mx-auto p-4 sm:p-6 lg:p-8">
 
                 {/* HEADER */}
-                <header className="pt-6">
+                <header className="pt-6 pb-2">
                     <div className="flex flex-wrap justify-between items-start gap-4">
 
                         {/* Event Details */}
                         <div>
-                            <div className="flex items-center gap-2.5 mb-3">
-                                <p
-                                    className="text-xs font-bold tracking-widest uppercase text-white
-                                    bg-secondary px-3 py-1 rounded"
-                                >
-                                    Organizer View
-                                </p>
-                            </div>
-                            <h1 className="text-3xl lg:text-5xl font-jersey-25 text-primary">
+                            <p className="text-xs font-bold tracking-widest uppercase text-white
+                                        bg-secondary px-3 py-1 rounded w-fit mb-3"
+                            >
+                                Organizer View
+                            </p>
+
+                            <h1 className="text-3xl lg:text-5xl font-jersey text-primary">
                                 {event.name}
                             </h1>
-                            <p className="mt-2 text-base sm:text-lg font-semibold text-gray-700">
-                                {event.video_game_name} · BRACKET FORMAT
-                                · {formatDate(event.start_time, 'MMM d, yyyy')} — {formatDate(event.end_time, 'MMM d, yyyy')}
-                            </p>
+
+                            <div className="mt-1 flex flex-col gap-x-2 text-base text-gray-600">
+                                <span className="font-semibold text-gray-800 lg:text-lg">{event.video_game_name}</span>
+                                <span>
+                                    {formatDate(event.start_time, 'MMM d, yyyy')} — {formatDate(event.end_time, 'MMM d, yyyy')}
+                                </span>
+                            </div>
+
+                            <div className="mt-1 flex items-center gap-1.5 text-sm text-gray-500">
+                                {bracketPhases.map((bp, index) => (
+                                    <div key={bp.id} className="flex items-center gap-1.5">
+                                        <Link href={`/tournaments/${event.tournament_id}/events/${event.id}/brackets?bpid=${bp.id}`}>
+                                            <span>{bp.name}</span>
+                                        </Link>
+
+                                        {index !== bracketPhases.length - 1 && (
+                                            <ChevronRight className="size-3.5" />
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
                         </div>
 
                         {/* Admin tools button */}
@@ -278,45 +292,38 @@ export default function EventDetails({
                             onClick={() => setShowAdmin(!showAdmin)}
                             className={redButtonClassName}
                         >
-                            {!showAdmin && (
-                                <Wrench className="size-5"/>
-                            )}
-
-                            {showAdmin && (
-                                <X className="size-5"/>
-                            )}
-
+                            {showAdmin ? <X className="size-5"/> : <Wrench className="size-5"/>}
                             {showAdmin ? "Close Admin Tools" : "Admin Tools"}
                         </button>
                     </div>
 
-                    {/* stat cards */}
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5 mt-6">
-                        {[
-                            {
-                                label: "Round",
-                                value: `${TOURNAMENT.currentRound} / ${TOURNAMENT.totalRounds}`,
-                                bar: "bg-primary"
-                            },
-                            {label: "Teams", value: String(TOURNAMENT.registeredTeams)},
-                            {label: "Played", value: String(TOURNAMENT.matchesPlayed)},
-                            {label: "Remaining", value: String(TOURNAMENT.matchesRemaining)},
-                        ].map((s, i) => (
-                            <div key={i}
-                                 className="relative overflow-hidden bg-white rounded-xl
-                                 px-4 py-4 shadow-md"
-                            >
-                                <p className="font-jersey-25 text-base md:text-lg lg:text-xl">{s.label}</p>
-                                <p className="font-semibold text-lg text-primary">{s.value}</p>
-                            </div>
-                        ))}
-                    </div>
+                    {/* Stat cards */}
+                    {/*<div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5 mt-6">*/}
+                    {/*    {[*/}
+                    {/*        {label: "Round", value: totalRounds > 0 ? `${currentRound} / ${totalRounds}` : "—"},*/}
+                    {/*        {label: "Teams", value: uniqueTeams > 0 ? String(uniqueTeams) : "—"},*/}
+                    {/*        // replace with played matches*/}
+                    {/*        {label: "Played", value: 0},*/}
+                    {/*        {label: "Remaining", value: String(totalMatches)},*/}
+                    {/*    ].map((s, i) => (*/}
+                    {/*        <div key={i}*/}
+                    {/*             className="bg-white rounded-xl px-4 py-4 shadow-sm border border-gray-100"*/}
+                    {/*        >*/}
+                    {/*            <p className="font-jersey text-base md:text-lg lg:text-xl text-gray-500">*/}
+                    {/*                {s.label}*/}
+                    {/*            </p>*/}
+                    {/*            <p className="font-semibold text-lg text-primary mt-0.5">*/}
+                    {/*                {s.value}*/}
+                    {/*            </p>*/}
+                    {/*        </div>*/}
+                    {/*    ))}*/}
+                    {/*</div>*/}
                 </header>
 
                 {/* ADMIN PANEL */}
                 {showAdmin && (
                     <div className="my-6 p-5 rounded-xl border border-zinc-700 bg-zinc-800 text-white">
-                        <p className="font-jersey-25 text-base md:text-lg lg:text-xl uppercase text-white mb-4">
+                        <p className="font-jersey text-base md:text-lg lg:text-xl uppercase text-white mb-4">
                             Admin Alerts & Actions
                         </p>
 
@@ -349,7 +356,7 @@ export default function EventDetails({
                                     key={a}
                                     className="bg-zinc-700 border border-zinc-600 px-4 py-2 rounded-lg
                                                 cursor-pointer hover:bg-zinc-600 transition-colors text-zinc-300
-                                                hover:text-white font-jersey-25 text-sm md:text-lg"
+                                                hover:text-white font-jersey text-sm md:text-lg"
                                 >
                                     {a}
                                 </button>
@@ -365,7 +372,7 @@ export default function EventDetails({
                             key={tab}
                             onClick={() => setActiveTab(tab)}
                             className={`flex-1 sm:flex-none px-2 sm:px-7 py-2 text-sm md:text-lg uppercase
-                                        -mb-0.5 transition-colors cursor-pointer border-b-3 font-jersey-25
+                                        -mb-0.5 transition-colors cursor-pointer border-b-3 font-jersey
                             ${
                                 activeTab === tab
                                     ? "text-primary border-primary"
@@ -383,26 +390,24 @@ export default function EventDetails({
                     {activeTab === "brackets" && (
                         <div className="flex flex-col gap-2.5">
                             {bracketPhases.map((bp) => (
-                                <Link key={bp.id} href={`/tournaments/${event.tournament_id}/events/${event.id}/brackets?bpid=${bp.id}`}>
+                                <Link key={bp.id}
+                                      href={`/tournaments/${event.tournament_id}/events/${event.id}/brackets?bpid=${bp.id}`}>
                                     <div
                                         className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 px-5 py-4
-                               bg-gray-50 border border-gray-100 rounded-xl shadow-sm"
+                                                 bg-gray-50 border border-gray-100 rounded-xl shadow-sm"
                                     >
-
-
                                         {/* Bracket Name */}
                                         <div className="flex items-center justify-center gap-3 sm:gap-4">
                                             <div
-                                                className={`text-right font-jersey-25 text-base sm:text-xl`}
+                                                className={`text-right font-jersey text-base sm:text-xl`}
                                             >
                                                 <p>{bp.name}</p>
                                             </div>
-
-
                                         </div>
 
                                         {/* Bracket Info */}
-                                        <div className="hidden sm:grid grid-cols-4 text-sm text-gray-700 font-semibold min-w-28">
+                                        <div
+                                            className="hidden sm:grid grid-cols-4 text-sm text-gray-700 font-semibold min-w-28">
                                             <div className='min-w-28 text-center flex-col items-center justify-center'>
                                                 <p className="font-bold">Pools</p>
                                                 <p>{bp.num_pools}</p>
@@ -415,7 +420,8 @@ export default function EventDetails({
                                                 <p className="font-bold">Type</p>
                                                 <p>{bp.bracket_type_name}</p>
                                             </div>
-                                            {bp.next_phase_name && <div className='min-w-28 text-center flex-col items-center justify-center'>
+                                            {bp.next_phase_name && <div
+                                                className='min-w-28 text-center flex-col items-center justify-center'>
                                                 <p className="font-bold">Progression</p>
                                                 <p>{bp.next_phase_name}</p>
                                             </div>}
@@ -438,7 +444,7 @@ export default function EventDetails({
                                         {["#", "Team", "W", "L", "D", "PTS", "Streak", ""].map((h, i) => (
                                             <th
                                                 key={i}
-                                                className={`px-3.5 py-2.5 font-jersey-25 text-base uppercase text-gray-700
+                                                className={`px-3.5 py-2.5 font-jersey text-base uppercase text-gray-700
                                                 font-normal 
                                                 ${
                                                     i === 1 ? "text-left" : "text-center"
@@ -470,15 +476,15 @@ export default function EventDetails({
                                                     {/* Team Name */}
                                                     <td className="px-3.5 py-4">
                                                         <div className="flex items-center gap-3">
-                                                            <p className="font-jersey-25 text-base md:text-lg lg:text-xl">{team.name}</p>
+                                                            <p className="font-jersey text-base md:text-lg lg:text-xl">{team.name}</p>
                                                         </div>
                                                     </td>
 
                                                     {/* Team Stats */}
-                                                    <td className="text-center px-3.5 py-4 font-jersey-25 text-xl text-black">{team.wins}</td>
-                                                    <td className="text-center px-3.5 py-4 font-jersey-25 text-xl text-black">{team.losses}</td>
-                                                    <td className="text-center px-3.5 py-4 font-jersey-25 text-xl text-gray-500">{team.draws}</td>
-                                                    <td className="text-center px-3.5 py-4 font-jersey-25 text-2xl text-gray-900">{team.pts}</td>
+                                                    <td className="text-center px-3.5 py-4 font-jersey text-xl text-black">{team.wins}</td>
+                                                    <td className="text-center px-3.5 py-4 font-jersey text-xl text-black">{team.losses}</td>
+                                                    <td className="text-center px-3.5 py-4 font-jersey text-xl text-gray-500">{team.draws}</td>
+                                                    <td className="text-center px-3.5 py-4 font-jersey text-2xl text-gray-900">{team.pts}</td>
 
                                                     <td className="text-center px-3.5 py-4">
                                                         <p
@@ -527,61 +533,61 @@ export default function EventDetails({
                             </div>
 
                             {/* selected team detail */}
-                            {selectedData && (
-                                <div className="mt-5 p-5 rounded-xl bg-white border border-gray-200 shadow-sm">
-                                    <div className="flex flex-wrap justify-between items-center gap-4">
-                                        <div className="flex items-center gap-3.5">
-                                            <div>
-                                                <p className="text-2xl font-jersey-25">
-                                                    {selectedData.name}
-                                                </p>
-                                                <p className="text-base font-semibold text-gray-700">
-                                                    {selectedData.wins}W-{selectedData.losses}L-{selectedData.draws}D
-                                                </p>
-                                            </div>
-                                        </div>
+                            {/*{selectedData && (*/}
+                            {/*    <div className="mt-5 p-5 rounded-xl bg-white border border-gray-200 shadow-sm">*/}
+                            {/*        <div className="flex flex-wrap justify-between items-center gap-4">*/}
+                            {/*            <div className="flex items-center gap-3.5">*/}
+                            {/*                <div>*/}
+                            {/*                    <p className="text-2xl font-jersey">*/}
+                            {/*                        {selectedData.name}*/}
+                            {/*                    </p>*/}
+                            {/*                    <p className="text-base font-semibold text-gray-700">*/}
+                            {/*                        {selectedData.wins}W-{selectedData.losses}L-{selectedData.draws}D*/}
+                            {/*                    </p>*/}
+                            {/*                </div>*/}
+                            {/*            </div>*/}
 
-                                        <div className="flex gap-2">
-                                            {showAdmin && (
-                                                <>
-                                                    <button
-                                                        className={redButtonClassName}
-                                                    >
-                                                        <ShieldAlert className="size-5"/>
-                                                        Disqualify
-                                                    </button>
-                                                </>
-                                            )}
-                                        </div>
-                                    </div>
+                            {/*            <div className="flex gap-2">*/}
+                            {/*                {showAdmin && (*/}
+                            {/*                    <>*/}
+                            {/*                        <button*/}
+                            {/*                            className={redButtonClassName}*/}
+                            {/*                        >*/}
+                            {/*                            <ShieldAlert className="size-5"/>*/}
+                            {/*                            Disqualify*/}
+                            {/*                        </button>*/}
+                            {/*                    </>*/}
+                            {/*                )}*/}
+                            {/*            </div>*/}
+                            {/*        </div>*/}
 
-                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-5 ">
-                                        {[
-                                            {
-                                                label: "Win Rate",
-                                                value: `${Math.round((selectedData.wins / Math.max(selectedData.wins + selectedData.losses + selectedData.draws, 1)) * 100)}%`
-                                            },
-                                            {label: "Points", value: String(selectedData.pts)},
-                                            {label: "Streak", value: selectedData.streak},
-                                        ].map((s, i) => (
-                                            <div
-                                                key={i}
-                                                className="text-center py-3.5 px-3 bg-gray-50 rounded-lg border
-                                                border-gray-200"
-                                            >
-                                                <p
-                                                    className="font-jersey-25 uppercase text-gray-500 mb-1.5"
-                                                >
-                                                    {s.label}
-                                                </p>
-                                                <p className="text-2xl font-extrabold text-gray-900">
-                                                    {s.value}
-                                                </p>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
+                            {/*        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-5 ">*/}
+                            {/*            {[*/}
+                            {/*                {*/}
+                            {/*                    label: "Win Rate",*/}
+                            {/*                    value: `${Math.round((selectedData.wins / Math.max(selectedData.wins + selectedData.losses + selectedData.draws, 1)) * 100)}%`*/}
+                            {/*                },*/}
+                            {/*                {label: "Points", value: String(selectedData.pts)},*/}
+                            {/*                {label: "Streak", value: selectedData.streak},*/}
+                            {/*            ].map((s, i) => (*/}
+                            {/*                <div*/}
+                            {/*                    key={i}*/}
+                            {/*                    className="text-center py-3.5 px-3 bg-gray-50 rounded-lg border*/}
+                            {/*                    border-gray-200"*/}
+                            {/*                >*/}
+                            {/*                    <p*/}
+                            {/*                        className="font-jersey uppercase text-gray-500 mb-1.5"*/}
+                            {/*                    >*/}
+                            {/*                        {s.label}*/}
+                            {/*                    </p>*/}
+                            {/*                    <p className="text-2xl font-extrabold text-gray-900">*/}
+                            {/*                        {s.value}*/}
+                            {/*                    </p>*/}
+                            {/*                </div>*/}
+                            {/*            ))}*/}
+                            {/*        </div>*/}
+                            {/*    </div>*/}
+                            {/*)}*/}
                         </div>
                     )}
 
@@ -608,7 +614,7 @@ export default function EventDetails({
                                     <div className="flex-1 flex items-center justify-center gap-3 sm:gap-4">
                                         {/* Left side team */}
                                         <div
-                                            className={`flex-1 text-right font-jersey-25 text-base sm:text-xl ${
+                                            className={`flex-1 text-right font-jersey text-base sm:text-xl ${
                                                 m.score1 > m.score2 ? "" : "text-gray-500"
                                             }`}
                                         >
@@ -641,7 +647,7 @@ export default function EventDetails({
 
                                         {/* Right side team */}
                                         <div
-                                            className={`flex-1 text-left font-jersey-25 text-base sm:text-xl ${
+                                            className={`flex-1 text-left font-jersey text-base sm:text-xl ${
                                                 m.score2 > m.score1 ? "" : "text-gray-500"
                                             }`}
                                         >
@@ -696,7 +702,7 @@ export default function EventDetails({
 
                                     {/* Team pairings */}
                                     <div className="flex-1 flex items-center justify-center gap-3 sm:gap-4">
-                                        <p className="flex-1 text-right font-jersey-25 text-base sm:text-xl">
+                                        <p className="flex-1 text-right font-jersey text-base sm:text-xl">
                                             {m.team1}
                                         </p>
 
@@ -705,7 +711,7 @@ export default function EventDetails({
                                             VS
                                         </p>
 
-                                        <p className="flex-1 text-left font-jersey-25 text-base sm:text-xl">
+                                        <p className="flex-1 text-left font-jersey text-base sm:text-xl">
                                             {m.team2}
                                         </p>
                                     </div>
@@ -730,9 +736,9 @@ export default function EventDetails({
                 {/* footer */}
                 <div
                     className="py-5 border-t border-gray-300 text-xs text-gray-400 text-center tracking-wider font-semibold">
-                    LAST SYNCED 2 MIN AGO
+                    LAST SYNCED {formatSyncedAgo(syncedAt)}
                 </div>
             </div>
-        </div>
+        </>
     );
 }

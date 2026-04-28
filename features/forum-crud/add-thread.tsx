@@ -47,7 +47,7 @@ export default function AddForumThread({
                 onSubmit={handleSubmitThread}
                 className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 space-y-5"
             >
-                <h2 className="text-xl sm:text-2xl font-jersey-25 font-normal">
+                <h2 className="text-xl sm:text-2xl font-jersey font-normal">
                     Create New Thread
                 </h2>
 
@@ -67,7 +67,7 @@ export default function AddForumThread({
                     className="block bg-white w-full rounded-lg border border-gray-300
                              text-black text-sm lg:text-base p-2.5 pb-0 focus:outline-none
                              focus:ring-2 focus:ring-primary focus:border-transparent transition
-                             duration-200 font-[Poppins]"
+                             duration-200 font-poppins"
                 />
 
                 {/* Content */}
@@ -78,7 +78,7 @@ export default function AddForumThread({
                     className="block bg-white w-full rounded-xl border border-gray-300
                              text-black text-sm lg:text-base p-2.5 focus:outline-none
                              focus:ring-2 focus:ring-primary focus:border-transparent
-                              transition duration-200 font-[Poppins] min-h-[140px]
+                              transition duration-200 font-poppins min-h-[140px]
                               sm:min-h-40 resize-y leading-relaxed"
                 />
 
@@ -87,7 +87,7 @@ export default function AddForumThread({
                     <button
                         type="submit"
                         className="w-full flex flex-row xs:w-auto text-center bg-primary text-sm md:text-base
-                                   font-jersey-25 font-normal tracking-wide p-2 px-6 rounded-lg hover:bg-secondary
+                                   font-jersey font-normal tracking-wide p-2 px-6 rounded-lg hover:bg-secondary
                                    text-white hover:cursor-pointer transition duration-200 gap-2 place-self-center
                                    disabled:bg-primary/70 disabled:cursor-not-allowed place-content-center"
                         disabled={!title.trim() || !content.trim() || isSubmitting}

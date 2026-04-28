@@ -1,47 +1,131 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-poppins: var(--font-poppins);
-}
-
-@theme {
-  --font-jersey-25: var(--font-jersey-25);
-  --font-poppins: var(--font-poppins);
-
-}
-
-@theme {
-  --color-primary:   #BD2D2D; /* main red color */
-  --color-secondary: #992323; /* darker red color */
-  --color-main-bg: #f4f4f5;  /* main-bg color */
-  --color-card-input: #ffffff; /* bg color for inputs and cards (such as in the search page */
-  --color-errors: #E46868;    /* error text color for input errors */
-}
-
-@theme {
-  --breakpoint-xs: 30rem;
-  --breakpoint-2xl: 100rem;
-  --breakpoint-3xl: 120rem;
-  --breakpoint-4xl: 140rem;
+    --background: #ffffff;
+    --foreground: #171717;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+    :root {
+        --background: #0a0a0a;
+        --foreground: #ededed;
+    }
 }
 
+@theme inline {
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+
+    /* Default sans font → Poppins (makes Tailwind's `font-sans`
+       utility and the body default resolve to Poppins). */
+    --font-sans: var(--font-poppins), system-ui, -apple-system, sans-serif;
+}
+
+@theme {
+    --color-primary: #BD2D2D; /* main red color */
+    --color-secondary: #992323; /* darker red color */
+    --color-main-bg: #f4f4f5; /* page background */
+    --color-card-input: #ffffff; /* bg color for inputs and cards */
+    --color-errors: #E46868; /* error text color */
+}
+
+/* ------------------------------------------------------------
+   Breakpoints
+   ------------------------------------------------------------ */
+@theme {
+    --breakpoint-xs: 30rem;
+    --breakpoint-2xl: 100rem;
+    --breakpoint-3xl: 120rem;
+    --breakpoint-4xl: 140rem;
+}
+
+/* ============================================================
+   TYPOGRAPHY SYSTEM
+   ------------------------------------------------------------
+
+     - Poppins    → body, UI, buttons, inputs, labels, captions.
+                    This is the DEFAULT body font (`font-sans`
+                    and `font-poppins` utilities).
+                    Weights loaded: 400, 500, 600, 700.
+
+     - Jersey 25  → display / headings (h1–h6), titles, navbar.
+                    Applied automatically to raw <h1>–<h6> via
+                    the @layer base block below, or explicitly
+                    with the `font-jersey` utility.
+                    Weights loaded: 400.
+
+   Font-family utilities:
+     font-sans     → Poppins (default, via @theme above)
+     font-poppins  → Poppins (explicit override)
+     font-jersey   → Jersey 25
+
+   Font-size scale: use Tailwind's built-in text-{xs..9xl}
+   utilities. Headings have fluid base sizes set in @layer base
+   that can be overridden per-instance with `text-*` utilities.
+
+   Font weights:
+     Poppins:   font-normal (400), font-medium (500),
+                font-semibold (600), font-bold (700)
+     Jersey 25: font-normal (400) only
+   ============================================================ */
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-poppins), system-ui, -apple-system, sans-serif;
+}
+
+@utility font-poppins {
+    font-family: var(--font-poppins), system-ui, -apple-system, sans-serif;
+}
+@utility font-jersey {
+    font-family: var(--font-jersey), Impact, "Arial Narrow Bold", sans-serif;
+}
+
+/* Heading defaults — Jersey 25 with a fluid responsive type
+   scale. Individual components can still override by adding
+   text-* / font-* utilities, which take precedence over these
+   base styles. */
+@layer base {
+    h1, h2, h3, h4, h5, h6 {
+        font-family: var(--font-jersey), Impact, "Arial Narrow Bold", sans-serif;
+        font-weight: 400;
+        line-height: 1.15;
+        letter-spacing: 0.01em;
+    }
+
+    /* Fluid scale: mobile → desktop */
+    h1 {
+        font-size: clamp(1.875rem, 1.25rem + 2.5vw, 3.75rem);
+    }
+
+    /* 30 → 60 */
+    h2 {
+        font-size: clamp(1.5rem, 1.10rem + 1.8vw, 3rem);
+    }
+
+    /* 24 → 48 */
+    h3 {
+        font-size: clamp(1.25rem, 1.00rem + 1.2vw, 2.25rem);
+    }
+
+    /* 20 → 36 */
+    h4 {
+        font-size: clamp(1.125rem, 1.00rem + 0.6vw, 1.5rem);
+    }
+
+    /* 18 → 24 */
+    h5 {
+        font-size: clamp(1rem, 0.95rem + 0.3vw, 1.25rem);
+    }
+
+    /* 16 → 20 */
+    h6 {
+        font-size: clamp(0.875rem, 0.85rem + 0.2vw, 1rem);
+    }
+
+    /* 14 → 16 */
+    p, li, label, input, textarea, select, button {
+        line-height: 1.5;
+    }
 }

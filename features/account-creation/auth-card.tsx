@@ -65,10 +65,10 @@ export default function AuthCard({
     return (
         <div className="flex flex-col place-self-center bg-main-bg rounded-lg p-10 2xl:p-16 gap-3 2xl:gap-6 w-full">
             <div>
-                <h1 className="text-2xl sm:text-3xl md:text-4xl 2xl:text-6xl text-primary tracking-tight text-center font-bold">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl 2xl:text-6xl text-primary tracking-tight text-center">
                     {headerMessage}
                 </h1>
-                <h2 className="text-xs sm:text-sm 2xl:text-lg text-zinc-500 font-[Poppins] font-semibold text-center">
+                <h2 className="text-xs sm:text-sm 2xl:text-lg text-zinc-500 font-poppins font-semibold text-center">
                     {subHeaderMessage}
                 </h2>
 
@@ -96,8 +96,8 @@ export default function AuthCard({
                                 labelClassName={pageLabelClass}
                                 labelText="Email"
                                 inputType="email"
-                                inputName="emailInput"
-                                inputId="emailInput"
+                                inputName="email"
+                                inputId="email"
                                 inputValue={email}
                                 inputOnChange={(e) => onEmailChange(e.target.value)}
                                 required={false}
@@ -112,7 +112,7 @@ export default function AuthCard({
                                 labelClassName={pageLabelClass}
                                 labelText="Password"
                                 inputType="password"
-                                inputName="passwordInput"
+                                inputName="password"
                                 inputId="password"
                                 inputValue={password}
                                 inputOnChange={(e) => onPasswordChange(e.target.value)}
@@ -129,7 +129,7 @@ export default function AuthCard({
                                     labelClassName={pageLabelClass}
                                     labelText="Confirm Password"
                                     inputType="password"
-                                    inputName="confirmPasswordInput"
+                                    inputName="confirmPassword"
                                     inputId="confirmPassword"
                                     inputValue={confirmPassword ?? ''}
                                     inputOnChange={(e) => onConfirmPasswordChange?.(e.target.value)}
