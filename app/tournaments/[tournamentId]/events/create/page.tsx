@@ -1,8 +1,7 @@
 import { fetchTournamentFromId } from '@/server/queries/tournaments.queries';
 import { notFound, redirect } from 'next/navigation';
-import { cookies } from 'next/headers';
-import { createClient } from '@/server/db/server';
 import EventInsertForm from '@/features/tournament-events/create-event';
+import {getUser} from "@/server/queries/users.queries";
 
 export default async function CreateEventPage({
     params,
@@ -16,11 +15,7 @@ export default async function CreateEventPage({
         notFound();
     }
 
-    const cookieStore = await cookies();
-    const supabase = await createClient(cookieStore);
-    const {
-        data: { user },
-    } = await supabase.auth.getUser();
+    const user = await getUser();
 
     const { success, tournament } = await fetchTournamentFromId(id);
 
