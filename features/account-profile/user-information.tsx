@@ -47,7 +47,7 @@ function EventCard({
             <div className="min-w-0 flex-1">
 
                 {/* Tournament name */}
-                <h3 className="font-jersey-25 text-primary truncate text-base sm:text-lg">
+                <h3 className="font-jersey text-primary truncate text-base sm:text-lg">
                     {tournamentName}
                 </h3>
 
@@ -129,7 +129,7 @@ export default function UserInformation({
     const router = useRouter();
 
     return (
-        <main className="bg-zinc-100 flex flex-col min-h-screen font-[Poppins]">
+        <main className="bg-main-bg flex-1 flex-col font-poppins">
             <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10 mx-auto w-full max-w-4xl">
 
                 {/* Profile Card */}
@@ -156,11 +156,11 @@ export default function UserInformation({
                                     <div className="flex gap-2 items-center min-w-0">
                                         {profile?.prefix && (
                                             <span
-                                                className="text-base sm:text-lg text-primary/50 font-jersey-25 shrink-0">
+                                                className="text-base sm:text-lg text-primary/50 font-jersey shrink-0">
                                                 {profile.prefix}
                                             </span>
                                         )}
-                                        <h1 className="text-2xl sm:text-4xl font-jersey-25 text-primary break-words">
+                                        <h1 className="text-2xl sm:text-4xl font-jersey text-primary break-words">
                                             {profile?.display_name}
                                         </h1>
                                     </div>
@@ -169,7 +169,7 @@ export default function UserInformation({
                                     <button
                                         onClick={() => {router.push(`/profile-settings`)}}
                                         className="shrink-0 bg-primary text-white py-1.5 px-3 rounded-lg
-                                        text-sm font-jersey-25 hover:bg-secondary transition-colors duration-150
+                                        text-sm font-jersey hover:bg-secondary transition-colors duration-150
                                         flex items-center gap-2">
                                         <Pencil size={14}/>
                                         Edit Profile
@@ -200,7 +200,7 @@ export default function UserInformation({
                 {/* Upcoming Events */}
                 <section className="mb-8">
                     <div className="flex items-center justify-between mb-3">
-                        <h2 className="text-xl font-jersey-25 text-gray-800 flex items-center gap-2">
+                        <h2 className="text-xl font-jersey text-gray-800 flex items-center gap-2">
                             <Calendar size={18}/>
                             Upcoming Events
                         </h2>
@@ -230,7 +230,7 @@ export default function UserInformation({
                 {/* Past Events */}
                 <section>
                     <div className="flex items-center justify-between mb-3">
-                        <h2 className="text-xl font-jersey-25 text-gray-800 flex items-center gap-2">
+                        <h2 className="text-xl font-jersey text-gray-800 flex items-center gap-2">
                             <Calendar size={18}/>
                             Past Events
                         </h2>

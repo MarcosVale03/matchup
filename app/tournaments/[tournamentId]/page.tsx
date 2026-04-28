@@ -1,16 +1,13 @@
-import { fetchTournamentFromId } from "@/server/queries/tournaments.queries";
-import { notFound } from "next/navigation";
-import { cookies } from "next/headers";
-import { createClient } from "@/server/db/server";
-import { TournamentDetails } from "@/features/tournament-search/tournament-details";
-import { Trophy } from "lucide-react";
+import {fetchTournamentFromId} from "@/server/queries/tournaments.queries";
+import {notFound} from "next/navigation";
+import {TournamentDetails} from "@/features/tournament-search/tournament-details";
+import {Trophy} from "lucide-react";
 import Link from "next/link";
-import { fetchEventsFromTournamentId } from "@/server/queries/events.queries";
-import { FetchEventsFromTournamentIdResponse } from "@/server/queries/events.queries";
+import {fetchEventsFromTournamentId} from "@/server/queries/events.queries";
+import {getUser} from "@/server/queries/users.queries";
+import {hasPermissionLevel} from "@/server/queries/admins.queries";
+import {PermissionLevel} from "@/lib/types/types";
 
-
-class fetchEventsFromTournamentIdResponse {
-}
 
 export default async function TournamentDetailsPage({ params }: { params: { tournamentId: string } }) {
     const { tournamentId: idStr } = await params;
@@ -21,7 +18,7 @@ export default async function TournamentDetailsPage({ params }: { params: { tour
     }
 
     const { success: tournamentSuccess, tournament } = await fetchTournamentFromId(id);
-    const { success: eventsSuccess, events } = await fetchEventsFromTournamentId(id);
+    const { events } = await fetchEventsFromTournamentId(id);
 
 
     if (!tournamentSuccess || !tournament) {
@@ -46,20 +43,15 @@ export default async function TournamentDetailsPage({ params }: { params: { tour
     }
 
     // getting the permissions for editing and deleting
-    const cookieStore = await cookies();
-    const supabase = await createClient(cookieStore);
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getUser();
 
-    const permissions = {
-        canEdit: user?.id === tournament.owner.user_id,
-        canDelete: user?.id === tournament.owner.user_id,
-    };
+    const permissions = await hasPermissionLevel(user.id, id, PermissionLevel.Reporter)
 
     return (
         <main className="bg-main-bg flex flex-col font-[Poppins] text-black">
             <TournamentDetails
                 tournament={tournament}
-                permissions={permissions}
+                hasPermissions={permissions}
                 events={events}
             />
         </main>

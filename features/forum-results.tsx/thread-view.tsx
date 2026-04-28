@@ -6,8 +6,8 @@ import DeleteThread from "@/features/forum-crud/delete-thread";
 import Image from "next/image";
 import ForumPostsList from "@/features/forum-results.tsx/forum-post-list";
 import AddThreadPost from "@/features/forum-crud/add-post";
-import { useToast } from "@/ui/toast/use-toast";
-import { Toast } from "@/ui/toast/toast";
+import { useForumToast } from "@/ui/toast/forum-use-toast";
+import { ForumToast } from "@/ui/toast/forum-toast";
 import { formatDate } from "date-fns";
 
 export function ThreadView({
@@ -22,10 +22,10 @@ export function ThreadView({
     isOwner: boolean;
 }) {
 
-    const toast = useToast();
+    const toast = useForumToast();
 
     return (
-        <main className="bg-main-bg font-[Poppins] text-black p-4 md:px-8 3xl:px-16">
+        <main className="bg-main-bg font-poppins text-black p-4 md:px-8 3xl:px-16">
             <div className="max-w-3xl mx-auto py-6">
                 <Link
                     href="/forums"
@@ -55,7 +55,7 @@ export function ThreadView({
                                         Author Name
                                     </p>
                                     <p>•</p>
-                                    <p>{formatDate(mainThread.created_at, "MMM d, yyyy @ h:mm a")}</p>
+                                    <p className="text-gray-600">{formatDate(mainThread.created_at, "MMM d, yyyy @ h:mm a")}</p>
                                 </div>
 
                             </div>
@@ -66,13 +66,13 @@ export function ThreadView({
 
                         {/* Title and delete*/}
                         <div className="flex items-center justify-between">
-                            <h1 className="text-2xl sm:text-3xl font-jersey-25 text-primary mb-3">
+                            <h4 className="mb-3">
                                 {title ?? 'Untitled Thread'}
-                            </h1>
+                            </h4>
                         </div>
 
-                        <div className="border-t border-gray-100 pt-5">
-                            <p className="text-gray-700 leading-relaxed whitespace-pre-wrap text-[15px] sm:text-base font-normal">
+                        <div className="border-t border-gray-200 pt-5">
+                            <p className="text-gray-700 leading-relaxed whitespace-pre-wrap text-[15px] sm:text-base font-normal wrap-break-word">
                                 {mainThread.content}
                             </p>
                         </div>
@@ -86,16 +86,16 @@ export function ThreadView({
                 />
 
                 <div className="mb-2">
-                    <Toast message={toast.message} />
+                    <ForumToast message={toast.message} />
                 </div>
 
                 {/* Posts under thread */}
                 <div className="space-y-4">
                     <div className="flex items-center gap-2 text-gray-600">
                         <MessageCircle className="size-5" />
-                        <h2 className="text-lg font-semibold">
+                        <h5 className="">
                             {posts.length}
-                        </h2>
+                        </h5>
                     </div>
 
                     <ForumPostsList posts={posts} toastControl={toast} />

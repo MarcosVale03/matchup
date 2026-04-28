@@ -1,35 +1,25 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono, Poppins, Jersey_25, Oswald } from "next/font/google";
+import type {Metadata} from "next";
+import {Poppins, Jersey_25} from "next/font/google";
 import NavigationBar from "@/ui/navigation-bar";
-import { cookies } from "next/headers";
-import { createClient } from "@/server/db/server";
-import { ClientLayout } from "./client-layout";
+import {cookies} from "next/headers";
+import {createClient} from "@/server/db/server";
+import {ClientLayout} from "./client-layout";
 import "./globals.css";
 import React from "react";
-
-const geistSans = Geist({
-    variable: "--font-geist-sans",
-    subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-    variable: "--font-geist-mono",
-    subsets: ["latin"],
-});
 
 const poppins = Poppins({
     subsets: ["latin"],
     weight: ["400", "500", "600", "700"],
     variable: "--font-poppins",
     display: "swap",
-});;
+});
 
 const jersey25 = Jersey_25({
     subsets: ["latin"],
     weight: ["400"],
-    variable: "--font-jersey-25",
+    variable: "--font-jersey",
     display: "swap",
-})
+});
 
 export const metadata: Metadata = {
     title: "Matchup Homepage",
@@ -46,25 +36,27 @@ export default async function RootLayout({
     const cookieStore = await cookies();
     const supabase = await createClient(cookieStore);
 
-    const { data: { user } } = await supabase.auth.getUser();
+    const {data: {user}} = await supabase.auth.getUser();
 
     return (
-        <html lang="en" className="bg-zinc-100 h-screen">
+        <html lang="en" className="bg-main-bg">
         <head>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
             <title></title>
         </head>
-            <body
-                className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable} ${jersey25.variable} antialiased`}
-            >
-            <ClientLayout
-                initialUser={user}
-            >
-                <NavigationBar />
-                {children}
-            </ClientLayout>
+        <body
+            className={`${poppins.variable} ${jersey25.variable} font-sans antialiased`}
+        >
+        <ClientLayout initialUser={user}>
+            <div className="flex flex-col min-h-screen bg-main-bg">
+                <NavigationBar/>
 
-            </body>
+                <main className="flex-1 flex flex-col">
+                    {children}
+                </main>
+            </div>
+        </ClientLayout>
+        </body>
         </html>
     );
 }

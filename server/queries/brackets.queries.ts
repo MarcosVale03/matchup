@@ -113,7 +113,7 @@ export async function fetchBracket(
 }
 
 
-async function getPrereqCondition(tournamentId: number, eventId: number, phaseGroupIdentifier: string, round_num: number, match_id: number, slot_num: number) {
+export async function getPrereqCondition(tournamentId: number, eventId: number, phaseGroupIdentifier: string, round_num: number, match_id: number, slot_num: number) {
     const cookieStore = await cookies()
     const supabase = await createClient(cookieStore)
 

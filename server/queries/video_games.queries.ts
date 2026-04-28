@@ -20,9 +20,11 @@ export async function fetchVideoGames(searchQuery: string = "", page: number = 0
     const pageStart = page * perPage
     const pageEnd = pageStart + perPage - 1
 
-    let query = supabase.from('video_games').select().range(pageStart, pageEnd).order('id')
+    let query = supabase.from('video_games').select().range(pageStart, pageEnd).order('name')
 
-    query = searchQuery ? query.textSearch('name', searchQuery, {type: "websearch", config: "english"}) : query
+    // Substring match — typeahead needs to match partial words ("stree" → "Street Fighter 6"),
+    // which websearch tsquery cannot do until a whole word is reached.
+    query = searchQuery ? query.ilike('name', `%${searchQuery}%`) : query
 
     const {data, error} = await query
     if (error) {

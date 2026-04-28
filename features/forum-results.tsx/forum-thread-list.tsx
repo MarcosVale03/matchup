@@ -5,8 +5,8 @@ import {CircleAlert, Plus, X} from "lucide-react";
 import SearchBar from "@/ui/search-bar";
 import AddForumThread from '../forum-crud/add-thread';
 import {useProfile} from "@/app/client-layout";
-import {useToast} from "@/ui/toast/use-toast";
-import {Toast} from "@/ui/toast/toast";
+import {useForumToast} from "@/ui/toast/forum-use-toast";
+import {ForumToast} from "@/ui/toast/forum-toast";
 import Link from "next/link";
 import Image from "next/image";
 import {formatDate} from "date-fns";
@@ -19,7 +19,7 @@ export default function ForumThreadList({threads}: {
     const [searchQuery, setSearchQuery] = useState('');
     const [isFormOpen, setIsFormOpen] = useState(false);
 
-    const toast = useToast();
+    const toast = useForumToast();
 
     const handleThreadAdded = () => {
         toast.show("Thread created successfully!");
@@ -54,7 +54,7 @@ export default function ForumThreadList({threads}: {
                         type="button"
                         onClick={() => setIsFormOpen(!isFormOpen)}
                         className="flex flex-row items-center justify-center gap-2 w-full md:w-auto py-2.5 text-center
-                                 bg-primary text-sm md:text-base font-jersey-25 tracking-wide px-6
+                                 bg-primary text-sm md:text-base font-jersey tracking-wide px-6
                                   rounded-lg hover:bg-secondary text-white hover:cursor-pointer
                                   transition duration-200 whitespace-nowrap"
                     >
@@ -64,7 +64,7 @@ export default function ForumThreadList({threads}: {
                 ) : (
                     <div
                         className="flex flex-row items-center justify-center gap-2 w-full md:w-auto py-2.5 text-center
-                                 bg-primary text-sm md:text-base font-jersey-25 tracking-wide px-6
+                                 bg-primary text-sm md:text-base font-jersey tracking-wide px-6
                                   rounded-lg text-white transition duration-200 whitespace-nowrap"
                     >
                         <CircleAlert className={iconClassName}/>
@@ -85,13 +85,13 @@ export default function ForumThreadList({threads}: {
             <div className="flex flex-col gap-2">
 
                 {/* Success Message */}
-                <Toast message={toast.message}/>
+                <ForumToast message={toast.message}/>
 
                 <div className="">
                     {/* Loading or empty state */}
                     {filteredThreads.length === 0 ? (
                         // Show different messages based on whether there's a search query
-                        <div className="p-8 text-center text-gray-500">
+                        <div className="p-4 text-center text-zinc-600 text-base md:text-lg">
                             {searchQuery.trim()
                                 ? `No results for "${searchQuery.trim()}"`
                                 : "No forum threads found."}
@@ -104,7 +104,7 @@ export default function ForumThreadList({threads}: {
                                     key={thread.id}
                                     className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm
                                                hover:shadow-md mb-4 hover:border-primary
-                                               transition duration-500"
+                                               transition duration-400"
                                 >
                                     {/* Post Title, Author, Tournament, Timestamp */}
                                     <Link
@@ -126,13 +126,13 @@ export default function ForumThreadList({threads}: {
                                                     <p className="font-semibold">Author Name</p>
                                                 </div>
                                                 <p className="hidden sm:inline">•</p>
-                                                <p className="font-medium">{formatDate(thread.created_at, "MMM d, yyyy @ h:mm a")}</p>
+                                                <p className="text-gray-600">{formatDate(thread.created_at, "MMM d, yyyy @ h:mm a")}</p>
                                             </div>
 
                                             {/* Title */}
-                                            <h3 className="text-2xl sm:text-3xl font-jersey-25 text-primary">
+                                            <h4 className="">
                                                 {thread.title}
-                                            </h3>
+                                            </h4>
                                         </div>
 
                                         {/* Thread content */}

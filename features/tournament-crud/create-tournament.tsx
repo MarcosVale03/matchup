@@ -7,9 +7,9 @@ import { insertTournament, TournamentInsertErrors } from '@/server/mutations/tou
 import { dateToInputString } from "@/lib/utils";
 import { ArrowRight } from 'lucide-react';
 import { ErrorMessageForTournament } from "@/features/tournament-crud/error-message-tournament";
-import Checkbox from "@/ui/checkbox";
+import { FormSection } from '@/ui/form-section';
+import { SegmentedToggle } from '@/ui/segmented-toggle';
 
-// Initial state for the form
 interface FormState {
     name: string;
     slug: string;
@@ -19,7 +19,6 @@ interface FormState {
     email: string;
     discord: string;
     isPublic: boolean;
-    // Location is simplified for the form input
     locationAddress: string;
 }
 
@@ -40,19 +39,16 @@ export default function TournamentInsertForm() {
     const [formError, setFormError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // Placeholder for location data (we would integrate Google Maps API here)
-    // For now, we only use the address input
+    // Placeholder until Google Maps
     const mockLocationData = {
         maps_place_id: 'mock_place_id',
         address: formData.locationAddress,
-        latitude: 34.0522, // Mock data for LA
-        longitude: -118.2437, // Mock data for LA
+        latitude: 34.0522,
+        longitude: -118.2437,
     };
 
-    // handler for changes in inputs
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
-
         setFormData(prev => ({
             ...prev,
             [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
@@ -81,10 +77,10 @@ export default function TournamentInsertForm() {
             );
 
             if (response.success) {
-                alert(`Tournament "${formData.name}" created successfully!`);
-                // Redirect to the new tournament's detail page
-                // will change this to push to create events page
-                router.push(`/tournaments/${response.data}`);
+                // Send the organizer to the event-creation page next. The
+                // "tournament created" toast fires after they finish adding
+                // events (or skip).
+                router.push(`/tournaments/${response.data}/events/create`);
             } else {
                 setFieldErrors(response.fieldErrors || {});
                 setFormError(response.formErrors?.join(' ') || 'Validation failed. Check the fields above.');
@@ -97,84 +93,74 @@ export default function TournamentInsertForm() {
         }
     };
 
-    // general classNames used in most of the inputs on this page
-    const pageLabelClass = "block text-zinc-600 2xl:text-xl rounded-md peer-focus:text-primary transition duration-400";
-
-
-    const pageInputClass = `peer block bg-white w-full rounded-xl border-2 border-white 
-                            text-black p-2 2xl:p-4 2xl:text-xl focus:outline-none 
-                            focus:border-primary shadow-sm transition duration-400 font-normal`;
-
-    const legendClass = "text-sm md:text-base lg:text-lg font-[Poppins] text-gray-700 px-2 -mb-3 tracking-tight"
+    const pageLabelClass = "block text-zinc-600 peer-focus:text-primary transition duration-400 tracking-tight";
+    const pageInputClass = `peer block bg-white w-full rounded-xl border-2 border-white
+                            text-black p-2 focus:outline-none focus:border-primary shadow-sm 
+                            transition duration-400 font-normal tracking-tight`;
 
     return (
-        <div className="mt-4 mx-4 sm:mx-auto w-full max-w-[calc(100%-2rem)] sm:max-w-2xl md:max-w-3xl lg:max-w-5xl 2xl:max-w-7xl">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-jersey-25">
-                Create Tournament
-            </h1>
+        <div className="mt-4 mx-4 flex-1 flex flex-col sm:mx-auto w-full max-w-[calc(100%-2rem)] sm:max-w-2xl md:max-w-3xl lg:max-w-5xl 2xl:max-w-7xl">
+            <h3>Create Tournament</h3>
 
-            <h2 className="text-base mb-4 pb-1 text-gray-600 border-b border-gray-300">
+            <h4 className="mb-4 pb-1 text-gray-600 border-b border-gray-300">
                 Fill in the details below to create your tournament
-            </h2>
+            </h4>
 
-            <form
-                onSubmit={handleSubmit}
-                className="mb-6"
-            >
-                {/* Error Message */}
+            <form onSubmit={handleSubmit} className="mb-6 flex-1 flex flex-col">
                 {formError && (
                     <div
                         role="alert"
                         className="bg-errors/20 text-sm lg:text-base px-3 py-2 rounded-xl mb-4 text-primary
-                                   font-[Poppins] font-semibold"
+                                   font-poppins font-semibold"
                     >
                         {formError}
                     </div>
                 )}
 
-
-                {/* General Details */}
-                <fieldset className="space-y-4 mb-4">
+                {/* Basic Details */}
+                <FormSection title="Basic Details">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {/* Name */}
-                        <div className="mb-2">
+                        <div>
                             <BasicInputWithLabel
                                 labelClassName={pageLabelClass}
-                                labelText="Tournament Name (Required)"
+                                labelText="Tournament Name - Required"
                                 inputType='text'
                                 inputName="name"
                                 inputId="name"
                                 inputValue={formData.name}
                                 inputOnChange={handleChange}
                                 required={true}
-                                inputPlaceholder="Enter tournament name"
+                                inputPlaceholder="More than 3 characters"
                                 inputClassName={pageInputClass}
                             />
                             <ErrorMessageForTournament field='name' fieldErrors={fieldErrors} />
                         </div>
 
-                        {/* Slug */}
-                        <div className="">
+                        <div>
                             <BasicInputWithLabel
                                 labelClassName={pageLabelClass}
-                                labelText="Slug (Optional, for URL)"
+                                labelText="Slug - Optional, for URL"
                                 inputType="text"
                                 inputName="slug"
                                 inputId="slug"
                                 inputValue={formData.slug}
                                 inputOnChange={handleChange}
                                 required={false}
-                                inputPlaceholder="e.g., mytourney2025"
+                                inputPlaceholder="More than 3 characters"
                                 inputClassName={pageInputClass}
                             />
                             <ErrorMessageForTournament field='slug' fieldErrors={fieldErrors} />
                         </div>
+                    </div>
+                </FormSection>
 
-                        {/* Start Time */}
-                        <div className="mb-2">
+                {/* Schedule */}
+                <FormSection title="Schedule">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
                             <BasicInputWithLabel
                                 labelClassName={pageLabelClass}
-                                labelText="Start Date (Required)"
+                                labelText="Start Date - Required"
                                 inputType="datetime-local"
                                 inputName="startTime"
                                 inputId="startTime"
@@ -188,14 +174,12 @@ export default function TournamentInsertForm() {
                                 inputClassName={`${pageInputClass} appearance-none`}
                                 maxDateTime="9999-12-31T23:59"
                             />
-                            <ErrorMessageForTournament field='times' fieldErrors={fieldErrors} />
                         </div>
 
-                        {/* End Time */}
                         <div>
                             <BasicInputWithLabel
                                 labelClassName={pageLabelClass}
-                                labelText="End Date (Required)"
+                                labelText="End Date - Required"
                                 inputType="datetime-local"
                                 inputName="endTime"
                                 inputId="endTime"
@@ -209,46 +193,32 @@ export default function TournamentInsertForm() {
                                 inputClassName={pageInputClass}
                                 maxDateTime="9999-12-31T23:59"
                             />
+                            <ErrorMessageForTournament field='times' fieldErrors={fieldErrors} />
                         </div>
                     </div>
-                </fieldset>
+                </FormSection>
 
-                {/* Location Type */}
-                <fieldset className="p-2 px-5 border-2 border-zinc-600 rounded-lg mb-6 w-full">
-                    <legend className={`${legendClass} mb-0`}>
-                        Location Type
-                    </legend>
-
-                    {/* isOnline Checkbox */}
-                    <Checkbox
-                        id="isOnline"
-                        name="isOnline"
-                        checked={formData.isOnline}
-                        onChange={handleChange}
-                        label="Online tournament"
-                        boxClassName="group h-4 w-4 rounded-sm border-2 border-primary flex items-center
-                                      justify-center transition-all duration-200 hover:bg-white"
-                        checkedBoxClassName="bg-primary text-black"
-                        iconSize={18}
-                        iconClassName="group-hover:text-primary text-white"
-                        labelClassName=" text-sm md:text-base tracking-tight font-semibold"
+                {/* Location */}
+                <FormSection title="Location">
+                    <SegmentedToggle
+                        ariaLabel="Tournament location type"
+                        value={formData.isOnline}
+                        onChange={(v) => setFormData({ ...formData, isOnline: v })}
+                        options={[
+                            { value: true, label: "Online" },
+                            { value: false, label: "In-Person" },
+                        ]}
                     />
 
-
-                    {/* Location Address (Appears only if offline) */}
                     <div
-                        className={`grid transition-all duration-500 
-                            ${!formData.isOnline ?
-                                'grid-rows-[1fr] opacity-100' :
-                                'grid-rows-[0fr] opacity-0'
-                            }
-                        `}
+                        className={`grid transition-all duration-500 mt-3
+                            ${!formData.isOnline ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
                         aria-hidden={formData.isOnline}
                     >
-                        <div className="p-2 overflow-hidden">
+                        <div className="overflow-hidden">
                             <BasicInputWithLabel
                                 labelClassName={pageLabelClass}
-                                labelText="Physical Location Address (Required)"
+                                labelText="Physical Location Address - Required"
                                 inputType="text"
                                 inputName="locationAddress"
                                 inputId="locationAddress"
@@ -256,112 +226,74 @@ export default function TournamentInsertForm() {
                                 inputOnChange={handleChange}
                                 required={!formData.isOnline}
                                 inputPlaceholder="e.g., 123 Main St, Anytown"
-                                inputClassName={`${pageInputClass}`}
+                                inputClassName={`${pageInputClass} mb-1`}
                                 tabIndex={formData.isOnline ? -1 : 0}
                             />
                             <ErrorMessageForTournament field='location' fieldErrors={fieldErrors} />
                         </div>
                     </div>
-                </fieldset>
+                </FormSection>
 
-                {/* Tournament Visibility */}
-                <fieldset className="p-4 px-5 border-2 border-zinc-600 rounded-lg mb-6 w-full">
-                    <legend className={legendClass}>
-                        Tournament Visibility
-                    </legend>
+                {/* Visibility */}
+                <FormSection title="Visibility">
+                    <SegmentedToggle
+                        ariaLabel="Tournament visibility"
+                        value={formData.isPublic}
+                        onChange={(v) => setFormData({ ...formData, isPublic: v })}
+                        options={[
+                            { value: true, label: "Public" },
+                            { value: false, label: "Private" },
+                        ]}
+                    />
+                    <p className="mt-2 text-xs text-gray-600 tracking-tight">
+                        {formData.isPublic
+                            ? "Anyone can find and view this tournament."
+                            : "Only people you invite can view this tournament."}
+                    </p>
+                </FormSection>
 
-                    {/* Public */}
-                    <div className="flex items-center mb-2">
-                        <input
-                            type="radio"
-                            id="tournament-public"
-                            name="visibility"
-                            value="public"
-                            checked={formData.isPublic === true}
-                            className="h-4 w-4 accent-primary shrink-0"
-                            onChange={() => setFormData({ ...formData, isPublic: true })}
-                        />
-                        <label
-                            htmlFor="tournament-public"
-                            className="ml-2 text-sm md:text-base tracking-tight font-semibold"
-                        >
-                            Public
-                        </label>
-                    </div>
-
-                    {/* Private */}
-                    <div className="flex items-center">
-                        <input
-                            type="radio"
-                            id="tournament-private"
-                            name="visibility"
-                            value="private"
-                            checked={formData.isPublic === false}
-                            className="h-4 w-4 accent-primary shrink-0"
-                            onChange={() => setFormData({ ...formData, isPublic: false })}
-                        />
-                        <label
-                            htmlFor="tournament-private"
-                            className="ml-2 text-sm md:text-base tracking-tight font-semibold"
-                        >
-                            Private
-                        </label>
-                    </div>
-                </fieldset>
-
-                {/* Contact Information */}
-                <fieldset className="p-4 px-5 border-2 border-zinc-600 rounded-lg mb-6 w-full">
-                    <legend className={legendClass}>
-                        Contact Information (At least one required)
-                    </legend>
-
+                {/* Contact */}
+                <FormSection title="Contact — at least one required">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {/* Email */}
-                        <div className="mt-2">
-                            <BasicInputWithLabel
-                                labelClassName={pageLabelClass}
-                                labelText='Email (Optional)'
-                                inputType='email'
-                                inputName='email'
-                                inputId='email'
-                                inputValue={formData.email}
-                                inputOnChange={handleChange}
-                                required={false}
-                                inputPlaceholder='Enter your email'
-                                inputClassName={pageInputClass}
-                            />
-                        </div>
-
-                        {/* Discord */}
-                        <div className="mt-2">
-                            <BasicInputWithLabel
-                                labelClassName={pageLabelClass}
-                                labelText='Discord Link (Optional)'
-                                inputType='text'
-                                inputName='discord'
-                                inputId='discord'
-                                inputValue={formData.discord}
-                                inputOnChange={handleChange}
-                                required={false}
-                                inputPlaceholder='e.g., https://discord.gg/xxxxxxxx'
-                                inputClassName={pageInputClass}
-                            />
-                        </div>
+                        <BasicInputWithLabel
+                            labelClassName={pageLabelClass}
+                            labelText='Email'
+                            inputType='email'
+                            inputName='email'
+                            inputId='email'
+                            inputValue={formData.email}
+                            inputOnChange={handleChange}
+                            required={false}
+                            inputPlaceholder='organizer@example.com'
+                            inputClassName={pageInputClass}
+                        />
+                        <BasicInputWithLabel
+                            labelClassName={pageLabelClass}
+                            labelText='Discord Invite'
+                            inputType='text'
+                            inputName='discord'
+                            inputId='discord'
+                            inputValue={formData.discord}
+                            inputOnChange={handleChange}
+                            required={false}
+                            inputPlaceholder='https://discord.gg/xxxxxxxx'
+                            inputClassName={pageInputClass}
+                        />
                     </div>
                     <ErrorMessageForTournament field='contact' fieldErrors={fieldErrors} />
-                </fieldset>
+                </FormSection>
 
-                {/* Submit Button */}
-                <div className="pt-4 sm:pt-6 mt-4 border-t-2 border-gray-400 flex gap-2">
+                {/* Submit button */}
+                <div className="border-t border-gray-300 pt-3 pb-3 mt-6 -mx-4 px-4 sm:mx-0 sm:px-0">
                     <button
                         type="submit"
                         disabled={isSubmitting}
                         className="w-full flex items-center justify-center gap-2 py-2.5 px-4
-                                   rounded-md shadow-sm text-base md:text-lg lg:text-xl font-jersey-25
+                                   rounded-md shadow-sm text-base md:text-lg lg:text-xl font-jersey
                                    text-white bg-primary hover:bg-secondary disabled:opacity-50
-                                   transition-colors"
+                                   disabled:cursor-not-allowed transition-colors"
                     >
-                        {isSubmitting ? 'Going to events...' : 'Create events for this tournament'}
+                        {isSubmitting ? 'Creating...' : 'Create events for this tournament'}
                         <ArrowRight size={16} className='shrink-0' />
                     </button>
                 </div>
@@ -369,4 +301,3 @@ export default function TournamentInsertForm() {
         </div>
     );
 }
-

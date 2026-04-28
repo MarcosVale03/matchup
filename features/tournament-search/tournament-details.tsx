@@ -2,8 +2,7 @@
 import { FetchTournamentFromIdResponse } from "@/server/queries/tournaments.queries";
 import { getTimeUntilStart } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { Mail, Pencil, Globe, Trash, Info, Torus, Trophy } from "lucide-react";
+import { Mail, Globe, Cog } from "lucide-react";
 import Image from "next/image";
 import React, { useState } from "react";
 import { deleteTournament } from "@/server/mutations/tournaments.mutations";
@@ -12,10 +11,6 @@ import { FetchEventsFromTournamentIdResponse } from "@/server/queries/events.que
 import EventList from "@/features/tournament-events/event-list";
 import { formatDate } from "date-fns";
 
-export type TournamentPermissions = {
-    canEdit: boolean;
-    canDelete: boolean;
-};
 
 function InfoCells({ tournament }: { tournament: FetchTournamentFromIdResponse }) {
 
@@ -127,38 +122,15 @@ function InfoCells({ tournament }: { tournament: FetchTournamentFromIdResponse }
 export function TournamentDetails({
     tournament,
     events,
-    permissions
+    hasPermissions
 }: {
     tournament: FetchTournamentFromIdResponse;
     events?: FetchEventsFromTournamentIdResponse;
-    permissions: TournamentPermissions;
+    hasPermissions: boolean;
 }) {
     const router = useRouter();
 
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [isDeleting, setIsDeleting] = useState(false);
-    const [deleteError, setDeleteError] = useState<string | null>(null);
-
-    const handleEditClick = () => router.push(`/tournaments/${tournament.id}/edit`);
-
-    const handleDeleteConfirm = async () => {
-        setIsDeleting(true);
-        setDeleteError(null);
-        try {
-            const response = await deleteTournament(tournament.id);
-            if (response.success) {
-                await new Promise(resolve => setTimeout(resolve, 800));
-                router.push('/tournaments');
-            } else {
-                setIsDeleting(false);
-                setDeleteError("Failed to delete the tournament. Please try again.");
-            }
-        } catch (err) {
-            console.error(err);
-            setIsDeleting(false);
-            setDeleteError("An unexpected error occurred.");
-        }
-    };
+    const handleAdminClick = () => router.push(`/admin/tournaments/${tournament.id}/`);
 
     return (
         <div className="flex flex-row">
@@ -179,29 +151,17 @@ export function TournamentDetails({
                         </h1>
 
                         {/* Shows edit/delete option if user has permissions */}
-                        {permissions.canEdit && permissions.canDelete && (
+                        {hasPermissions && (
                             <div className="flex gap-4 tracking-wide shrink-0">
                                 <button
-                                    onClick={handleEditClick}
+                                    onClick={handleAdminClick}
                                     className="flex items-center justify-center gap-2 p-2 px-4 lg:mt-0
                                            rounded-md shadow-sm text-sm md:text-lg font-jersey-25
                                            text-white bg-primary hover:bg-secondary cursor-pointer
                                            disabled:opacity-50 transition-colors duration-200"
                                 >
-                                    <Pencil className="size-5" />
-                                    Edit
-                                </button>
-
-                                {/* Will throw an error if an event is tied to the tournament */}
-                                <button
-                                    onClick={() => setShowDeleteModal(true)}
-                                    className="flex items-center justify-center gap-2 p-2 px-4 lg:mt-0
-                                           rounded-md shadow-sm text-sm md:text-lg font-jersey-25
-                                           text-white bg-primary hover:bg-secondary cursor-pointer
-                                           disabled:opacity-50 transition-colors duration-200"
-                                >
-                                    <Trash className="size-5" />
-                                    Delete
+                                    <Cog className="size-5" />
+                                    Admin
                                 </button>
                             </div>
                         )}
@@ -260,33 +220,6 @@ export function TournamentDetails({
 
                 {/* Info cells | visibility, contact, discord, status */}
                 <InfoCells tournament={tournament} />
-
-                {/* Delete modal */}
-                <ConfirmButton
-                    isOpen={showDeleteModal}
-                    title={`Delete "${tournament.name}"`}
-                    message="This action cannot be undone. All events and registrations associated with this tournament will be permanently deleted."
-                    isSubmitting={isDeleting}
-                    error={deleteError ?? ''}
-                    onConfirm={handleDeleteConfirm}
-                    onCancelForm={() => {
-                        setShowDeleteModal(false);
-                        setDeleteError(null);
-                    }}
-                />
-
-                {/* Register button */}
-                <div className="px-4 sm:px-6 lg:px-8 py-4 border-b border-zinc-200">
-                    <Link
-                        href={`/tournaments/${tournament.id}/register`}
-                        className="inline-flex items-center gap-2 bg-primary text-white px-5 py-2.5
-                                   rounded-md font-jersey-25 text-lg hover:bg-secondary
-                                   transition-colors duration-150"
-                    >
-                        <Trophy className="size-5" />
-                        Register for this Tournament
-                    </Link>
-                </div>
 
                 <EventList events={events} />
             </div>
