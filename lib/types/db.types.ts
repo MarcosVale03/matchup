@@ -1136,6 +1136,15 @@ export type Database = {
         }
         Returns: undefined
       }
+      update_seeding: {
+        Args: {
+          eid: number
+          pgids: string[]
+          seed_users: (string | null)[][]
+          tid: number
+        }
+        Returns: undefined
+      }
       update_setup: {
         Args: {
           s_event_id: number
