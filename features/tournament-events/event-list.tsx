@@ -1,3 +1,5 @@
+'use client'
+
 import {FetchEventsFromTournamentIdResponse} from "@/server/queries/events.queries";
 import {formatDate} from "date-fns";
 import {useRouter} from "next/navigation";
