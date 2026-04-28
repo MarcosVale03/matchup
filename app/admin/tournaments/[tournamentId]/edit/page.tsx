@@ -1,17 +1,15 @@
 import { fetchTournamentFromId } from "@/server/queries/tournaments.queries";
 import {notFound, redirect} from "next/navigation";
-import { createClient } from "@/server/db/server";
-import { cookies } from "next/headers";
 import TournamentEditForm from "@/features/tournament-crud/edit-tournament";
+import {hasPermissionLevel} from "@/server/queries/admins.queries";
+import {PermissionLevel} from "@/lib/types/types";
+import {getUser} from "@/server/queries/users.queries";
 
-export default async function EditTournamentPage({ params }: { params: { tournamentId: string } }) {
+export default async function EditTournamentPage({ params }: { params: Promise<{ tournamentId: string }> }) {
     const { tournamentId: idStr } = await params
     const id = Number(idStr);
 
-    const cookieStore = await cookies();
-    const supabase = await createClient(cookieStore);
-
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getUser();
 
     const { success, tournament } = await fetchTournamentFromId(id);
 
@@ -19,7 +17,9 @@ export default async function EditTournamentPage({ params }: { params: { tournam
         return notFound();
     }
 
-    if (!user || user.id !== tournament.owner.user_id) {
+    const hasPermissions = await hasPermissionLevel(user.id, id, PermissionLevel.Admin)
+
+    if (!hasPermissions) {
         redirect('/tournaments')
     }
 
