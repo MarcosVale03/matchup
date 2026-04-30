@@ -1,11 +1,10 @@
 import { fetchTournamentFromId } from '@/server/queries/tournaments.queries';
 import { fetchEventsFromTournamentId } from '@/server/queries/events.queries';
 import { notFound, redirect } from 'next/navigation';
-import { cookies } from 'next/headers';
-import { createClient } from '@/server/db/server';
 import { Trophy } from 'lucide-react';
 import Link from 'next/link';
 import RegistrationForm from '@/features/tournament-registration/registration-form';
+import {getUser} from "@/server/queries/users.queries";
 
 export default async function TournamentRegistrationPage({
     params,
@@ -20,11 +19,7 @@ export default async function TournamentRegistrationPage({
     }
 
     // Auth check — redirect to login if not signed in
-    const cookieStore = await cookies();
-    const supabase = await createClient(cookieStore);
-    const {
-        data: { user },
-    } = await supabase.auth.getUser();
+    const user = await getUser()
 
     if (!user) {
         redirect(`/login?redirect=/tournaments/${tournamentId}/register`);
