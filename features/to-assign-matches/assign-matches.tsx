@@ -23,7 +23,7 @@ function Draggable({match} : {match : any}) {
         )
     }
 
-function Droppable({id} : {id : string, match?: any}) {
+function Droppable({id, match} : {id : string, match?: any}) {
     const {isOver, setNodeRef} = useDroppable({
         id: id,
         data : {identifier : id}
@@ -33,12 +33,26 @@ function Droppable({id} : {id : string, match?: any}) {
         color: isOver ? 'green' : undefined,
     };  
 
+    if (match) {
+
+        return (
+            <div suppressHydrationWarning ref={setNodeRef} style={style} className='peer block bg-white w-full rounded-xl border-2 border-white 
+                text-black p-2 2xl:p-4 2xl:text-xl focus:outline-none 
+                focus:border-primary shadow-sm cursor-grab font-normal'>
+                <p className='text-sm'>{match.code} - {match.phase_group_identifier}- Round {match.round_num}</p>
+                <p className='font-semibold'>{match.match_slots?.[0]?.seeds?.users?.display_name} vs {match.match_slots?.[1]?.seeds?.users?.display_name}</p>
+            </div>
+        )
+    }
+
     return (
+        
         <div ref={setNodeRef} className='flex items-center justify-center border-1 border-dashed border-gray-500 py-3 px-3 mt-2 mb-3' style={style}>
             DROP MATCH HERE
         </div>
     );
 }
+
 
 export default function AssignMatchesForm({matches, stations, tournament_id, event_id}: {matches: any[], stations : any[], tournament_id: number, event_id : number}) {console.log(matches[0])
     const pageLabelClass = "block text-zinc-600 2xl:text-xl rounded-md peer-focus:text-primary transition duration-400";
@@ -107,18 +121,9 @@ export default function AssignMatchesForm({matches, stations, tournament_id, eve
                                             focus:border-primary shadow-sm transition duration-400 font-normal'>
                                             <div className='flex justify-between items-start'>
                                                 <p>{station.identifier}</p>
-                                                <button  onClick={() => handleSetupRelease(station.identifier)} className='px-2 py-0.5 text-sm rounded-md border border-red-500 text-red-600 hover:bg-red-500 hover:text-white transition-colors'>Release</button>
+                                                <button onClick={() => handleSetupRelease(station.identifier)} className='px-2 py-0.5 text-sm rounded-md border border-red-500 text-red-600 hover:bg-red-500 hover:text-white transition-colors'>Release</button>
                                             </div>
-                                            <Droppable id={station.identifier}/>
-                                            {/* Winner */}
-                                            <div className='flex gap-2'>
-                                                <button className='w-full text-sm rounded border rounded-md hover:border-red-50 hover:bg-red-400 transition-colors'>
-                                                    Player 1 Wins
-                                                </button>
-                                                <button className='w-full text-sm rounded border rounded-md hover:border-red-50 hover:bg-red-400 transition-colors'>
-                                                    Player 2 Wins
-                                                </button>
-                                            </div>
+                                            <Droppable id={station.identifier} match={matches.find(match => match.id === station.match_id)}/>
                                         </div>
                                     ))}
                                 </div>
