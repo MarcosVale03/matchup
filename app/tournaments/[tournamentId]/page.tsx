@@ -7,6 +7,8 @@ import {fetchEventsFromTournamentId} from "@/server/queries/events.queries";
 import {getUser} from "@/server/queries/users.queries";
 import {hasPermissionLevel} from "@/server/queries/admins.queries";
 import {PermissionLevel} from "@/lib/types/types";
+import {FetchEventsFromTournamentIdResponse} from "@/server/queries/events.queries";
+import { fetchAdminsFromTournament } from "@/server/queries/admins.queries";
 
 
 export default async function TournamentDetailsPage({ params }: { params: { tournamentId: string } }) {
@@ -46,6 +48,16 @@ export default async function TournamentDetailsPage({ params }: { params: { tour
     const user = await getUser();
 
     const permissions = await hasPermissionLevel(user.id, id, PermissionLevel.Reporter)
+    // get admins
+    const admins = await fetchAdminsFromTournament(id)
+    let adminPermLevel
+
+    for (const admin of admins) {
+        if (user?.id === admin.users.user_id) {
+            adminPermLevel = admin.permission_levels.id
+            break
+        }
+    }
 
     return (
         <main className="bg-main-bg flex flex-col font-[Poppins] text-black">

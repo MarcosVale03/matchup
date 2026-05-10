@@ -7,9 +7,13 @@ import { insertTournament, TournamentInsertErrors } from '@/server/mutations/tou
 import { dateToInputString } from "@/lib/utils";
 import { ArrowRight } from 'lucide-react';
 import { ErrorMessageForTournament } from "@/features/tournament-crud/error-message-tournament";
+import Checkbox from "@/ui/checkbox";
+import { AdminInsertErrors, insertAdmin } from '@/server/mutations/add-admin.mutation';
+import { getUserIdfromEmail } from '@/server/queries/profile.queries';
 import { FormSection } from '@/ui/form-section';
 import { SegmentedToggle } from '@/ui/segmented-toggle';
 
+// Initial state for the form
 interface FormState {
     name: string;
     slug: string;
@@ -19,8 +23,26 @@ interface FormState {
     email: string;
     discord: string;
     isPublic: boolean;
+    // Location is simplified for the form input
     locationAddress: string;
+    adminEmail : string;
+    adminPermissionLevel : number;
 }
+
+// Initial form state with default values
+const initialFormState: FormState = {
+    name: '',
+    slug: '',
+    startTime: new Date(),
+    endTime: new Date(Date.now() + 24 * 60 * 60 * 1000),
+    isOnline: true,
+    email: '',
+    discord: '',
+    isPublic: true,
+    locationAddress: '',
+    adminEmail : '',
+    adminPermissionLevel : 4, // default to lowest
+};
 
 export default function TournamentInsertForm() {
     const router = useRouter();
@@ -34,9 +56,12 @@ export default function TournamentInsertForm() {
         discord: '',
         isPublic: true,
         locationAddress: '',
+        adminEmail : '',
+        adminPermissionLevel : 4,
     }));
     const [fieldErrors, setFieldErrors] = useState<TournamentInsertErrors>({});
     const [formError, setFormError] = useState<string | null>(null);
+    const [admin, setAdmin] = useState([{adminEmail : "", adminPermissionLevel : 4}])
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Placeholder until Google Maps
@@ -47,11 +72,44 @@ export default function TournamentInsertForm() {
         longitude: -118.2437,
     };
 
+    // handler for admin add
+    const handleAdminAdd=()=>{
+        setAdmin([...admin, {adminEmail: "", adminPermissionLevel : 4}])
+    }
+
+    // handler for admin change
+    const handleAdminChange=(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, i: number)=> {
+        const {name, value}=e.target
+        const onChangeVal = [...admin]
+
+        if (name === 'adminPermissionLevel') {
+            onChangeVal[i].adminPermissionLevel = parseInt(value, 10)
+        }
+
+        if (name === 'adminEmail') {
+            onChangeVal[i].adminEmail = value
+        }
+
+        setAdmin(onChangeVal)
+    }
+
+    // handler for admin delete
+    const handleAdminDelete=()=> {
+        const deleteVal = [...admin]
+        if (admin.length > 1) {
+            setAdmin(admin.slice(0,-1))
+        }
+
+    }
+
+
+    // handler for changes in inputs
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
+
         setFormData(prev => ({
             ...prev,
-            [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
+            [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : name === 'adminPermissionLevel' ? parseInt(value, 10) : value,
         }));
     };
 
@@ -76,11 +134,28 @@ export default function TournamentInsertForm() {
                 locationArg
             );
 
-            if (response.success) {
-                // Send the organizer to the event-creation page next. The
-                // "tournament created" toast fires after they finish adding
-                // events (or skip).
-                router.push(`/tournaments/${response.data}/events/create`);
+            if (response.success && response.data) {
+
+                for (const admins of admin) {
+                if (admins.adminEmail.trim()) {
+                    const user = await getUserIdfromEmail(admins.adminEmail)
+                    console.log('email tried:', admins.adminEmail)
+                    console.log('user lookup result:', JSON.stringify(user))
+                    if (user.success && user.data) {
+                        const result = await insertAdmin(response.data, user.data, admins.adminPermissionLevel)
+                        console.log('insert result:', JSON.stringify(result))
+                    } else {
+                        console.log('user lookup failed or returned no data')
+                    }
+                } else {
+                    console.log('skipped empty email at index', admin.indexOf(admins))
+                }
+            }
+
+                alert(`Tournament "${formData.name}" created successfully!`);
+                // Redirect to the new tournament's detail page
+                // will change this to push to create events page
+                router.push(`/tournaments/${response.data}`);
             } else {
                 setFieldErrors(response.fieldErrors || {});
                 setFormError(response.formErrors?.join(' ') || 'Validation failed. Check the fields above.');
@@ -174,8 +249,10 @@ export default function TournamentInsertForm() {
                                 inputClassName={`${pageInputClass} appearance-none`}
                                 maxDateTime="9999-12-31T23:59"
                             />
+                            <ErrorMessageForTournament field='times' fieldErrors={fieldErrors} />
                         </div>
 
+                        {/* End Time */}
                         <div>
                             <BasicInputWithLabel
                                 labelClassName={pageLabelClass}
@@ -282,9 +359,55 @@ export default function TournamentInsertForm() {
                     </div>
                     <ErrorMessageForTournament field='contact' fieldErrors={fieldErrors} />
                 </FormSection>
+                <fieldset className="p-4 px-5 border-2 border-zinc-600 rounded-2xl mb-6 w-full">
+                    <legend >
+                        Tournament Admins
+                    </legend>
+                    {
+                        admin.map((val, i) => (
+                            <div key={i}>
+                                {/* Admin Email */}
+                                <div className="mt-2">
+                                    <BasicInputWithLabel
+                                        labelClassName={pageLabelClass}
+                                        labelText='Admin Email'
+                                        inputType='email'
+                                        inputName='adminEmail'
+                                        inputId='adminEmail'
+                                        inputValue={val.adminEmail}
+                                        inputOnChange={(e) => handleAdminChange(e, i)}
+                                        required={false}
+                                        inputPlaceholder='Enter your admin email'
+                                        inputClassName={pageInputClass}
+                                    />
+                                </div>
+                                {/* Admin Permission Level */}
+                                <div>
+                                    <label htmlFor='adminPermissionLevel'>Premission Level</label>
+                                    <select name='adminPermissionLevel' value={val.adminPermissionLevel} onChange={(e) => handleAdminChange(e, i)} className={pageInputClass}>
+                                        <option value={1}>Admin</option>
+                                        <option value={2}>Moderator</option>
+                                        <option value={3}>Bracket Manager</option>
+                                        <option value={4}>Reporter</option>
+                                    </select>
+                                </div>
+                            </div>
+                        ))
+                    }
 
-                {/* Submit button */}
-                <div className="border-t border-gray-300 pt-3 pb-3 mt-6 -mx-4 px-4 sm:mx-0 sm:px-0">
+                    {/* Add/Delete Admins Button */}
+                    <div className='flex items-center gap-4 mt-3 '>
+                        <button type='button' onClick={handleAdminAdd} className='rounded-md shadow-sm text-base md:text-lg lg:text-xl font-jersey-25
+                                   text-white bg-primary hover:bg-secondary disabled:opacity-50
+                                   transition-colors py-2.5 px-4'>+</button>
+                        <button type='button' disabled={admin.length <=1} onClick={() => handleAdminDelete()} className='rounded-md shadow-sm text-base md:text-lg lg:text-xl font-jersey-25
+                                   text-white bg-primary hover:bg-secondary disabled:opacity-50
+                                   transition-colors py-2.5 px-4'>-</button>
+                    </div>
+
+                </fieldset>
+                {/* Submit Button */}
+                <div className="pt-4 sm:pt-6 mt-4 border-t-2 border-gray-400 flex gap-2">
                     <button
                         type="submit"
                         disabled={isSubmitting}
@@ -301,3 +424,4 @@ export default function TournamentInsertForm() {
         </div>
     );
 }
+

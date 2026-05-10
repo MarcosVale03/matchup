@@ -9,7 +9,8 @@ import { MutationResponse } from "@/lib/types/types"
 const AdminInsertSchema = z.object({
     tournament_id : z.number().int().positive(),
     user_id : z.string().uuid(),
-    permission_level : z.enum(['0', '1', '2', '3', '4']).transform(Number)
+    permission_level : z.number().int().min(0).max(4),
+    //email : z.string().email()
 })
 
 // init the admin insert errors
@@ -17,11 +18,12 @@ export type AdminInsertErrors = {
     tournament_id? : string[],
     user_id? : string[],
     permission_level? : string[]
+    //email? : string[]
 }
 
 // function inserts adminds into the table in the db
 export async function insertAdmin(tournament_id : number, user_id : string, permission_level : number) : Promise<MutationResponse<void, AdminInsertErrors>> {
-
+    
     // creating client 
     const cookieStore = await cookies()
     const supabase = await createClient(cookieStore)
@@ -30,7 +32,8 @@ export async function insertAdmin(tournament_id : number, user_id : string, perm
     const result = AdminInsertSchema.safeParse({
         tournament_id : tournament_id,
         user_id : user_id,
-        permission_level : permission_level
+        permission_level : permission_level,
+        //email : email
     })
 
     // check for any errors
@@ -47,7 +50,8 @@ export async function insertAdmin(tournament_id : number, user_id : string, perm
     const {data, error} = await supabase.rpc('insert_admin', {
         a_tournament_id : result.data.tournament_id,
         a_user_id : result.data.user_id,
-        a_permission_level : result.data.permission_level
+        a_permission_level : result.data.permission_level,
+        //a_admin_email : result.data.email
     })
 
     // checks if inserting gave any errors 
@@ -66,7 +70,8 @@ export async function insertAdmin(tournament_id : number, user_id : string, perm
 const AdminUpdateSchema = z.object({
     tournament_id : z.number().int().positive(),
     user_id : z.string().uuid(),
-    permission_level : z.enum(['0', '1', '2', '3', '4']).transform(Number)
+    permission_level : z.number().int().min(0).max(4),
+    //email : z.string().email()
 })
 
 // init the admin udpate errors
@@ -74,10 +79,11 @@ export type AdminUpdateErrors = {
     tournament_id? : string[],
     user_id? : string[],
     permission_level? : string[]
+    //email? : string[]
 }
 
 // this function allows us to update the adminds data
-export async function updateAdmin(tournament_id : number, user_id : string, permission_level : number) : Promise<MutationResponse<void, AdminUpdateErrors>> {
+export async function updateAdmin(tournament_id : number, user_id : string, permission_level : number, email : string) : Promise<MutationResponse<void, AdminUpdateErrors>> {
     
     // creating client 
     const cookieStore = await cookies()
@@ -87,7 +93,8 @@ export async function updateAdmin(tournament_id : number, user_id : string, perm
     const result = AdminUpdateSchema.safeParse({
         tournament_id : tournament_id,
         user_id : user_id,
-        permission_level : permission_level
+        permission_level : permission_level,
+        //email : email
     })
 
     // check for any errors
@@ -104,7 +111,8 @@ export async function updateAdmin(tournament_id : number, user_id : string, perm
     const {data, error} = await supabase.rpc('update_admins', {
         a_tournament_id : result.data.tournament_id,
         a_user_id : result.data.user_id,
-        a_permission_level : result.data.permission_level
+        a_permission_level : result.data.permission_level,
+        //a_admin_email : email,
     })
 
     // checking if the insert gave any errors 
@@ -118,18 +126,17 @@ export async function updateAdmin(tournament_id : number, user_id : string, perm
     }
 }
 
-export async function deleteAdmin(tournament_id : number, user_id : string) {
+export async function deleteAdmins(tournament_id : number) {
 
     // creating client
     const cookieStore = await cookies()
     const supabase = await createClient(cookieStore)
     
     // deleting wave from db
-    const {error} = await supabase.from('admins').delete().eq('tournament_id', tournament_id).eq('user_id', user_id)
+    const {count, error} = await supabase.from('admins').delete().eq('tournament_id', tournament_id).neq('permission_level', 0)
     if (error) {
         throw new Error("DB Error while trying to delete from Admins" + error.details + " " + error.message)
     }
-
     // returns sucess
     return {
         success : true
