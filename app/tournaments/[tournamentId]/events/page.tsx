@@ -1,6 +1,6 @@
 import {fetchEventsFromTournamentId} from "@/server/queries/events.queries";
 import {notFound} from "next/navigation";
-import Link from "next/link";
+import EventList from "@/features/tournament-events/event-list";
 
 export default async function Events({ params }: { params: Promise<{ tournamentId: string }> }) {
     const { tournamentId: idStr } = await params
@@ -17,11 +17,7 @@ export default async function Events({ params }: { params: Promise<{ tournamentI
     }
 
 
-    return (<div>
-        {events.map((event) => {
-            return (<li key={event.id}>
-                <Link href={`/tournaments/${tournamentId}/events/${event.id}`}>{event.name}</Link>
-            </li>)
-        })}
+    return (<div className="bg-main-bg flex flex-col font-[Poppins] text-black">
+        <EventList events={events} />
     </div>)
 }

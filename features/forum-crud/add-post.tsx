@@ -2,7 +2,6 @@
 import React, {useState} from 'react';
 import {X, Send} from "lucide-react";
 import {insertPost} from '@/server/mutations/forum.mutation';
-import {Toast} from "@/ui/toast/toast";
 import {useRouter} from "next/navigation";
 
 type Toast = {
@@ -78,7 +77,7 @@ export default function AddThreadPost({ threadId, toastControl }: {threadId: str
                 placeholder="Create a post"
                 className="w-full px-4 py-2 min-h-[50px] leading-relaxed border border-gray-300
                            rounded-lg resize-y focus:outline-none focus:ring-2 focus:ring-primary
-                           focus:border-transparent font-[Poppins] bg-white"
+                           focus:border-transparent font-poppins bg-white"
             />
 
             {/* Cancel/Post Buttons */}
@@ -95,7 +94,7 @@ export default function AddThreadPost({ threadId, toastControl }: {threadId: str
                                 type="button"
                                 onClick={() => setIsAddButtonsOpen(false)}
                                 className="flex items-center justify-center gap-2 py-1 px-4
-                                   rounded-md shadow-sm text-base md:text-lg font-jersey-25
+                                   rounded-md shadow-sm text-base md:text-lg font-jersey
                                    text-white bg-primary hover:bg-secondary disabled:opacity-50
                                    transition-colors"
                             >
@@ -105,7 +104,7 @@ export default function AddThreadPost({ threadId, toastControl }: {threadId: str
                             <button
                                 type="submit"
                                 className="flex items-center justify-center gap-2 py-1 px-4
-                                   rounded-md shadow-sm text-base md:text-lg font-jersey-25
+                                   rounded-md shadow-sm text-base md:text-lg font-jersey
                                    text-white bg-primary hover:bg-secondary disabled:opacity-50
                                    transition-colors"
                                 disabled={!content.trim() || isSubmitting}

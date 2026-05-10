@@ -67,7 +67,7 @@ export default function SignupPage() {
     }
 
     return (
-        <div className="bg-primary font-[Poppins] h-screen sm:absolute sm:h-full sm:inset-0 flex items-center justify-center p-4 2xl:p-12">
+        <div className="bg-primary font-poppins flex-1 sm:absolute sm:h-full sm:inset-0 flex items-center justify-center p-4 2xl:p-12">
             <div className="w-full max-w-2xl 2xl:max-w-4xl flex z-10 flex-col sm:flex-row rounded-lg overflow-hidden shadow-lg/40">
                 <AuthCard
                     step={step}

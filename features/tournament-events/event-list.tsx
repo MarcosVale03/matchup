@@ -1,3 +1,5 @@
+'use client'
+
 import {FetchEventsFromTournamentIdResponse} from "@/server/queries/events.queries";
 import {formatDate} from "date-fns";
 import {useRouter} from "next/navigation";
@@ -13,12 +15,12 @@ export default function EventList({
     return (
         <div className="p-4 sm:p-6 lg:p-8 mt-2">
             <div className="pb-3 border-b border-zinc-300 mb-4">
-                <h1 className="text-xl lg:text-3xl wrap-break-word font-jersey-25">
+                <h3 className="">
                     Tournament Events
-                </h1>
-                <h2 className="text-base text-gray-600">
+                </h3>
+                <h5 className="text-gray-600">
                     Select an event below to view its details
-                </h2>
+                </h5>
             </div>
 
             {events && events.length > 0 ? (
@@ -37,7 +39,7 @@ export default function EventList({
                                 {/* Game name in the bottom left corner of image */}
                                 <div
                                     className="absolute text-white left-3 bottom-3 sm:left-5 sm:bottom-5
-                                    bg-zinc-600 rounded-lg px-2 py-1 sm:p-2 text-sm lg:text-base font-jersey-25"
+                                    bg-zinc-600 rounded-lg px-2 py-1 sm:p-2 text-sm lg:text-base font-jersey"
                                 >
                                     {event.video_game_name}
                                 </div>
@@ -50,18 +52,18 @@ export default function EventList({
                                 <div
                                     className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
                                     <div>
-                                        <p className="text-lg lg:text-2xl font-jersey-25 text-primary">
+                                        <p className="text-lg lg:text-2xl font-jersey text-primary">
                                             {event.name}
                                         </p>
                                         <p className="text-sm text-gray-">
-                                            <span className="font-jersey-25 text-base tracking-normal font-normal">Platform: </span>{event.gaming_platform_name}
+                                            <span className="font-jersey text-base tracking-normal font-normal">Platform: </span>{event.gaming_platform_name}
                                         </p>
                                     </div>
                                     <div className="sm:text-right">
-                                        <p className="text-base lg:text-xl font-jersey-25">
+                                        <p className="text-base lg:text-xl font-jersey">
                                             Date & Time
                                         </p>
-                                        <p className="text-sm font-[Poppins] tracking-tight">
+                                        <p className="text-sm font-poppins tracking-tight">
                                             {formatDate(event.start_time, "MMM d, yyyy @ h:mm a")}
                                         </p>
                                     </div>
@@ -71,40 +73,40 @@ export default function EventList({
                                 <div className="grid grid-cols-1 xs:grid-cols-2 mt-3 border-y-2 border-y-gray-300 py-4 gap-y-3">
                                     {/* Entry Fee */}
                                     <div>
-                                        <h3 className="text-sm lg:text-base font-jersey-25 tracking-wide">
+                                        <h3 className="text-sm lg:text-base font-jersey tracking-wide">
                                             Entry Fee
                                         </h3>
-                                        <p className="text-sm lg:text-md font-[Poppins] tracking-tight">
+                                        <p className="text-sm lg:text-md font-poppins tracking-tight">
                                             ${event.price}
                                         </p>
                                     </div>
 
                                     {/* Team size */}
                                     <div>
-                                        <h3 className="text-sm lg:text-base font-jersey-25 tracking-wide">
+                                        <h3 className="text-sm lg:text-base font-jersey tracking-wide">
                                             Team Size
                                         </h3>
-                                        <p className="text-sm font-[Poppins] tracking-tight">
+                                        <p className="text-sm font-poppins tracking-tight">
                                             {event.max_team_size ? event.max_team_size : "Solos"}
                                         </p>
                                     </div>
 
                                     {/* Amount of teams registered out of maximum allowed */}
                                     <div>
-                                        <h3 className="text-sm lg:text-base font-jersey-25 tracking-wide">
+                                        <h3 className="text-sm lg:text-base font-jersey tracking-wide">
                                             Registered
                                         </h3>
-                                        <p className="text-sm font-[Poppins] tracking-tight">
+                                        <p className="text-sm font-poppins tracking-tight">
                                             16/20
                                         </p>
                                     </div>
 
                                     {/* Bracket type */}
                                     <div>
-                                        <h3 className="text-sm lg:text-base font-jersey-25 tracking-wide">
+                                        <h3 className="text-sm lg:text-base font-jersey tracking-wide">
                                             Registration Window
                                         </h3>
-                                        <p className="text-sm font-[Poppins] tracking-tight">
+                                        <p className="text-sm font-poppins tracking-tight">
                                             Placeholder Date
                                         </p>
                                     </div>
@@ -115,7 +117,7 @@ export default function EventList({
                                     onClick={() => router.push(`${event.tournament_id}/events/${event.id}`)}
                                     className="flex items-center justify-center gap-2 p-2 px-4 mt-4
                                            rounded-md shadow-sm text-sm md:text-base lg:text-lg
-                                           font-jersey-25 text-white bg-primary hover:bg-secondary
+                                           font-jersey text-white bg-primary hover:bg-secondary
                                            cursor-pointer disabled:opacity-50 transition-colors duration-200 w-full"
                                 >
                                     View Details
@@ -125,7 +127,7 @@ export default function EventList({
                     ))}
                 </div>
             ) : (
-                <div className="p-8 text-center font-semibold text-zinc-600 text-base md:text-lg">
+                <div className="p-4 text-center text-zinc-600 text-base md:text-lg">
                     No events have been added to this tournament.
                 </div>
             )}

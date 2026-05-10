@@ -18,7 +18,7 @@ type ConfirmButtonProps = {
 }
 
 
-export function ConfirmButton({
+export function     ConfirmButton({
     isOpen,
     title,
     message,
@@ -45,10 +45,10 @@ export function ConfirmButton({
                         <AlertTriangle className="w-5 h-5 text-primary" />
                     </div>
                     <div className="flex-1 min-w-0">
-                        <h3 className="mb-2 text-black font-semibold wrap-break-word">
+                        <h3 className="wrap-break-word">
                             {title}?
                         </h3>
-                        <p className="text-gray-600 wrap-break-word">
+                        <p className="text-gray-600 wrap-break-word font-poppins text-sm">
                             {message}
                         </p>
                     </div>
@@ -58,8 +58,9 @@ export function ConfirmButton({
                     <button
                         onClick={onCancelForm}
                         disabled={isSubmitting}
-                        className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50
-                                   transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100
+                                   transition-colors disabled:opacity-50 disabled:cursor-not-allowed
+                                   hover:cursor-pointer text-sm" 
                     >
                         Cancel
                     </button>
@@ -68,7 +69,7 @@ export function ConfirmButton({
                         onClick={onConfirm}
                         disabled={isSubmitting}
                         className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary
-                                   transition-colors disabled:opacity-50"
+                                   transition-colors disabled:opacity-50 hover:cursor-pointer text-sm"
                     >
                         {isSubmitting ? 'Deleting...' : 'Delete'}
                     </button>
