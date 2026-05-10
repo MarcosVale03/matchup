@@ -77,8 +77,10 @@ export default function TournamentInsertForm() {
             );
 
             if (response.success) {
-                // Pass ?created=1 so the destination page can render a toast/banner
-                router.push(`/tournaments/${response.data}?created=1`);
+                // Send the organizer to the event-creation page next. The
+                // "tournament created" toast fires after they finish adding
+                // events (or skip).
+                router.push(`/tournaments/${response.data}/events/create`);
             } else {
                 setFieldErrors(response.fieldErrors || {});
                 setFormError(response.formErrors?.join(' ') || 'Validation failed. Check the fields above.');

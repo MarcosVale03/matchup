@@ -22,3 +22,11 @@ BracketTypeMap.set("Single Elimination", BracketType.SingleElimination)
 BracketTypeMap.set("Double Elimination", BracketType.DoubleElimination)
 BracketTypeMap.set("Round Robin", BracketType.RoundRobin)
 export {BracketTypeMap};
+
+export enum PermissionLevel {
+    Owner,
+    Admin,
+    Moderator,
+    BracketManager,
+    Reporter
+}
