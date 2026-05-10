@@ -130,7 +130,7 @@ export default function TournamentEditForm({initialData, currAdmins}: { initialD
                 }
             }
             alert(`Tournament "${formData.name}" updated successfully!`);
-            router.push(`/tournaments/${formData.id}`);
+            router.push(`/admin/tournaments/${formData.id}`);
         } else {
             setFieldErrors(response.fieldErrors || {});
             setFormError(response.formErrors?.join(' ') || 'Validation failed.');

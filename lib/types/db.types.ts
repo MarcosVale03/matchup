@@ -1140,7 +1140,7 @@ export type Database = {
         Args: {
           eid: number
           pgids: string[]
-          seed_users: string[]
+          seed_users: (string | null)[][]
           tid: number
         }
         Returns: undefined
