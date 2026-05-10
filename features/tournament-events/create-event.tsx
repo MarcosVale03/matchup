@@ -122,7 +122,7 @@ export default function EventInsertForm({
                 setCreatedEvents((prev) => [...prev, newEvent]);
 
                 if (andFinish) {
-                    router.push(`/tournaments/${tournamentId}?created=1`);
+                    router.push(`/admin/tournaments/${tournamentId}?created=1`);
                     return;
                 }
 
@@ -164,7 +164,7 @@ export default function EventInsertForm({
     };
 
     const handleDone = () => {
-        router.push(`/tournaments/${tournamentId}?created=1`);
+        router.push(`/admin/tournaments/${tournamentId}?created=1`);
     };
 
     const pageLabelClass = 'block text-zinc-600 peer-focus:text-primary transition duration-400 tracking-tight';
