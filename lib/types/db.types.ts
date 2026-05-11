@@ -528,7 +528,7 @@ export type Database = {
           code: string
           event_id: number
           id: number
-          is_complete: boolean | null
+          is_complete: boolean
           l_advance_match_id: number | null
           l_advance_slot_num: number | null
           phase_group_identifier: string
@@ -541,7 +541,7 @@ export type Database = {
           code: string
           event_id: number
           id?: number
-          is_complete?: boolean | null
+          is_complete?: boolean
           l_advance_match_id?: number | null
           l_advance_slot_num?: number | null
           phase_group_identifier: string
@@ -554,7 +554,7 @@ export type Database = {
           code?: string
           event_id?: number
           id?: number
-          is_complete?: boolean | null
+          is_complete?: boolean
           l_advance_match_id?: number | null
           l_advance_slot_num?: number | null
           phase_group_identifier?: string
