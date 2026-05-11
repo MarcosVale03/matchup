@@ -1,0 +1,1 @@
+alter table public.matches alter column "is_complete" set not null;
