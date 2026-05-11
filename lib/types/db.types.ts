@@ -528,7 +528,7 @@ export type Database = {
           code: string
           event_id: number
           id: number
-          isComplete: boolean
+          is_complete: boolean | null
           l_advance_match_id: number | null
           l_advance_slot_num: number | null
           phase_group_identifier: string
@@ -541,7 +541,7 @@ export type Database = {
           code: string
           event_id: number
           id?: number
-          isComplete?: boolean
+          is_complete?: boolean | null
           l_advance_match_id?: number | null
           l_advance_slot_num?: number | null
           phase_group_identifier: string
@@ -554,7 +554,7 @@ export type Database = {
           code?: string
           event_id?: number
           id?: number
-          isComplete?: boolean
+          is_complete?: boolean | null
           l_advance_match_id?: number | null
           l_advance_slot_num?: number | null
           phase_group_identifier?: string
@@ -1097,6 +1097,17 @@ export type Database = {
       }
       register_user_for_tournament: {
         Args: { eids: number[]; tid: number; uid: string }
+        Returns: undefined
+      }
+      report_scores: {
+        Args: {
+          completed: boolean
+          eid: number
+          mid: number
+          pgid: string
+          scores: number[]
+          tid: number
+        }
         Returns: undefined
       }
       update_admins: {
