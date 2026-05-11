@@ -1,6 +1,6 @@
 import {notFound} from "next/navigation";
 import {doesPhaseGroupExist, fetchBracketTypeFromBracketPhase} from "@/server/queries/phases.queries";
-import SingleElimBracket from "@/features/tournament-events/single-elim-bracket";
+import SingleElimBracket from "@/features/event-brackets/single-elim-bracket";
 import {fetchBracket} from "@/server/queries/brackets.queries";
 import {BracketType} from "@/lib/types/types";
 

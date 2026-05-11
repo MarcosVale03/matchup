@@ -70,7 +70,7 @@ function MatchNode({ match, isLast, showSeeds }: {
 
     // TODO: winner detection is hardcoded — should compare slot scores
     // once scoring is wired up 
-    const isComplete = match.isComplete;
+    const isComplete = match.is_complete;
     const winner = isComplete && slot1.score != slot2.score ? (slot1.score > slot2.score ? 1 : 2) : null;
     console.log(winner)
 
@@ -183,7 +183,7 @@ function MatchPopup({ onClick, match, showSeeds }: {
 
     // TODO: winner detection is hardcoded — should compare slot scores
     // once scoring is wired up
-    const isComplete = match.isComplete;
+    const isComplete = match.is_complete;
     const winner = isComplete && slot1.score != slot2.score ? (slot1.score > slot2.score ? 1 : 2) : null;
     console.log(winner)
 
