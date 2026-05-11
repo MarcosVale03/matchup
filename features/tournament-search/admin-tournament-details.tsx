@@ -193,7 +193,7 @@ export function TournamentDetails({
                                 </button>
 
                                 {/* Will throw an error if an event is tied to the tournament */}
-                                <button
+                                {/*<button
                                     onClick={() => setShowDeleteModal(true)}
                                     className="flex items-center justify-center gap-2 p-2 px-4 lg:mt-0
                                            rounded-md shadow-sm text-sm md:text-lg font-jersey-25
@@ -202,7 +202,7 @@ export function TournamentDetails({
                                 >
                                     <Trash className="size-5" />
                                     Delete
-                                </button>
+                                </button>*/}
                                 <button
                                     onClick={() => handleAddEventClick()}
                                     className="flex items-center justify-center gap-2 p-2 px-4 lg:mt-0
