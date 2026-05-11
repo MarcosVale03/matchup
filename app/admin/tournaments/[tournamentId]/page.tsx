@@ -1,4 +1,4 @@
-import {fetchTournamentFromId} from "@/server/queries/tournaments.queries";
+import {fetchTournamentFromId, fetchTournamentParticipants} from "@/server/queries/tournaments.queries";
 import {notFound} from "next/navigation";
 import {TournamentDetails} from "@/features/tournament-search/admin-tournament-details";
 import {Trophy} from "lucide-react";
@@ -6,6 +6,7 @@ import Link from "next/link";
 import {fetchEventsFromTournamentId} from "@/server/queries/events.queries";
 import {getUser} from "@/server/queries/users.queries";
 import {hasPermissionLevel} from "@/server/queries/admins.queries";
+import {QueryParamToast} from "@/ui/toast/query-param-toast";
 import {PermissionLevel} from "@/lib/types/types";
 
 
@@ -19,6 +20,7 @@ export default async function TournamentDetailsPage({ params }: { params: { tour
 
     const { success: tournamentSuccess, tournament } = await fetchTournamentFromId(id);
     const { events } = await fetchEventsFromTournamentId(id);
+    const participants = await fetchTournamentParticipants(id)
 
 
     if (!tournamentSuccess || !tournament) {
@@ -52,11 +54,21 @@ export default async function TournamentDetailsPage({ params }: { params: { tour
     const hasPermissions = await hasPermissionLevel(user.id, id, PermissionLevel.Admin)
 
     return (
-        <main className="bg-main-bg flex flex-col font-[Poppins] text-black">
+        <main className="bg-main-bg flex flex-1 flex-col font-poppins text-black">
             <TournamentDetails
                 tournament={tournament}
                 hasPermissions={hasPermissions}
                 events={events}
+                participants={participants}
+            />
+
+            <QueryParamToast
+                paramKey="created"
+                message="Tournament created successfully"
+            />
+            <QueryParamToast
+                paramKey="updated"
+                message="Changes saved"
             />
         </main>
     );

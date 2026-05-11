@@ -6,8 +6,8 @@ import { fetchVideoGames } from '@/server/queries/video_games.queries';
 
 export function GameAutocomplete({
     value,
-    onChange,
-    onSelect,
+    onChangeAction,
+    onSelectAction,
     inputId,
     labelText,
     labelClassName,
@@ -16,8 +16,8 @@ export function GameAutocomplete({
     placeholder,
 }: {
     value: string;
-    onChange: (name: string) => void;
-    onSelect: (name: string) => void;
+    onChangeAction: (name: string) => void;
+    onSelectAction: (name: string) => void;
     inputId: string;
     labelText: string;
     labelClassName: string;
@@ -29,8 +29,10 @@ export function GameAutocomplete({
     const [open, setOpen] = useState(false);
     const wrapperRef = useRef<HTMLDivElement | null>(null);
 
-    const onSelectRef = useRef(onSelect);
-    onSelectRef.current = onSelect;
+    const onSelectRef = useRef(onSelectAction);
+    useEffect(() => {
+        onSelectRef.current = onSelectAction;
+    }, [onSelectAction]);
 
     useEffect(() => {
         if (!open) return;
@@ -77,7 +79,7 @@ export function GameAutocomplete({
                 inputId={inputId}
                 inputValue={value}
                 inputOnChange={(e) => {
-                    onChange(e.target.value);
+                    onChangeAction(e.target.value);
                     setOpen(true);
                 }}
                 required={required}
@@ -94,7 +96,7 @@ export function GameAutocomplete({
                             <button
                                 type="button"
                                 onClick={() => {
-                                    onSelect(name);
+                                    onSelectAction(name);
                                     setOpen(false);
                                 }}
                                 className="w-full text-left px-3 py-2 text-sm md:text-base

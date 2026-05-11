@@ -1,8 +1,8 @@
 'use client';
-import { FetchTournamentFromIdResponse } from "@/server/queries/tournaments.queries";
+import {FetchTournamentFromIdResponse, FetchTournamentParticipantsResponse} from "@/server/queries/tournaments.queries";
 import { getTimeUntilStart } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { Mail, Pencil, Globe, Trash} from "lucide-react";
+import {Mail, Pencil, Globe, Trash, AlertTriangle, Trash2, Plus} from "lucide-react";
 import Image from "next/image";
 import React, { useState } from "react";
 import { deleteTournament } from "@/server/mutations/tournaments.mutations";
@@ -122,19 +122,24 @@ function InfoCells({ tournament }: { tournament: FetchTournamentFromIdResponse }
 export function TournamentDetails({
     tournament,
     events,
-    hasPermissions
+    hasPermissions,
+    participants,
 }: {
     tournament: FetchTournamentFromIdResponse;
     events?: FetchEventsFromTournamentIdResponse;
     hasPermissions: boolean;
+    participants: FetchTournamentParticipantsResponse
 }) {
     const router = useRouter();
 
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showRemovePlayerModal, setShowRemovePlayerModal] = useState(false);
+
     const [isDeleting, setIsDeleting] = useState(false);
     const [deleteError, setDeleteError] = useState<string | null>(null);
 
     const handleEditClick = () => router.push(`/admin/tournaments/${tournament.id}/edit`);
+    const handleAddEventsClick = () => router.push(`/admin/tournaments/${tournament.id}/events/create`);
 
     const handleDeleteConfirm = async () => {
         setIsDeleting(true);
@@ -156,12 +161,21 @@ export function TournamentDetails({
     };
 
     return (
-        <div className="flex flex-row">
+        <div className="flex flex-row flex-1">
             {/* Left side, tournament information and events  */}
-            <div className="w-full border-x-2 border-gray-300">
+
+            <div className="w-full border-r-2 border-gray-300">
+
+                <div className="w-full p-2 text-base bg-primary/20 text-secondary font-bold">
+                    <p className="flex place-content-center"
+                    >
+                        <AlertTriangle className="size-5 place-self-center mr-1 stroke-2" />
+                        You are currently viewing as an admin
+                    </p>
+                </div>
 
                 {/* Container for tournament name, edit/delete button, owner, and start/end time */}
-                <div className="p-4 sm:p-6 lg:p-8">
+                <div className="px-4 sm:px-6 lg:px-8 py-2 sm:py-4">
                     {/* Tournament Name and Edit */}
                     <div
                         className="flex flex-col lg:flex-row items-start lg:items-center gap-3 mb-2 lg:gap-0 justify-between">
@@ -179,7 +193,7 @@ export function TournamentDetails({
                                 <button
                                     onClick={handleEditClick}
                                     className="flex items-center justify-center gap-2 p-2 px-4 lg:mt-0
-                                           rounded-md shadow-sm text-sm md:text-lg font-jersey-25
+                                           rounded-md shadow-sm text-sm md:text-lg font-jersey
                                            text-white bg-primary hover:bg-secondary cursor-pointer
                                            disabled:opacity-50 transition-colors duration-200"
                                 >
@@ -191,13 +205,24 @@ export function TournamentDetails({
                                 <button
                                     onClick={() => setShowDeleteModal(true)}
                                     className="flex items-center justify-center gap-2 p-2 px-4 lg:mt-0
-                                           rounded-md shadow-sm text-sm md:text-lg font-jersey-25
+                                           rounded-md shadow-sm text-sm md:text-lg font-jersey
                                            text-white bg-primary hover:bg-secondary cursor-pointer
                                            disabled:opacity-50 transition-colors duration-200"
                                 >
                                     <Trash className="size-5" />
                                     Delete
                                 </button>
+                                <button
+                                    onClick={handleAddEventsClick}
+                                    className="flex items-center justify-center gap-2 p-2 px-4 lg:mt-0
+                                           rounded-md shadow-sm text-sm md:text-lg font-jersey
+                                           text-white bg-primary hover:bg-secondary cursor-pointer
+                                           disabled:opacity-50 transition-colors duration-200"
+                                >
+                                    <Plus className="size-5" />
+                                    Add Events
+                                </button>
+
                             </div>
                         )}
                     </div>
@@ -270,15 +295,81 @@ export function TournamentDetails({
                     }}
                 />
 
-                <EventList events={events} />
+                <EventList events={events} amountRegistered={participants.length} isAdmin/>
             </div>
 
-            {/* RIght side, participants list */}
-            <div className="p-5 mx-5">
-                <h1 className="text-2xl lg:text-4xl text-primary font-jersey-25 min-w-0 flex-1">
-                    Participants
-                </h1>
-            </div>
+            {/* Right side, participants list */}
+            {/* Right side, participants list */}
+            <aside className="hidden lg:block w-72 shrink-0 p-5 self-start max-h-screen overflow-y-auto">
+                <div className="flex items-baseline justify-between mb-3">
+                    <h1 className="text-2xl lg:text-3xl text-primary">
+                        Participants
+                    </h1>
+                    <span className="text-sm text-gray-500 font-semibold tabular-nums">
+                        {participants.length}
+                    </span>
+                </div>
+
+                {participants.length === 0 ? (
+                    <p className="text-sm text-gray-500">No participants yet.</p>
+                ) : (
+                    <ul className="flex flex-col gap-1.5 pr-1">
+                        {participants.map((p) => (
+                            <li
+                                key={p.user_id}
+                                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-50
+                                           border border-gray-100 hover:bg-gray-100 transition-colors
+                                           text-black"
+                            >
+                                <Image
+                                    src="/random-pfp.png"
+                                    alt=""
+                                    width={32}
+                                    height={32}
+                                    className="rounded-full shrink-0"
+                                />
+                                <div className="min-w-0 flex-1">
+                                    <div className="flex items-center gap-1 min-w-0">
+                                        {p.prefix && (
+                                            <span className="text-xs font-bold opacity-70 shrink-0">
+                                                {p.prefix}
+                                            </span>
+                                        )}
+                                        <p className="truncate text-sm font-semibold">
+                                            {p.display_name}
+                                        </p>
+                                    </div>
+                                    <p className="text-xs text-gray-500">
+                                        {p.event_count} {p.event_count === 1 ? "event" : "events"}
+                                    </p>
+                                </div>
+
+                                {hasPermissions && (
+                                    <button onClick={() => setShowRemovePlayerModal(true)}>
+                                        <Trash2 className="size-4 text-gray-600 cursor-pointer" />
+                                    </button>
+                                )}
+
+                                <ConfirmButton
+                                    isOpen={showRemovePlayerModal}
+                                    title={`Remove ${p.display_name}?`}
+                                    message="This action cannot be undone. This player will no longer be registered in this tournament."
+                                    isSubmitting={isDeleting}
+                                    error={deleteError ?? ''}
+                                    onConfirm={handleDeleteConfirm}
+                                    onCancelForm={() => {
+                                        setShowRemovePlayerModal(false);
+                                        setDeleteError(null);
+                                    }}
+                                />
+
+                            </li>
+
+
+                        ))}
+                    </ul>
+                )}
+            </aside>
         </div>
     );
 }

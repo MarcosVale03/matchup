@@ -2,15 +2,11 @@
 import { FetchTournamentFromIdResponse, FetchTournamentParticipantsResponse } from "@/server/queries/tournaments.queries";
 import { getTimeUntilStart } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { Mail, Globe, Cog } from "lucide-react";
+import {Mail, Globe, Cog, NotebookPen} from "lucide-react";
 import Image from "next/image";
-import React, { useState } from "react";
-import { deleteTournament } from "@/server/mutations/tournaments.mutations";
-import { ConfirmButton } from "@/ui/confirm-button";
 import { FetchEventsFromTournamentIdResponse } from "@/server/queries/events.queries";
 import EventList from "@/features/tournament-events/event-list";
 import { formatDate } from "date-fns";
-
 
 function InfoCells({ tournament }: { tournament: FetchTournamentFromIdResponse }) {
 
@@ -125,19 +121,22 @@ export function TournamentDetails({
     hasPermissions,
     eventsSuccess,
     participants,
+    isUserParticipant,
 }: {
     tournament: FetchTournamentFromIdResponse;
     events?: FetchEventsFromTournamentIdResponse;
     hasPermissions: boolean;
     eventsSuccess: boolean;
     participants: FetchTournamentParticipantsResponse;
+    isUserParticipant: boolean;
 }) {
     const router = useRouter();
 
     const handleAdminClick = () => router.push(`/admin/tournaments/${tournament.id}/`);
+    const handleRegisterClick = () => router.push(`/tournaments/${tournament.id}/register`);
 
     return (
-        <div className="flex flex-row">
+        <div className="flex flex-row text-black">
             {/* Left side, tournament information and events  */}
             <div className="w-full border-r border-gray-300">
 
@@ -166,6 +165,21 @@ export function TournamentDetails({
                                 >
                                     <Cog className="size-5" />
                                     Admin
+                                </button>
+                            </div>
+                        )}
+
+                        {!isUserParticipant && (
+                            <div className="flex gap-4 tracking-wide shrink-0 ml-2 ">
+                                <button
+                                    onClick={handleRegisterClick}
+                                    className="flex items-center justify-center gap-2 p-2 px-4 lg:mt-0
+                                           rounded-md shadow-sm text-sm md:text-lg font-jersey
+                                           text-white bg-primary hover:bg-secondary cursor-pointer
+                                           disabled:opacity-50 transition-colors duration-200"
+                                >
+                                    <NotebookPen className="size-5" />
+                                    Register
                                 </button>
                             </div>
                         )}
@@ -225,7 +239,9 @@ export function TournamentDetails({
                 {/* Info cells | visibility, contact, discord, status */}
                 <InfoCells tournament={tournament} />
 
-                <EventList events={events} />
+                {eventsSuccess && (
+                    <EventList events={events} amountRegistered={participants.length} />
+                )}
             </div>
 
             {/* Right side, participants list */}
@@ -247,7 +263,8 @@ export function TournamentDetails({
                             <li
                                 key={p.user_id}
                                 className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-50
-                                           border border-gray-100 hover:bg-gray-100 transition-colors"
+                                           border border-gray-100 hover:bg-gray-100 transition-colors
+                                           text-black"
                             >
                                 <Image
                                     src="/random-pfp.png"

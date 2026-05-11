@@ -298,8 +298,8 @@ export default function EventInsertForm({
                             <div>
                                 <GameAutocomplete
                                     value={formData.videoGame}
-                                    onChange={handleGameTyping}
-                                    onSelect={handleGameSelect}
+                                    onChangeAction={handleGameTyping}
+                                    onSelectAction={handleGameSelect}
                                     inputId="videoGame"
                                     labelText="Video Game - Required"
                                     labelClassName={pageLabelClass}

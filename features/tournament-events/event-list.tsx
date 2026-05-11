@@ -5,9 +5,13 @@ import {formatDate} from "date-fns";
 import {useRouter} from "next/navigation";
 
 export default function EventList({
-    events
+    events,
+    amountRegistered,
+    isAdmin = false,
 }: {
     events?: FetchEventsFromTournamentIdResponse;
+    amountRegistered: number;
+    isAdmin?: boolean;
 }) {
 
     const router = useRouter();
@@ -35,14 +39,6 @@ export default function EventList({
                                 <p className="text-lg lg:text-2xl text-white">
                                     [Game Image]
                                 </p>
-
-                                {/* Game name in the bottom left corner of image */}
-                                <div
-                                    className="absolute text-white left-3 bottom-3 sm:left-5 sm:bottom-5
-                                    bg-zinc-600 rounded-lg px-2 py-1 sm:p-2 text-sm lg:text-base font-jersey"
-                                >
-                                    {event.video_game_name}
-                                </div>
                             </div>
 
                             {/* Event details container */}
@@ -97,24 +93,27 @@ export default function EventList({
                                             Registered
                                         </h3>
                                         <p className="text-sm font-poppins tracking-tight">
-                                            16/20
+                                            {amountRegistered === 0 ? "None" : amountRegistered}
                                         </p>
                                     </div>
 
-                                    {/* Bracket type */}
                                     <div>
                                         <h3 className="text-sm lg:text-base font-jersey tracking-wide">
-                                            Registration Window
+                                            Game
                                         </h3>
                                         <p className="text-sm font-poppins tracking-tight">
-                                            Placeholder Date
+                                            {event.video_game_name}
                                         </p>
                                     </div>
                                 </div>
 
                                 {/* Event Details Button */}
                                 <button
-                                    onClick={() => router.push(`${event.tournament_id}/events/${event.id}`)}
+                                    onClick={() => router.push(
+                                        isAdmin
+                                            ? `/admin/tournaments/${event.tournament_id}/events/${event.id}`
+                                            : `/tournaments/${event.tournament_id}/events/${event.id}`
+                                    )}
                                     className="flex items-center justify-center gap-2 p-2 px-4 mt-4
                                            rounded-md shadow-sm text-sm md:text-base lg:text-lg
                                            font-jersey text-white bg-primary hover:bg-secondary

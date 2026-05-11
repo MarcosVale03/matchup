@@ -18,6 +18,6 @@ export default async function Events({ params }: { params: Promise<{ tournamentI
 
 
     return (<div className="bg-main-bg flex flex-col font-[Poppins] text-black">
-        <EventList events={events} />
+        <EventList events={events} amountRegistered={1}/>
     </div>)
 }

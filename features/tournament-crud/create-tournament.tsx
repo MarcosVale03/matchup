@@ -29,21 +29,6 @@ interface FormState {
     adminPermissionLevel : number;
 }
 
-// Initial form state with default values
-const initialFormState: FormState = {
-    name: '',
-    slug: '',
-    startTime: new Date(),
-    endTime: new Date(Date.now() + 24 * 60 * 60 * 1000),
-    isOnline: true,
-    email: '',
-    discord: '',
-    isPublic: true,
-    locationAddress: '',
-    adminEmail : '',
-    adminPermissionLevel : 4, // default to lowest
-};
-
 export default function TournamentInsertForm() {
     const router = useRouter();
     const [formData, setFormData] = useState<FormState>(() => ({
@@ -151,11 +136,7 @@ export default function TournamentInsertForm() {
                     console.log('skipped empty email at index', admin.indexOf(admins))
                 }
             }
-
-                alert(`Tournament "${formData.name}" created successfully!`);
-                // Redirect to the new tournament's detail page
-                // will change this to push to create events page
-                router.push(`/tournaments/${response.data}`);
+                router.push(`/admin/tournaments/${response.data}/events/create`);
             } else {
                 setFieldErrors(response.fieldErrors || {});
                 setFormError(response.formErrors?.join(' ') || 'Validation failed. Check the fields above.');

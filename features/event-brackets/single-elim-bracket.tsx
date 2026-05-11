@@ -127,8 +127,19 @@ function MatchNode({ match, matchIndex, isLast, showSeeds }: {
     isLast: boolean;
     showSeeds: boolean;
 }) {
-    const slot1 = match.match_slots[0];
-    const slot2 = match.match_slots[1];
+    const sortedSlots = [...match.match_slots].sort((a, b) => a.slot_num - b.slot_num);
+    const slot1 = sortedSlots.find(s => s.slot_num === 1) ?? sortedSlots[0];
+    const slot2 = sortedSlots.find(s => s.slot_num === 2) ?? sortedSlots[1];
+
+    if (!slot1 || !slot2) {
+        return (
+            <div className="flex-1 flex items-center relative min-h-24 w-full">
+                <div className="bg-white rounded-lg shadow-sm p-3 text-xs text-gray-500" style={{ width: CARD_WIDTH }}>
+                    {match.code}: incomplete slots
+                </div>
+            </div>
+        );
+    }
 
     const isComplete = match.isComplete;
     const winner =
@@ -221,7 +232,7 @@ export default function SingleElimBracket({
 
     return (
         <div className="p-8">
-            <div className="flex overflow-x-auto">
+            <div className="flex overflow-x-auto pl-2">
             {rounds.map((round, roundIndex) => (
                 <div
                     key={roundIndex}

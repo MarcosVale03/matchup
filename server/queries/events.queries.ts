@@ -274,6 +274,86 @@ export async function fetchStandings(tournamentId: number, eventId: number): Pro
     return rows
 }
 
+export type MatchSlotRow = {
+    slot_num: number
+    score: number | null
+    display_name: string | null
+    prefix: string | null
+}
+
+export type MatchRow = {
+    id: number
+    code: string
+    round_num: number
+    isComplete: boolean
+    phase_group_identifier: string
+    slots: MatchSlotRow[]
+}
+
+export type FetchMatchesFromEventIdResponse = MatchRow[]
+
+/**
+ * Returns all matches for the given event within a tournament,
+ * including the entrants on each slot.
+ */
+export async function fetchMatchesFromEventId(tournamentId: number, eventId: number): Promise<{
+    success: boolean,
+    matches?: FetchMatchesFromEventIdResponse
+}> {
+    if (!(await doesEventExist(tournamentId, eventId))) {
+        return { success: false }
+    }
+
+    const cookieStore = await cookies()
+    const supabase = await createClient(cookieStore)
+
+    const { data, error } = await supabase
+        .from('matches')
+        .select(`
+            id,
+            code,
+            round_num,
+            isComplete,
+            phase_group_identifier,
+            match_slots:match_slots_matches_fk_01(
+                slot_num,
+                score,
+                seed:match_slots_seeds_fk_01(
+                    user:seeds_users_fk_01(display_name, prefix)
+                )
+            )
+        `)
+        .eq('tournament_id', tournamentId)
+        .eq('event_id', eventId)
+        .order('round_num', { ascending: true })
+
+    if (error) {
+        throw new Error("DB error while trying to query matches: " + error.details + " " + error.message)
+    }
+
+    const matches: FetchMatchesFromEventIdResponse = data.map(m => ({
+        id: m.id,
+        code: m.code,
+        round_num: m.round_num,
+        isComplete: m.isComplete,
+        phase_group_identifier: m.phase_group_identifier,
+        slots: m.match_slots
+            .map(s => ({
+                slot_num: s.slot_num,
+                score: s.score,
+                display_name: s.seed?.user?.display_name ?? null,
+                prefix: s.seed?.user?.prefix ?? null,
+            }))
+            .sort((a, b) => a.slot_num - b.slot_num),
+    }))
+
+    return {
+        success: true,
+        matches,
+    }
+}
+
+
 export async function doesEventExist(tournamentId: number, eventId: number): Promise<boolean> {
     const cookieStore = await cookies()
     const supabase = await createClient(cookieStore)

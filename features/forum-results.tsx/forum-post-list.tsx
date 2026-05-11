@@ -12,7 +12,7 @@ type toast = {
     show: (text: string) => void
 }
 
-export default function ForumPostsList({posts, toastControl}: { posts: Post[], toastControl: toast }) {
+export default function ForumPostsList({posts, toastControl, threadAuthorId}: { posts: Post[], toastControl: toast, threadAuthorId: string }) {
     const {user} = useProfile();
     const [editingPostId, setEditingPostId] = useState<string | null>(null);
     const [showDeleteConfirmId, setShowDeleteConfirmId] = useState<string | null>(null);
@@ -53,7 +53,7 @@ export default function ForumPostsList({posts, toastControl}: { posts: Post[], t
                                 <div className="font-semibold">
                                     Author
                                     <span className="font-semibold text-blue-900 italic">
-                                        {user?.id === post.author_id ? " OP" : ''}
+                                        {post.author_id === threadAuthorId ? " OP" : ''}
                                     </span>
                                 </div>
                                 <p>•</p>

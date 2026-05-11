@@ -7,7 +7,6 @@ import {fetchEventsFromTournamentId} from "@/server/queries/events.queries";
 import {getUser} from "@/server/queries/users.queries";
 import {hasPermissionLevel} from "@/server/queries/admins.queries";
 import {PermissionLevel} from "@/lib/types/types";
-import {FetchEventsFromTournamentIdResponse} from "@/server/queries/events.queries";
 import { fetchAdminsFromTournament } from "@/server/queries/admins.queries";
 
 
@@ -62,6 +61,14 @@ export default async function TournamentDetailsPage({params}: { params: { tourna
         }
     }
 
+    let isParticipant = false;
+    for (const participant of participants) {
+        if (user?.id === participant.user_id) {
+            isParticipant = true;
+            break;
+        }
+    }
+
     return (
         <>
             <TournamentDetails
@@ -70,14 +77,7 @@ export default async function TournamentDetailsPage({params}: { params: { tourna
                 events={events}
                 eventsSuccess={eventsSuccess}
                 participants={participants}
-            />
-            <QueryParamToast
-                paramKey="created"
-                message="Tournament created successfully"
-            />
-            <QueryParamToast
-                paramKey="updated"
-                message="Changes saved"
+                isUserParticipant={isParticipant}
             />
         </>
     );

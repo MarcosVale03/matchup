@@ -26,7 +26,8 @@ export default async function Events({ params }: { params: Promise<{ tournamentI
         notFound()
     }
 
-    return (<div className="bg-main-bg flex flex-col font-[Poppins] text-black">
-        <EventList events={events} />
-    </div>)
+    return (
+        <div className="bg-main-bg flex flex-1 flex-col font-poppins text-black">
+            {/*<EventList events={events} />*/}
+        </div>)
 }

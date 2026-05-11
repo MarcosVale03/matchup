@@ -1,8 +1,12 @@
 'use client'
 import {Fragment, useEffect, useState} from "react";
-import {FetchEventFromEventIdResponse, FetchStandingsResponse} from "@/server/queries/events.queries";
+import {
+    FetchEventFromEventIdResponse,
+    FetchMatchesFromEventIdResponse,
+    FetchStandingsResponse
+} from "@/server/queries/events.queries";
 import {formatDate} from "date-fns";
-import {CalendarSync, ChevronRight, Crown, Wrench, X} from "lucide-react";
+import {ChevronRight, Wrench, X} from "lucide-react";
 import {FetchBracketPhasesResponse} from "@/server/queries/phases.queries";
 import Link from "next/link";
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
@@ -10,42 +14,10 @@ import {usePathname, useRouter, useSearchParams} from "next/navigation";
 const TABS = ["brackets", "players", "matches", "upcoming"] as const;
 type TabName = typeof TABS[number];
 
-interface Match {
-    id: number;
-    team1: string;
-    score1: number;
-    team2: string;
-    score2: number;
-    round: number;
-    time: string;
-}
-
-interface UpcomingMatch {
-    id: number;
-    team1: string;
-    team2: string;
-    round: number;
-    time: string;
-}
-
 interface Alert {
     type: "warning" | "info" | "success";
     msg: string;
 }
-
-const RECENT_MATCHES: Match[] = [
-    {id: 1, team1: "Phantom Rift", score1: 2, team2: "Solar Flare", score2: 0, round: 3, time: "Today, 4:30 PM"},
-    {id: 2, team1: "Neon Vanguard", score1: 2, team2: "Glacier Nine", score2: 1, round: 3, time: "Today, 3:00 PM"},
-    {id: 3, team1: "Iron Collective", score1: 2, team2: "Verdant Edge", score2: 0, round: 3, time: "Today, 1:30 PM"},
-    {id: 4, team1: "Dusk Protocol", score1: 2, team2: "Byte Force", score2: 1, round: 3, time: "Yesterday"},
-    {id: 5, team1: "Crimson Wolves", score1: 0, team2: "Echo Chamber", score2: 2, round: 3, time: "Yesterday"},
-];
-
-const UPCOMING: UpcomingMatch[] = [
-    {id: 6, team1: "Phantom Rift", team2: "Neon Vanguard", round: 4, time: "Mar 10, 2:00 PM"},
-    {id: 7, team1: "Iron Collective", team2: "Dusk Protocol", round: 4, time: "Mar 10, 3:30 PM"},
-    {id: 8, team1: "Solar Flare", team2: "Echo Chamber", round: 4, time: "Mar 10, 5:00 PM"},
-];
 
 const ALERTS: Alert[] = [
     {type: "warning", msg: "Byte Force has requested a reschedule for Round 4 match"},
@@ -53,27 +25,19 @@ const ALERTS: Alert[] = [
     {type: "success", msg: "Round 3 completed — all results confirmed"},
 ];
 
-function rankClass(rank: number): string {
-    if (rank === 1) return "text-primary";
-    if (rank === 2) return "text-secondary";
-    if (rank === 3) return "text-secondary/95";
-    return "text-gray-700";
-}
-
-function rowBg(rank: number, selected: boolean): string {
-    if (selected) return "bg-primary/15";
-    if (rank <= 3) return "bg-gray-300/30";
-    return "bg-white";
-}
 
 export default function EventDetails({
     event,
     bracketPhases,
     standings,
+    matches,
+    isAdmin = false,
 }: {
-    event: FetchEventFromEventIdResponse,
-    bracketPhases: FetchBracketPhasesResponse,
-    standings: FetchStandingsResponse,
+    event: FetchEventFromEventIdResponse;
+    bracketPhases: FetchBracketPhasesResponse;
+    standings: FetchStandingsResponse;
+    matches: FetchMatchesFromEventIdResponse;
+    isAdmin?: boolean;
 }) {
     const searchParams = useSearchParams();
     const pathname = usePathname();
@@ -240,83 +204,83 @@ export default function EventDetails({
     }
 
     function renderMatchesTab() {
+        if (matches.length === 0) {
+            return <p className="text-gray-500 text-center py-8">No matches yet.</p>;
+        }
+
+        const formatEntrant = (slot?: { display_name: string | null; prefix: string | null }) => {
+            if (!slot || !slot.display_name) return "TBD";
+            return slot.prefix ? `${slot.prefix} | ${slot.display_name}` : slot.display_name;
+        };
+
         return (
             <div className="flex flex-col gap-2.5">
-                <p className="text-center">Placeholder</p>
-                {/*{RECENT_MATCHES.map((m) => (*/}
-                {/*    <div*/}
-                {/*        key={m.id}*/}
-                {/*        className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 px-5 py-4*/}
-                {/*                   bg-gray-50 border border-gray-100 rounded-xl shadow-sm"*/}
-                {/*    >*/}
-                {/*        <div className="flex justify-between sm:contents">*/}
-                {/*            <p className="text-xs font-bold tracking-wider uppercase text-gray-700 sm:min-w-12">*/}
-                {/*                R{m.round}*/}
-                {/*            </p>*/}
-                {/*            <p className="text-sm text-gray-700 font-semibold sm:hidden">*/}
-                {/*                {m.time}*/}
-                {/*            </p>*/}
-                {/*        </div>*/}
+                {matches.map((m) => {
+                    const slotA = m.slots[0];
+                    const slotB = m.slots[1];
+                    const scoreA = slotA?.score ?? 0;
+                    const scoreB = slotB?.score ?? 0;
+                    const aWon = m.isComplete && scoreA > scoreB;
+                    const bWon = m.isComplete && scoreB > scoreA;
 
-                {/*        <div className="flex-1 flex items-center justify-center gap-3 sm:gap-4">*/}
-                {/*            <div*/}
-                {/*                className={`flex-1 text-right font-jersey text-base sm:text-xl ${*/}
-                {/*                    m.score1 > m.score2 ? "" : "text-gray-500"*/}
-                {/*                }`}*/}
-                {/*            >*/}
-                {/*                <div className="flex justify-end gap-2">*/}
-                {/*                    {m.score1 > m.score2 && (*/}
-                {/*                        <Crown className="size-4 sm:size-5 text-yellow-500 place-self-center"/>*/}
-                {/*                    )}*/}
-                {/*                    {m.team1}*/}
-                {/*                </div>*/}
-                {/*            </div>*/}
+                    return (
+                        <div
+                            key={m.id}
+                            className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 px-5 py-4
+                                       bg-gray-50 border border-gray-100 rounded-xl shadow-sm"
+                        >
+                            <p className="text-xs font-bold tracking-wider uppercase text-gray-700 sm:min-w-12">
+                                R{m.round_num}
+                            </p>
 
-                {/*            <div*/}
-                {/*                className="flex items-center justify-center gap-2 px-3 sm:px-5 py-1.5 sm:py-2 rounded-lg bg-primary shrink-0">*/}
-                {/*                <p className={`text-base sm:text-xl font-semibold ${*/}
-                {/*                    m.score1 > m.score2 ? "text-white" : "text-white/70"*/}
-                {/*                }`}>*/}
-                {/*                    {m.score1}*/}
-                {/*                </p>*/}
-                {/*                <p className="text-base sm:text-xl font-semibold text-white/25">:</p>*/}
-                {/*                <p className={`text-base sm:text-xl font-semibold ${*/}
-                {/*                    m.score2 > m.score1 ? "text-white" : "text-white/50"*/}
-                {/*                }`}>*/}
-                {/*                    {m.score2}*/}
-                {/*                </p>*/}
-                {/*            </div>*/}
+                            <div className="flex-1 flex items-center justify-center gap-3 sm:gap-4">
+                                <div
+                                    className={`flex-1 text-right font-jersey text-base sm:text-xl ${
+                                        aWon ? "" : "text-gray-500"
+                                    }`}
+                                >
+                                    {formatEntrant(slotA)}
+                                </div>
 
-                {/*            <div*/}
-                {/*                className={`flex-1 text-left font-jersey text-base sm:text-xl ${*/}
-                {/*                    m.score2 > m.score1 ? "" : "text-gray-500"*/}
-                {/*                }`}*/}
-                {/*            >*/}
-                {/*                <div className="flex justify-start gap-2">*/}
-                {/*                    {m.team2}*/}
-                {/*                    {m.score2 > m.score1 && (*/}
-                {/*                        <Crown className="size-4 sm:size-5 text-yellow-500 place-self-center"/>*/}
-                {/*                    )}*/}
-                {/*                </div>*/}
-                {/*            </div>*/}
-                {/*        </div>*/}
+                                {m.isComplete ? (
+                                    <div className="flex items-center justify-center gap-2 px-3 sm:px-5 py-1.5 sm:py-2 rounded-lg bg-primary shrink-0">
+                                        <p className={`text-base sm:text-xl font-semibold ${aWon ? "text-white" : "text-white/70"}`}>
+                                            {scoreA}
+                                        </p>
+                                        <p className="text-base sm:text-xl font-semibold text-white/25">:</p>
+                                        <p className={`text-base sm:text-xl font-semibold ${bWon ? "text-white" : "text-white/70"}`}>
+                                            {scoreB}
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <p className="px-3 sm:px-5 py-1.5 rounded-lg text-sm font-extrabold tracking-widest
+                                                  bg-red-50 border border-primary text-primary shrink-0">
+                                        VS
+                                    </p>
+                                )}
 
-                {/*        <p className="hidden sm:block text-sm text-gray-700 font-semibold min-w-28 text-right">*/}
-                {/*            {m.time}*/}
-                {/*        </p>*/}
+                                <div
+                                    className={`flex-1 text-left font-jersey text-base sm:text-xl ${
+                                        bWon ? "" : "text-gray-500"
+                                    }`}
+                                >
+                                    {formatEntrant(slotB)}
+                                </div>
+                            </div>
 
-                {/*        {showAdmin && (*/}
-                {/*            <button*/}
-                {/*                className="text-base font-semibold bg-white border border-gray-300*/}
-                {/*                           text-gray-700 px-3.5 py-1 rounded-md cursor-pointer*/}
-                {/*                           hover:bg-gray-100 transition-colors duration-300*/}
-                {/*                           w-full sm:w-auto"*/}
-                {/*            >*/}
-                {/*                Edit*/}
-                {/*            </button>*/}
-                {/*        )}*/}
-                {/*    </div>*/}
-                {/*))}*/}
+                            {showAdmin && (
+                                <button
+                                    className="text-base font-semibold bg-white border border-gray-300
+                                               text-gray-700 px-3.5 py-1 rounded-md cursor-pointer
+                                               hover:bg-gray-100 transition-colors duration-300
+                                               w-full sm:w-auto"
+                                >
+                                    Edit
+                                </button>
+                            )}
+                        </div>
+                    );
+                })}
             </div>
         );
     }
@@ -379,11 +343,13 @@ export default function EventDetails({
 
                     {/* Event Details */}
                     <div>
-                        <p className="text-xs font-bold tracking-widest uppercase text-white
-                                        bg-secondary px-3 py-1 rounded w-fit mb-3"
-                        >
-                            Organizer View
-                        </p>
+                        {isAdmin && (
+                            <p className="text-xs font-bold tracking-widest uppercase text-white
+                                            bg-secondary px-3 py-1 rounded w-fit mb-3"
+                            >
+                                Admin View
+                            </p>
+                        )}
 
                         {/* Event name */}
                         <h1 className="text-3xl lg:text-5xl font-jersey text-primary">
@@ -416,18 +382,20 @@ export default function EventDetails({
                     </div>
 
                     {/* Admin tools button */}
-                    <button
-                        onClick={() => setShowAdmin(!showAdmin)}
-                        className={redButtonClassName}
-                    >
-                        {showAdmin ? <X className="size-5"/> : <Wrench className="size-5"/>}
-                        {showAdmin ? "Close Admin Tools" : "Admin Tools"}
-                    </button>
+                    {isAdmin && (
+                        <button
+                            onClick={() => setShowAdmin(!showAdmin)}
+                            className={redButtonClassName}
+                        >
+                            {showAdmin ? <X className="size-5"/> : <Wrench className="size-5"/>}
+                            {showAdmin ? "Close Admin Tools" : "Admin Tools"}
+                        </button>
+                    )}
                 </div>
             </header>
 
             {/* ADMIN PANEL */}
-            {showAdmin && (
+            {isAdmin && showAdmin && (
                 <div className="my-6 p-5 rounded-xl border border-zinc-700 bg-zinc-800 text-white">
                     <p className="font-jersey text-base md:text-lg lg:text-xl uppercase text-white mb-4">
                         Admin Alerts & Actions

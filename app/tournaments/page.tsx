@@ -20,7 +20,7 @@ export default async function TournamentSearchPage({searchParams}: {
             className="flex-col bg-main-bg font-poppins font-semibold text-black justify-center items-center p-4 md:px-8 3xl:px-16">
 
             {/* Header */}
-            <div className="text-center mb-6 mt-4 w-fit place-self-center">
+            <div className="text-center mb-6 mt-4 w-full place-self-center">
                 <h2 className="">
                     The Arena Awaits: Find Your Competition
                 </h2>
