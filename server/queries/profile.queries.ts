@@ -106,7 +106,7 @@ export async function fetchFutureTournaments(user_id: string): Promise<QueryResp
     // getting all tournaments that has the users id in it and are in the future
     const {data, error} = await supabase
         .from('tournaments')
-        .select('*, users!tournaments_users_fk_01(display_name), attendees!inner(user_id)')
+        .select('*, users!tournaments_users_fk_01(display_name), attendees!attendees_tournaments_fk_01!inner(user_id)')
         .eq('attendees.user_id', user_id)
         .gt('start_time', curr_date)
 

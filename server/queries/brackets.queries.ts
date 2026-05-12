@@ -106,7 +106,9 @@ export async function fetchBracket(
                 score: slot.score,
                 placement: slot.placement,
                 seed: slot.seed,
-                prereqCondition: await getPrereqCondition(round.tournament_id, round.event_id, round.phase_group_identifier, round.round_num, match.id, slot.slot_num)
+                prereqCondition: slot.seed?.user
+                    ? ""
+                    : await getPrereqCondition(round.tournament_id, round.event_id, round.phase_group_identifier, round.round_num, match.id, slot.slot_num)
             }}))
         }}))
     }}))

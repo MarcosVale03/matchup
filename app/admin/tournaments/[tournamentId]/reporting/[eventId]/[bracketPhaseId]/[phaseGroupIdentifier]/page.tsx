@@ -9,7 +9,10 @@ import {
     fetchBracketTypeFromBracketPhase, fetchPhaseGroupsFromBracketPhase
 } from "@/server/queries/phases.queries";
 import SingleElimBracket from "@/features/event-brackets/admin-single-elim-bracket";
+import AdminRoundRobinBracket from "@/features/event-brackets/admin-round-robin-bracket";
 import {fetchBracket} from "@/server/queries/brackets.queries";
+import Link from "next/link";
+import {ArrowLeft} from "lucide-react";
 
 export default async function Page(
     { params, searchParams }: { params: Promise<{ tournamentId: string, eventId: string, bracketPhaseId: string, phaseGroupIdentifier: string }>
@@ -63,7 +66,20 @@ export default async function Page(
 
     return (
         <div>
+            <Link
+                href={`/admin/tournaments/${tournamentId}`}
+                className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-primary
+                           transition-colors ml-4 mt-6"
+            >
+                <ArrowLeft className="size-4" />
+                Back to tournament details
+            </Link>
             {bracketType == BracketType.SingleElimination && <SingleElimBracket
+                tournamentId={tournamentId} events={events} currEventId={eventId}
+                bracketPhases={bracketPhases} currBP={bracketPhaseId}
+                phaseGroups={phaseGroups} currPG={phaseGroupIdentifier}
+                rounds={matches} match={match} round={round} />}
+            {bracketType == BracketType.RoundRobin && <AdminRoundRobinBracket
                 tournamentId={tournamentId} events={events} currEventId={eventId}
                 bracketPhases={bracketPhases} currBP={bracketPhaseId}
                 phaseGroups={phaseGroups} currPG={phaseGroupIdentifier}

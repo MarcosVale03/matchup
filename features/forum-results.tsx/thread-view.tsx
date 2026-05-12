@@ -98,7 +98,7 @@ export function ThreadView({
                         </h5>
                     </div>
 
-                    <ForumPostsList posts={posts} toastControl={toast} />
+                    <ForumPostsList posts={posts} toastControl={toast} threadAuthorId={mainThread.author_id} />
                 </div>
             </div>
         </main>

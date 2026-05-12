@@ -4,9 +4,11 @@ import {FetchEventsFromTournamentIdResponse} from "@/server/queries/events.queri
 import {formatDate} from "date-fns";
 
 export default function EventList({
-    events
+    events,
+    amountRegistered,
 }: {
     events?: FetchEventsFromTournamentIdResponse;
+    amountRegistered: number;
 }) {
 
 
@@ -33,14 +35,6 @@ export default function EventList({
                                 <p className="text-lg lg:text-2xl text-white">
                                     [Game Image]
                                 </p>
-
-                                {/* Game name in the bottom left corner of image */}
-                                <div
-                                    className="absolute text-white left-3 bottom-3 sm:left-5 sm:bottom-5
-                                    bg-zinc-600 rounded-lg px-2 py-1 sm:p-2 text-sm lg:text-base font-jersey"
-                                >
-                                    {event.video_game_name}
-                                </div>
                             </div>
 
                             {/* Event details container */}
@@ -95,17 +89,17 @@ export default function EventList({
                                             Registered
                                         </h3>
                                         <p className="text-sm font-poppins tracking-tight">
-                                            16/20
+                                            {amountRegistered === 0 ? "None" : amountRegistered}
                                         </p>
                                     </div>
 
                                     {/* Bracket type */}
                                     <div>
                                         <h3 className="text-sm lg:text-base font-jersey tracking-wide">
-                                            Registration Window
+                                            Game
                                         </h3>
                                         <p className="text-sm font-poppins tracking-tight">
-                                            Placeholder Date
+                                            {event.video_game_name}
                                         </p>
                                     </div>
                                 </div>

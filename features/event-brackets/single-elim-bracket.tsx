@@ -3,21 +3,67 @@ import {FetchBracketResponse, MatchResponse} from "@/server/queries/brackets.que
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
 import {MouseEventHandler} from "react";
 
-// Groups flat match array into rounds by parsing "R1", "R2", etc. from match identifiers,
-// then returns them sorted ascending so earlier rounds render left-to-right
-/*function organizeIntoRounds(matches: FetchBracketResponse[]): FetchBracketResponse[][] {
-    const roundMap = new Map<number, FetchBracketResponse[]>();
+const CARD_WIDTH = 200;
+const COLUMN_WIDTH = 244;
+const GUTTER = (COLUMN_WIDTH - CARD_WIDTH) / 2; // 22
 
-    for (const match of matches) {
-        const roundNum = parseInt(match.identifier.match(/R(\d+)/)?.[1] ?? "0");
-        if (!roundMap.has(roundNum)) roundMap.set(roundNum, []);
-        roundMap.get(roundNum)!.push(match);
+// Appears at the top of the column
+function roundLabel(roundNum: number, totalRounds: number): string {
+    if (roundNum === 1) return "Finals";
+    if (roundNum === 2) return "Semifinals";
+    if (roundNum === 3) return "Quarterfinals";
+    return `Round ${totalRounds - roundNum + 1}`;
+}
+
+type BracketStats = {
+    totalEntrants: number;
+    completedMatches: number;
+    totalMatches: number;
+    currentRoundLabel: string | null;
+    champion: { displayName: string; prefix: string | null } | null;
+};
+
+function computeBracketStats(rounds: FetchBracketResponse): BracketStats {
+    const totalRounds = rounds.length;
+    let totalMatches = 0;
+    let completedMatches = 0;
+    for (const round of rounds) {
+        totalMatches += round.matches.length;
+        completedMatches += round.matches.filter(m => m.is_complete).length;
     }
 
-    return Array.from(roundMap.entries())
-        .sort(([a], [b]) => a - b)
-        .map(([, matches]) => matches);
-}*/
+    // The starting round has the highest round_num (round_num=1 is the final).
+    const startRound = rounds.reduce<typeof rounds[number] | null>(
+        (acc, r) => (acc === null || r.round_num > acc.round_num ? r : acc),
+        null
+    );
+    const totalEntrants = startRound ? startRound.matches.length * 2 : 0;
+
+    // Current round = lowest round_num with at least one incomplete match.
+    const inProgress = [...rounds]
+        .sort((a, b) => b.round_num - a.round_num)
+        .find(r => r.matches.some(m => !m.is_complete));
+    const currentRoundLabel = inProgress
+        ? roundLabel(inProgress.round_num, totalRounds)
+        : null;
+
+    // Champion lives in the final (round_num === 1) if it's complete and decisive.
+    const finalRound = rounds.find(r => r.round_num === 1);
+    const finalMatch = finalRound?.matches[0];
+    let champion: BracketStats["champion"] = null;
+    if (finalMatch?.is_complete) {
+        const [s1, s2] = finalMatch.match_slots;
+        if (s1 && s2 && s1.score !== s2.score) {
+            const winnerSlot = s1.score > s2.score ? s1 : s2;
+            const user = winnerSlot.seed?.user;
+            if (user) {
+                champion = { displayName: user.display_name, prefix: user.prefix };
+            }
+        }
+    }
+
+    return { totalEntrants, completedMatches, totalMatches, currentRoundLabel, champion };
+}
 
 function Slot({
     name,
@@ -34,57 +80,101 @@ function Slot({
     seed: number | null;
     showSeed: boolean;
 }) {
-    return (
-        <div className={`flex items-center justify-between px-3 py-2 
-            ${isWinner ? "bg-primary/10" : ""}
-            ${name === "TBD" ? "text-gray-400 italic" : ""}`}
-        >
-            <div className='flex flex-row items-center w-full justify-start'>
-                {showSeed && <div className={`text-sm mr-2 pr-3 border-r
-                ${isWinner ? "font-bold text-primary" : "text-gray-800"}`}>
-                    <p>{seed}</p>
-                </div>}
-                <p className={`text-sm truncate flex-1 
-                ${isWinner ? "font-bold text-primary" : "text-gray-800"}`}>
-                    {prefix && <span className="mr-1 text-xs">{prefix}</span>}<span>{name}</span>
-                </p>
-            </div>
+    const isTBD = name === "TBD";
 
+    return (
+        <div
+            className={`flex items-stretch gap-2 border-l-4 transition-colors
+                ${isWinner ? "bg-primary/10 border-primary" : "border-transparent"}
+                ${isTBD ? "text-gray-400 italic" : ""}`}
+        >
+            {/* Seed number of the entrant */}
+            {showSeed && (
+                <span
+                    className={`text-sm border-r p-2 border-gray-500 shrink-0 flex items-center justify-center w-9 tabular-nums
+                        ${isWinner ? "font-bold text-primary" : "text-gray-500"}`}
+                >
+                    {seed ?? ""}
+                </span>
+            )}
+
+            {/* Name of the entrant */}
+            <p
+                className={`text-sm truncate min-w-0 flex-1 self-center py-2
+                    ${!showSeed ? "pl-2" : ""}
+                    ${isWinner ? "font-semibold text-primary" : "text-gray-800"}`}
+            >
+                {prefix && (
+                    <span className="mr-1 text-xs font-bold opacity-70">{prefix}</span>
+                )}
+                {name}
+            </p>
+
+            {/* Score of the entrant */}
             {score != null && (
-                <p className={`text-sm ml-2 font-bold
-                    ${isWinner ? "text-primary" : "text-gray-400"}`}>
+                <span
+                    className={`text-sm font-bold shrink-0 tabular-nums pr-2 self-center
+                        ${isWinner ? "text-primary" : "text-gray-400"}`}
+                >
                     {score}
-                </p>
+                </span>
             )}
         </div>
     );
 }
 
-function MatchNode({ match, isLast, showSeeds }: {
+function MatchNode({ match, matchIndex, isLast, showSeeds, onClick }: {
     match: MatchResponse;
+    matchIndex: number;
     isLast: boolean;
-    showSeeds: boolean
+    showSeeds: boolean;
+    onClick: MouseEventHandler;
 }) {
-    const slot1 = match.match_slots[0];
-    const slot2 = match.match_slots[1];
+    const sortedSlots = [...match.match_slots].sort((a, b) => a.slot_num - b.slot_num);
+    const slot1 = sortedSlots.find(s => s.slot_num === 1) ?? sortedSlots[0];
+    const slot2 = sortedSlots.find(s => s.slot_num === 2) ?? sortedSlots[1];
 
-    // TODO: winner detection is hardcoded — should compare slot scores
-    // once scoring is wired up 
+    if (!slot1 || !slot2) {
+        return (
+            <div className="flex-1 flex items-center relative min-h-24 w-full">
+                <div className="bg-white rounded-lg shadow-sm p-3 text-xs text-gray-500" style={{ width: CARD_WIDTH }}>
+                    {match.code}: incomplete slots
+                </div>
+            </div>
+        );
+    }
+
     const isComplete = match.is_complete;
-    const winner = isComplete && slot1.score != slot2.score ? (slot1.score > slot2.score ? 1 : 2) : null;
-    console.log(winner)
+    const winner =
+        isComplete && slot1.score !== slot2.score
+            ? (slot1.score! > slot2.score! ? 1 : 2)
+            : null;
+    const isTopOfPair = matchIndex % 2 === 0;
+
+    // Connector geometry, anchored inside the container (left-origin).
+    //   card right edge → CARD_WIDTH
+    //   pair midline    → CARD_WIDTH + GUTTER
+    //   column edge     → CARD_WIDTH + 2*GUTTER (== COLUMN_WIDTH)
+    const cardRight = CARD_WIDTH;
+    const midline = CARD_WIDTH + GUTTER;
 
     return (
-        <div className="flex items-center relative ml-4">
-            {/* Connector line leading in from the previous round */}
-            {/*roundIndex > 0 && <div className="w-6 h-px bg-gray-300" />*/}
-
-            <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden w-[200px]">
+        <div className="flex-1 flex items-center relative min-h-24 w-full">
+            {/* Match card */}
+            <div
+                onClick={onClick}
+                className="relative bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                style={{ width: CARD_WIDTH }}
+            >
+                {/* Match code badge */}
+                <div className="absolute -top-4 -left-2 z-10 bg-gray-800 text-white text-xs font-bold px-1.5 py-0.5 rounded-md shadow-sm tracking-wide">
+                    {match.code}
+                </div>
                 <Slot
                     name={slot1.seed?.user?.display_name ?? slot1.prereqCondition ?? "Error"}
                     prefix={slot1.seed?.user?.prefix ?? ""}
                     score={slot1.score}
-                    isWinner={winner == 1}
+                    isWinner={winner === 1}
                     seed={slot1.seed?.seed_num ?? null}
                     showSeed={showSeeds}
                 />
@@ -93,27 +183,61 @@ function MatchNode({ match, isLast, showSeeds }: {
                     name={slot2.seed?.user?.display_name ?? slot2.prereqCondition ?? "Error"}
                     prefix={slot2.seed?.user?.prefix ?? ""}
                     score={slot2.score}
-                    isWinner={winner == 2}
+                    isWinner={winner === 2}
                     seed={slot2.seed?.seed_num ?? null}
                     showSeed={showSeeds}
                 />
             </div>
-            {/*Match Code*/}
-            <div className="absolute bg-gray-800 text-white -left-4 font-bold w-6 h-6 flex align-center justify-center">{match.code}</div>
 
-            {/* Connector line leading out to the next round */}
-            {!isLast && <div className="w-6 h-px bg-gray-300" />}
+            {/* L-shaped connector: horizontal out of the card, vertical to the
+                pair's midpoint, then a horizontal into the next round (drawn
+                once per pair from the top match). */}
+            {!isLast && (
+                <>
+                    {/* Horizontal stub: card's right edge → pair midline */}
+                    <div
+                        className="absolute h-px bg-gray-300"
+                        style={{ top: '50%', left: cardRight, width: GUTTER }}
+                    />
+                    {/* Vertical line at the pair midline */}
+                    <div
+                        className="absolute w-px bg-gray-300"
+                        style={
+                            isTopOfPair
+                                ? { top: '50%', bottom: 0, left: midline }
+                                : { top: 0, bottom: '50%', left: midline }
+                        }
+                    />
+                    {/* Pair midline → next round's card (drawn once per pair) */}
+                    {isTopOfPair && (
+                        <div
+                            className="absolute h-px bg-gray-300"
+                            style={{ bottom: 0, left: midline, width: GUTTER }}
+                        />
+                    )}
+                </>
+            )}
         </div>
     );
 }
 
-export default function SingleElimBracket({ rounds, showSeeds = true, round = null, match = null }:
-{ rounds: FetchBracketResponse, showSeeds?: boolean, round: number | null, match: number | null }) {
+export default function SingleElimBracket({
+    rounds,
+    showSeeds = true,
+    round = null,
+    match = null
+}: {
+    rounds: FetchBracketResponse;
+    showSeeds?: boolean;
+    round: number | null;
+    match: number | null
+}) {
     const searchParams = useSearchParams()
     const pathname = usePathname()
-    const { replace } = useRouter()
+    const {replace} = useRouter()
+    const totalRounds = rounds.length;
 
-    if (rounds.length === 0) {
+    if (totalRounds === 0) {
         return <p className="text-gray-400 text-center py-8">No bracket data yet</p>;
     }
 
@@ -134,40 +258,46 @@ export default function SingleElimBracket({ rounds, showSeeds = true, round = nu
     }
 
     return (
-        <div className="flex overflow-x-auto gap-0 p-8 bg-white min-h-screen" onClick={handleBgClick}>
+        <div className="p-8" onClick={handleBgClick}>
+            <div className="flex overflow-x-auto pl-2">
             {rounds.map((round, roundIndex) => (
-                <div key={roundIndex} className="flex flex-col justify-around min-w-[220px]">
-                    {/* Label the last two rounds as Finals/Semifinals, everything else numerically */}
-                    <p className="text-center font-[Poppins] font-semibold text-sm text-gray-500 mb-4">
-                        {round.round_num === 1
-                            ? "Finals"
-                            : round.round_num === 2
-                                ? "Semifinals"
-                                : `Round ${rounds.length - round.round_num + 1}`}
+                <div
+                    key={roundIndex}
+                    className="flex flex-col"
+                    style={{ width: COLUMN_WIDTH, minWidth: COLUMN_WIDTH }}
+                >
+                    {/* Round label (e.g., Finals */}
+                    <p
+                        className="text-center font-semibold text-sm uppercase tracking-wider text-gray-500"
+                        style={{ width: CARD_WIDTH }}
+                    >
+                        {roundLabel(round.round_num, totalRounds)}
                     </p>
-                    {/* justify-around distributes matches vertically so they align
-                        with their parent match in the next round */}
-                    <div className="flex flex-col justify-around flex-1 gap-4">
+
+                    {/* Matches */}
+                    <div className="flex flex-col flex-1">
                         {round.matches.map((match, matchIndex) => (
-                            <button key={match.code} onClick={(e) => {
-                                e.stopPropagation();
-                                handleClick(roundIndex, matchIndex)
-                            }} className='cursor-pointer'>
-                                <MatchNode
-                                    match={match}
-                                    isLast={roundIndex === rounds.length - 1}
-                                    showSeeds={showSeeds}
-                                />
-                            </button>
+                            <MatchNode
+                                key={match.code}
+                                match={match}
+                                matchIndex={matchIndex}
+                                isLast={roundIndex === rounds.length - 1}
+                                showSeeds={showSeeds}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleClick(roundIndex, matchIndex);
+                                }}
+                            />
                         ))}
                     </div>
                 </div>
             ))}
-            {/*SHOWN MATCH*/}
-            {((round !== null && match !== null) && rounds[round]?.matches[match] !== undefined) &&
-               <MatchPopup showSeeds={showSeeds} match={rounds[round].matches[match]} onClick={(e) => e.stopPropagation()}>
+                {/*SHOWN MATCH*/}
+                {((round !== null && match !== null) && rounds[round]?.matches[match] !== undefined) &&
+                    <MatchPopup showSeeds={showSeeds} match={rounds[round].matches[match]} onClick={(e) => e.stopPropagation()}>
 
-               </MatchPopup>}
+                    </MatchPopup>}
+            </div>
         </div>
     );
 }

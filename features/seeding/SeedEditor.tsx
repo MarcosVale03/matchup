@@ -70,28 +70,38 @@ export default function SeedEditor({tournamentId, events, currEventId, phaseGrou
     }
 
     return (
-        <div>
+        <div className="p-4">
             {/*HEADING*/}
-            <div className='flex space-x-2 items-center m-4'>
-                <h2>Seeding</h2>
-                <select defaultValue={currEventId} onChange={handleEventChange} className="text-blue-600">
-                    {events.map(event => (
-                        <option key={event.id} value={event.id}>{event.name}</option>
-                    ))}
-                </select>
+            <div className='flex flex-wrap gap-4 items-end mb-6'>
+                <h2 className="mr-2">Seeding</h2>
+                <label className="flex flex-col text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Event
+                    <select
+                        defaultValue={currEventId}
+                        onChange={handleEventChange}
+                        className="mt-1 min-w-40 rounded-md border border-gray-300 bg-white px-3 py-1.5
+                                   text-sm text-gray-800 shadow-sm hover:border-primary
+                                   focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary
+                                   transition-colors normal-case tracking-normal cursor-pointer"
+                    >
+                        {events.map(event => (
+                            <option key={event.id} value={event.id}>{event.name}</option>
+                        ))}
+                    </select>
+                </label>
                 <button
                     disabled={isSubmitting}
-                    className="w-32 flex items-center justify-center gap-2 py-2.5 px-4
-                                   rounded-md shadow-sm text-base md:text-lg lg:text-xl font-jersey-25
+                    className="ml-auto flex items-center justify-center gap-2 py-2 px-6
+                                   rounded-md shadow-sm text-base md:text-lg font-jersey
                                    text-white bg-primary hover:bg-secondary disabled:opacity-50
-                                   transition-colors"
+                                   transition-colors cursor-pointer"
                     onClick={handleSubmit}>Submit</button>
             </div>
             {/*POOLS*/}
             <DragDropContext onDragEnd={onDragEnd}>
-                <div className="flex flex-col gap-8 my-4">
+                <div className="flex flex-col gap-8">
                     {phaseGroups.map(pg => (
-                        <div key={pg.identifier} className="flex flex-col gap-2">
+                        <div key={pg.identifier} className="flex flex-col gap-3 bg-white rounded-lg shadow-sm p-4">
                             <h3 className='font-jersey-25 text-base sm:text-3xl'>Pool {pg.identifier}</h3>
                             <Droppable droppableId={pg.identifier}>
                                 {(provided) => (

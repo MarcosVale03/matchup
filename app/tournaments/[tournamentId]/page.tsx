@@ -1,4 +1,4 @@
-import {fetchTournamentFromId} from "@/server/queries/tournaments.queries";
+import {fetchTournamentFromId, fetchTournamentParticipants} from "@/server/queries/tournaments.queries";
 import {notFound} from "next/navigation";
 import {TournamentDetails} from "@/features/tournament-search/tournament-details";
 import {Trophy} from "lucide-react";
@@ -7,27 +7,29 @@ import {fetchEventsFromTournamentId} from "@/server/queries/events.queries";
 import {getUser} from "@/server/queries/users.queries";
 import {hasPermissionLevel} from "@/server/queries/admins.queries";
 import {PermissionLevel} from "@/lib/types/types";
-import {FetchEventsFromTournamentIdResponse} from "@/server/queries/events.queries";
 import { fetchAdminsFromTournament } from "@/server/queries/admins.queries";
 
 
-export default async function TournamentDetailsPage({ params }: { params: { tournamentId: string } }) {
-    const { tournamentId: idStr } = await params;
+export default async function TournamentDetailsPage({params}: { params: { tournamentId: string } }) {
+    const {tournamentId: idStr} = await params;
     const id = Number(idStr);
 
     if (isNaN(id) || id <= 0) {
         notFound();
     }
 
-    const { success: tournamentSuccess, tournament } = await fetchTournamentFromId(id);
-    const { events } = await fetchEventsFromTournamentId(id);
+    const [{success: tournamentSuccess, tournament}, {success: eventsSuccess, events}, participants] = await Promise.all([
+        fetchTournamentFromId(id),
+        fetchEventsFromTournamentId(id),
+        fetchTournamentParticipants(id),
+    ]);
 
 
     if (!tournamentSuccess || !tournament) {
         return (
-            <main className="bg-main-bg flex flex-col items-center justify-center py-10 text-black font-[Poppins]">
-                <Trophy size={48} className="text-gray-300 mb-4" />
-                <h1 className="text-2xl font-jersey-25 text-gray-700 mb-2">
+            <main className="bg-main-bg flex flex-col items-center justify-center py-10 text-black font-poppins">
+                <Trophy size={48} className="text-gray-300 mb-4"/>
+                <h1 className="text-2xl font-jersey text-gray-700 mb-2">
                     Tournament Does Not Exist
                 </h1>
                 <p className="text-sm text-gray-500 mb-6 text-center">
@@ -35,7 +37,7 @@ export default async function TournamentDetailsPage({ params }: { params: { tour
                 </p>
                 <Link
                     href="/tournaments"
-                    className="bg-primary text-white px-4 py-2 rounded-lg text-base font-jersey-25
+                    className="bg-primary text-white px-4 py-2 rounded-lg text-base font-jersey
                                 hover:bg-secondary transition-colors duration-150"
                 >
                     Back to Tournaments
@@ -60,12 +62,14 @@ export default async function TournamentDetailsPage({ params }: { params: { tour
     }
 
     return (
-        <main className="bg-main-bg flex flex-col font-[Poppins] text-black">
+        <>
             <TournamentDetails
                 tournament={tournament}
                 hasPermissions={permissions}
                 events={events}
+                eventsSuccess={eventsSuccess}
+                participants={participants}
             />
-        </main>
+        </>
     );
 }

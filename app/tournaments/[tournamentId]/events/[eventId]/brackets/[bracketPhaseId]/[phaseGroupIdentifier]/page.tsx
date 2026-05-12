@@ -1,6 +1,9 @@
 import {notFound} from "next/navigation";
+import Link from "next/link";
+import {ArrowLeft} from "lucide-react";
 import {doesPhaseGroupExist, fetchBracketTypeFromBracketPhase} from "@/server/queries/phases.queries";
 import SingleElimBracket from "@/features/event-brackets/single-elim-bracket";
+import RoundRobinBracket from "@/features/event-brackets/round-robin-bracket";
 import {fetchBracket} from "@/server/queries/brackets.queries";
 import {BracketType} from "@/lib/types/types";
 
@@ -42,8 +45,17 @@ searchParams?: Promise<{
 
 
     return (
-        <div>
+        <div className="flex-1 bg-main-bg font-poppins text-black overflow-y-auto overflow-x-scroll mx-0 sm:mx-4 lg:mx-20 border-x-0 sm:border-x-2 border-gray-200">
+            <Link
+                href={`/tournaments/${tournamentId}/events/${eventId}/brackets`}
+                className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-primary
+                           transition-colors ml-4 mt-6"
+            >
+                <ArrowLeft className="size-4" />
+                Back to brackets
+            </Link>
             {bracketType == BracketType.SingleElimination && <SingleElimBracket rounds={matches} match={match} round={round} />}
+            {bracketType == BracketType.RoundRobin && <RoundRobinBracket rounds={matches} />}
         </div>
     )
 }

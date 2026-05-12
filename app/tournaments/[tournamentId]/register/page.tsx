@@ -34,7 +34,7 @@ export default async function TournamentRegistrationPage({
 
     if (!tournamentSuccess || !tournament) {
         return (
-            <main className="bg-main-bg flex flex-col items-center justify-center py-10 text-black font-[Poppins]">
+            <main className="bg-main-bg flex flex-col items-center justify-center py-10 text-black font-poppins">
                 <Trophy size={48} className="text-gray-300 mb-4" />
                 <h1 className="text-2xl font-jersey-25 text-gray-700 mb-2">Tournament Not Found</h1>
                 <p className="text-sm text-gray-500 mb-6 text-center">
@@ -52,7 +52,7 @@ export default async function TournamentRegistrationPage({
     }
 
     return (
-        <main className="bg-main-bg font-[Poppins] font-semibold text-black min-h-screen">
+        <main className="bg-main-bg font-poppins text-black min-h-screen">
             <RegistrationForm
                 tournament={tournament}
                 events={eventsSuccess ? (events ?? []) : []}

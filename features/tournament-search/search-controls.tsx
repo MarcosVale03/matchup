@@ -26,6 +26,7 @@ export default function SearchControls() {
         } else {
             params.delete(key);
         }
+        params.delete('page'); // reset to first page when filters change
         router.push(`${pathname}?${params.toString()}`);
     }, [router, pathname, searchParams]);
 
