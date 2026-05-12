@@ -9,6 +9,7 @@ import {
     fetchBracketTypeFromBracketPhase, fetchPhaseGroupsFromBracketPhase
 } from "@/server/queries/phases.queries";
 import SingleElimBracket from "@/features/event-brackets/admin-single-elim-bracket";
+import AdminRoundRobinBracket from "@/features/event-brackets/admin-round-robin-bracket";
 import {fetchBracket} from "@/server/queries/brackets.queries";
 import Link from "next/link";
 import {ArrowLeft} from "lucide-react";
@@ -74,6 +75,11 @@ export default async function Page(
                 Back to tournament details
             </Link>
             {bracketType == BracketType.SingleElimination && <SingleElimBracket
+                tournamentId={tournamentId} events={events} currEventId={eventId}
+                bracketPhases={bracketPhases} currBP={bracketPhaseId}
+                phaseGroups={phaseGroups} currPG={phaseGroupIdentifier}
+                rounds={matches} match={match} round={round} />}
+            {bracketType == BracketType.RoundRobin && <AdminRoundRobinBracket
                 tournamentId={tournamentId} events={events} currEventId={eventId}
                 bracketPhases={bracketPhases} currBP={bracketPhaseId}
                 phaseGroups={phaseGroups} currPG={phaseGroupIdentifier}
