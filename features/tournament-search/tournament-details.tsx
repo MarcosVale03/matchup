@@ -2,7 +2,7 @@
 import { FetchTournamentFromIdResponse, FetchTournamentParticipantsResponse } from "@/server/queries/tournaments.queries";
 import { getTimeUntilStart } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import {Mail, Globe, Cog, NotebookPen} from "lucide-react";
+import {Mail, Globe, Cog, UserPlus} from "lucide-react";
 import Image from "next/image";
 import { FetchEventsFromTournamentIdResponse } from "@/server/queries/events.queries";
 import EventList from "@/features/tournament-events/event-list";
@@ -133,7 +133,7 @@ export function TournamentDetails({
     const router = useRouter();
 
     const handleAdminClick = () => router.push(`/admin/tournaments/${tournament.id}/`);
-    const handleRegisterClick = () => router.push(`/tournaments/${tournament.id}/register`);
+    const handleRegClick = () => router.push(`/tournaments/${tournament.id}/register`);
 
     return (
         <div className="flex flex-row text-black">
@@ -153,36 +153,28 @@ export function TournamentDetails({
                             {tournament.name}
                         </h1>
 
-                        {/* Shows edit/delete option if user has permissions */}
-                        {hasPermissions && (
-                            <div className="flex gap-4 tracking-wide shrink-0">
-                                <button
-                                    onClick={handleAdminClick}
-                                    className="flex items-center justify-center gap-2 p-2 px-4 lg:mt-0
-                                           rounded-md shadow-sm text-sm md:text-lg font-jersey
+                        <div className="flex gap-4 tracking-wide shrink-0">
+                            {hasPermissions && <button
+                                onClick={handleAdminClick}
+                                className="flex items-center justify-center gap-2 p-2 px-4 lg:mt-0
+                                           rounded-md shadow-sm text-sm md:text-lg font-jersey-25
                                            text-white bg-primary hover:bg-secondary cursor-pointer
                                            disabled:opacity-50 transition-colors duration-200"
-                                >
-                                    <Cog className="size-5" />
-                                    Admin
-                                </button>
-                            </div>
-                        )}
-
-                        {!isUserParticipant && (
-                            <div className="flex gap-4 tracking-wide shrink-0 ml-2 ">
-                                <button
-                                    onClick={handleRegisterClick}
-                                    className="flex items-center justify-center gap-2 p-2 px-4 lg:mt-0
-                                           rounded-md shadow-sm text-sm md:text-lg font-jersey
+                            >
+                                <Cog className="size-5" />
+                                Admin
+                            </button>}
+                            <button
+                                onClick={handleRegClick}
+                                className="flex items-center justify-center gap-2 p-2 px-4 lg:mt-0
+                                           rounded-md shadow-sm text-sm md:text-lg font-jersey-25
                                            text-white bg-primary hover:bg-secondary cursor-pointer
                                            disabled:opacity-50 transition-colors duration-200"
-                                >
-                                    <NotebookPen className="size-5" />
-                                    Register
-                                </button>
-                            </div>
-                        )}
+                            >
+                                <UserPlus className="size-5" />
+                                Register
+                            </button>
+                        </div>
                     </div>
 
                     {/* organizer, start/end time*/}

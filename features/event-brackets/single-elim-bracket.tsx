@@ -1,5 +1,7 @@
 'use client'
 import {FetchBracketResponse, MatchResponse} from "@/server/queries/brackets.queries";
+import {usePathname, useRouter, useSearchParams} from "next/navigation";
+import {MouseEventHandler} from "react";
 
 const CARD_WIDTH = 200;
 const COLUMN_WIDTH = 244;
@@ -49,7 +51,7 @@ function computeBracketStats(rounds: FetchBracketResponse): BracketStats {
     const finalRound = rounds.find(r => r.round_num === 1);
     const finalMatch = finalRound?.matches[0];
     let champion: BracketStats["champion"] = null;
-    if (finalMatch?.isComplete) {
+    if (finalMatch?.is_complete) {
         const [s1, s2] = finalMatch.match_slots;
         if (s1 && s2 && s1.score !== s2.score) {
             const winnerSlot = s1.score > s2.score ? s1 : s2;
@@ -69,7 +71,7 @@ function Slot({
     score,
     isWinner,
     seed,
-    showSeed,
+    showSeed
 }: {
     name: string;
     prefix: string;
@@ -141,7 +143,7 @@ function MatchNode({ match, matchIndex, isLast, showSeeds }: {
         );
     }
 
-    const isComplete = match.isComplete;
+    const isComplete = match.is_complete;
     const winner =
         isComplete && slot1.score !== slot2.score
             ? (slot1.score! > slot2.score! ? 1 : 2)
@@ -220,18 +222,41 @@ function MatchNode({ match, matchIndex, isLast, showSeeds }: {
 export default function SingleElimBracket({
     rounds,
     showSeeds = true,
+    round = null,
+    match = null
 }: {
     rounds: FetchBracketResponse;
     showSeeds?: boolean;
+    round: number | null;
+    match: number | null
 }) {
+    const searchParams = useSearchParams()
+    const pathname = usePathname()
+    const {replace} = useRouter()
     const totalRounds = rounds.length;
 
     if (totalRounds === 0) {
         return <p className="text-gray-400 text-center py-8">No bracket data yet</p>;
     }
 
+    const handleClick = (rnum: number, mid: number) => {
+        const params = new URLSearchParams(searchParams);
+        params.set('r', rnum.toString())
+        params.set('m', mid.toString())
+        replace(`${pathname}?${params.toString()}`);
+    }
+
+    const handleBgClick: MouseEventHandler = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const params = new URLSearchParams(searchParams);
+        params.delete('r')
+        params.delete('m')
+        replace(`${pathname}?${params.toString()}`);
+    }
+
     return (
-        <div className="p-8">
+        <div className="p-8" onClick={handleBgClick}>
             <div className="flex overflow-x-auto pl-2">
             {rounds.map((round, roundIndex) => (
                 <div
@@ -249,19 +274,119 @@ export default function SingleElimBracket({
 
                     {/* Matches */}
                     <div className="flex flex-col flex-1">
-                        {round.matches.map((match, i) => (
-                            <MatchNode
-                                key={match.code}
-                                match={match}
-                                matchIndex={i}
-                                isLast={roundIndex === rounds.length - 1}
-                                showSeeds={showSeeds}
-                            />
+                        {round.matches.map((match, matchIndex) => (
+                            <button key={match.code} onClick={(e) => {
+                                e.stopPropagation();
+                                handleClick(roundIndex, matchIndex)
+                            }} className='cursor-pointer' >
+                                <MatchNode
+                                    key={match.code}
+                                    match={match}
+                                    matchIndex={matchIndex}
+                                    isLast={roundIndex === rounds.length - 1}
+                                    showSeeds={showSeeds}
+                                />
+                            </button>
                         ))}
                     </div>
                 </div>
             ))}
+                {/*SHOWN MATCH*/}
+                {((round !== null && match !== null) && rounds[round]?.matches[match] !== undefined) &&
+                    <MatchPopup showSeeds={showSeeds} match={rounds[round].matches[match]} onClick={(e) => e.stopPropagation()}>
+
+                    </MatchPopup>}
             </div>
+        </div>
+    );
+}
+
+
+function MatchPopup({ onClick, match, showSeeds }: {
+    onClick: MouseEventHandler;
+    match: MatchResponse;
+    showSeeds: boolean
+}) {
+    const slot1 = match.match_slots[0];
+    const slot2 = match.match_slots[1];
+
+    // TODO: winner detection is hardcoded — should compare slot scores
+    // once scoring is wired up
+    const isComplete = match.is_complete;
+    const winner = isComplete && slot1.score != slot2.score ? (slot1.score > slot2.score ? 1 : 2) : null;
+    console.log(winner)
+
+    return (
+        <div className="absolute bottom-2/5 right-1/3 w-1/3 h-1/3 bg-gray-50 border-4 border-primary shadow-xl rounded-3xl"
+            onClick={onClick}>
+            {/* Connector line leading in from the previous round */}
+            {/*roundIndex > 0 && <div className="w-6 h-px bg-gray-300" />*/}
+
+            <div className='w-full h-full grid grid-cols-2'>
+                <PopupSlot
+                    name={slot1.seed?.user?.display_name ?? slot1.prereqCondition ?? "Error"}
+                    prefix={slot1.seed?.user?.prefix ?? ""}
+                    score={slot1.score}
+                    isWinner={winner == 1}
+                    seed={slot1.seed?.seed_num ?? null}
+                    showSeed={showSeeds}
+                    slotNum={1}
+                />
+                <PopupSlot
+                    name={slot2.seed?.user?.display_name ?? slot2.prereqCondition ?? "Error"}
+                    prefix={slot2.seed?.user?.prefix ?? ""}
+                    score={slot2.score}
+                    isWinner={winner == 2}
+                    seed={slot2.seed?.seed_num ?? null}
+                    showSeed={showSeeds}
+                    slotNum={2}
+                />
+            </div>
+        </div>
+    );
+}
+
+
+function PopupSlot({
+                  name,
+                  prefix,
+                  score,
+                  isWinner,
+                  seed,
+                  showSeed,
+                  slotNum
+              }: {
+    name: string;
+    prefix: string;
+    score: number | null;
+    isWinner: boolean;
+    seed: number | null;
+    showSeed: boolean;
+    slotNum: number;
+}) {
+    return (
+        <div className={`flex items-center px-3 py-2 justify-between m-4 h-20
+            ${isWinner ? "bg-primary/10" : ""}
+            ${name === "TBD" ? "text-gray-400 italic" : ""}
+            ${slotNum === 2 ? "flex-row-reverse" : ""}`}
+        >
+            <div className='flex flex-row items-center justify-start'>
+                {showSeed && <div className={`text-sm mr-2 pr-3 border-r
+                ${isWinner ? "font-bold text-primary" : "text-gray-800"}`}>
+                    <p>{seed}</p>
+                </div>}
+                <p className={`text-sm truncate flex-1 
+                ${isWinner ? "font-bold text-primary" : "text-gray-800"}`}>
+                    {prefix && <span className="mr-1 text-xs">{prefix}</span>}<span>{name}</span>
+                </p>
+            </div>
+
+            {score != null && (
+                <p className={`text-3xl mx-8 font-bold
+                    ${isWinner ? "text-primary" : "text-gray-400"}`}>
+                    {score}
+                </p>
+            )}
         </div>
     );
 }

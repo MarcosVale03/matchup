@@ -3,12 +3,13 @@ import {FetchTournamentFromIdResponse, FetchTournamentParticipantsResponse} from
 import { getTimeUntilStart } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import {Mail, Pencil, Globe, Trash, AlertTriangle, Trash2, Plus} from "lucide-react";
+import {Mail, Pencil, Globe, Trash, User, CalendarPlus, ArrowUpDown, Megaphone} from "lucide-react";
 import Image from "next/image";
 import React, { useState } from "react";
 import { deleteTournament } from "@/server/mutations/tournaments.mutations";
 import { ConfirmButton } from "@/ui/confirm-button";
 import { FetchEventsFromTournamentIdResponse } from "@/server/queries/events.queries";
-import EventList from "@/features/tournament-events/event-list";
+import EventList from "@/features/tournament-events/admin-event-list";
 import { formatDate } from "date-fns";
 
 
@@ -139,7 +140,6 @@ export function TournamentDetails({
     const [deleteError, setDeleteError] = useState<string | null>(null);
 
     const handleEditClick = () => router.push(`/admin/tournaments/${tournament.id}/edit`);
-    const handleAddEventsClick = () => router.push(`/admin/tournaments/${tournament.id}/events/create`);
 
     const handleDeleteConfirm = async () => {
         setIsDeleting(true);
@@ -159,6 +159,11 @@ export function TournamentDetails({
             setDeleteError("An unexpected error occurred.");
         }
     };
+
+    const handleViewClick = () => router.push(`/tournaments/${tournament.id}`)
+    const handleAddEventClick = () => router.push(`/admin/tournaments/${tournament.id}/events/create`)
+    const handleSeedingClick = () => router.push(`/admin/tournaments/${tournament.id}/seeding`)
+    const handleReportingClick = () => router.push(`/admin/tournaments/${tournament.id}/reporting`)
 
     return (
         <div className="flex flex-row flex-1">
@@ -213,16 +218,45 @@ export function TournamentDetails({
                                     Delete
                                 </button>
                                 <button
-                                    onClick={handleAddEventsClick}
+                                    onClick={() => handleAddEventClick()}
                                     className="flex items-center justify-center gap-2 p-2 px-4 lg:mt-0
-                                           rounded-md shadow-sm text-sm md:text-lg font-jersey
+                                           rounded-md shadow-sm text-sm md:text-lg font-jersey-25
                                            text-white bg-primary hover:bg-secondary cursor-pointer
                                            disabled:opacity-50 transition-colors duration-200"
                                 >
-                                    <Plus className="size-5" />
-                                    Add Events
+                                    <CalendarPlus className="size-5" />
+                                    Add Event
                                 </button>
-
+                                <button
+                                    onClick={() => handleSeedingClick()}
+                                    className="flex items-center justify-center gap-2 p-2 px-4 lg:mt-0
+                                           rounded-md shadow-sm text-sm md:text-lg font-jersey-25
+                                           text-white bg-primary hover:bg-secondary cursor-pointer
+                                           disabled:opacity-50 transition-colors duration-200"
+                                >
+                                    <ArrowUpDown className="size-5" />
+                                    Seeding
+                                </button>
+                                <button
+                                    onClick={() => handleReportingClick()}
+                                    className="flex items-center justify-center gap-2 p-2 px-4 lg:mt-0
+                                           rounded-md shadow-sm text-sm md:text-lg font-jersey-25
+                                           text-white bg-primary hover:bg-secondary cursor-pointer
+                                           disabled:opacity-50 transition-colors duration-200"
+                                >
+                                    <Megaphone className="size-5" />
+                                    Reporting
+                                </button>
+                                <button
+                                    onClick={() => handleViewClick()}
+                                    className="flex items-center justify-center gap-2 p-2 px-4 lg:mt-0
+                                           rounded-md shadow-sm text-sm md:text-lg font-jersey-25
+                                           text-white bg-primary hover:bg-secondary cursor-pointer
+                                           disabled:opacity-50 transition-colors duration-200"
+                                >
+                                    <User className="size-5" />
+                                    View as User
+                                </button>
                             </div>
                         )}
                     </div>

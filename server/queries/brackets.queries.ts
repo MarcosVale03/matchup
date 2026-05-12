@@ -10,7 +10,7 @@ export type MatchResponse = {
     w_advance_slot_num: number | null,
     l_advance_match_id: number | null,
     l_advance_slot_num: number | null,
-    isComplete: boolean,
+    is_complete: boolean,
     match_slots: {
         slot_num: number,
         score: number,
@@ -59,7 +59,7 @@ export async function fetchBracket(
                 l_advance_slot_num,
                 id,
                 code,
-                isComplete,
+                is_complete,
                 match_slots:match_slots_matches_fk_01(
                     slot_num,
                     score,
@@ -100,7 +100,7 @@ export async function fetchBracket(
             w_advance_slot_num: match.w_advance_slot_num,
             l_advance_match_id: match.l_advance_match_id,
             l_advance_slot_num: match.l_advance_slot_num,
-            isComplete: match.isComplete,
+            is_complete: match.is_complete,
             match_slots: await Promise.all(match.match_slots.map(async slot => {return {
                 slot_num: slot.slot_num,
                 score: slot.score,

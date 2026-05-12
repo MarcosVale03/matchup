@@ -7,8 +7,7 @@ import { insertTournament, TournamentInsertErrors } from '@/server/mutations/tou
 import { dateToInputString } from "@/lib/utils";
 import { ArrowRight } from 'lucide-react';
 import { ErrorMessageForTournament } from "@/features/tournament-crud/error-message-tournament";
-import Checkbox from "@/ui/checkbox";
-import { AdminInsertErrors, insertAdmin } from '@/server/mutations/add-admin.mutation';
+import { insertAdmin } from '@/server/mutations/add-admin.mutation';
 import { getUserIdfromEmail } from '@/server/queries/profile.queries';
 import { FormSection } from '@/ui/form-section';
 import { SegmentedToggle } from '@/ui/segmented-toggle';
@@ -136,6 +135,8 @@ export default function TournamentInsertForm() {
                     console.log('skipped empty email at index', admin.indexOf(admins))
                 }
             }
+                // Redirect to the new tournament's detail page
+                // will change this to push to create events page
                 router.push(`/admin/tournaments/${response.data}/events/create`);
             } else {
                 setFieldErrors(response.fieldErrors || {});
