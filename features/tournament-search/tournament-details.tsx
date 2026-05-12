@@ -121,14 +121,12 @@ export function TournamentDetails({
     hasPermissions,
     eventsSuccess,
     participants,
-    isUserParticipant,
 }: {
     tournament: FetchTournamentFromIdResponse;
     events?: FetchEventsFromTournamentIdResponse;
     hasPermissions: boolean;
     eventsSuccess: boolean;
     participants: FetchTournamentParticipantsResponse;
-    isUserParticipant: boolean;
 }) {
     const router = useRouter();
 
@@ -164,18 +162,16 @@ export function TournamentDetails({
                                 <Cog className="size-5" />
                                 Admin
                             </button>}
-                            {!isUserParticipant && (
-                                <button
-                                    onClick={handleRegClick}
-                                    className="flex items-center justify-center gap-2 p-2 px-4 lg:mt-0
-                                           rounded-md shadow-sm text-sm md:text-lg font-jersey
-                                           text-white bg-primary hover:bg-secondary cursor-pointer
-                                           disabled:opacity-50 transition-colors duration-200"
-                                >
-                                    <UserPlus className="size-5" />
-                                    Register
-                                </button>
-                            )}
+                            <button
+                                onClick={handleRegClick}
+                                className="flex items-center justify-center gap-2 p-2 px-4 lg:mt-0
+                                       rounded-md shadow-sm text-sm md:text-lg font-jersey
+                                       text-white bg-primary hover:bg-secondary cursor-pointer
+                                       disabled:opacity-50 transition-colors duration-200"
+                            >
+                                <UserPlus className="size-5" />
+                                Register
+                            </button>
 
                         </div>
                     </div>

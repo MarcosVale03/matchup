@@ -61,14 +61,6 @@ export default async function TournamentDetailsPage({params}: { params: { tourna
         }
     }
 
-    let isParticipant = false;
-    for (const participant of participants) {
-        if (user?.id === participant.user_id) {
-            isParticipant = true;
-            break;
-        }
-    }
-
     return (
         <>
             <TournamentDetails
@@ -77,7 +69,6 @@ export default async function TournamentDetailsPage({params}: { params: { tourna
                 events={events}
                 eventsSuccess={eventsSuccess}
                 participants={participants}
-                isUserParticipant={isParticipant}
             />
         </>
     );
