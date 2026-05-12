@@ -19,7 +19,7 @@ export default async function EditTournamentPage({ params }: { params: Promise<{
         return notFound();
     }
 
-    const hasPermissions = await hasPermissionLevel(user.id, id, PermissionLevel.Admin)
+    const hasPermissions = user ? await hasPermissionLevel(user.id, id, PermissionLevel.Admin) : false
 
     if (!hasPermissions) {
         redirect('/tournaments')
