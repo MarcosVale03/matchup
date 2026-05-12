@@ -161,7 +161,7 @@ export async function fetchStandings(tournamentId: number, eventId: number): Pro
             .from('matches')
             .select(`
                 id,
-                isComplete,
+                is_complete,
                 match_slots:match_slots_matches_fk_01(
                     slot_num,
                     score,
@@ -172,7 +172,7 @@ export async function fetchStandings(tournamentId: number, eventId: number): Pro
             `)
             .eq('tournament_id', tournamentId)
             .eq('event_id', eventId)
-            .eq('isComplete', true),
+            .eq('is_complete', true),
     ])
 
     throwIfQueryError(phasesRes, 'bracket_phases')
@@ -313,7 +313,7 @@ export async function fetchMatchesFromEventId(tournamentId: number, eventId: num
             id,
             code,
             round_num,
-            isComplete,
+            is_complete,
             phase_group_identifier,
             match_slots:match_slots_matches_fk_01(
                 slot_num,
@@ -335,7 +335,7 @@ export async function fetchMatchesFromEventId(tournamentId: number, eventId: num
         id: m.id,
         code: m.code,
         round_num: m.round_num,
-        isComplete: m.isComplete,
+        isComplete: m.is_complete,
         phase_group_identifier: m.phase_group_identifier,
         slots: m.match_slots
             .map(s => ({

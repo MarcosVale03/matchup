@@ -5,6 +5,8 @@ import {PermissionLevel} from "@/lib/types/types";
 import SeedEditor from "@/features/seeding/SeedEditor";
 import {doesEventExist, fetchEventsFromTournamentId} from "@/server/queries/events.queries";
 import {fetchSeedsFromEvent} from "@/server/queries/seeding.queries";
+import Link from "next/link";
+import {ArrowLeft} from "lucide-react";
 
 export default async function Page(
     { params }: { params: Promise<{ tournamentId: string, eventId: string }> }
@@ -37,6 +39,14 @@ export default async function Page(
 
     return (
         <main className="bg-main-bg flex flex-col font-[Poppins] text-black">
+            <Link
+                href={`/admin/tournaments/${tournamentId}`}
+                className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-primary
+                           transition-colors ml-4 mt-6"
+            >
+                <ArrowLeft className="size-4" />
+                Back to tournament details
+            </Link>
             <SeedEditor tournamentId={tournamentId} events={events} currEventId={eventId} phaseGroupsInit={phaseGroups}/>
         </main>
     )

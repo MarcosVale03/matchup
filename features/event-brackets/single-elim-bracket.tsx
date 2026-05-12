@@ -29,7 +29,7 @@ function computeBracketStats(rounds: FetchBracketResponse): BracketStats {
     let completedMatches = 0;
     for (const round of rounds) {
         totalMatches += round.matches.length;
-        completedMatches += round.matches.filter(m => m.isComplete).length;
+        completedMatches += round.matches.filter(m => m.is_complete).length;
     }
 
     // The starting round has the highest round_num (round_num=1 is the final).
@@ -42,7 +42,7 @@ function computeBracketStats(rounds: FetchBracketResponse): BracketStats {
     // Current round = lowest round_num with at least one incomplete match.
     const inProgress = [...rounds]
         .sort((a, b) => b.round_num - a.round_num)
-        .find(r => r.matches.some(m => !m.isComplete));
+        .find(r => r.matches.some(m => !m.is_complete));
     const currentRoundLabel = inProgress
         ? roundLabel(inProgress.round_num, totalRounds)
         : null;
@@ -123,11 +123,12 @@ function Slot({
     );
 }
 
-function MatchNode({ match, matchIndex, isLast, showSeeds }: {
+function MatchNode({ match, matchIndex, isLast, showSeeds, onClick }: {
     match: MatchResponse;
     matchIndex: number;
     isLast: boolean;
     showSeeds: boolean;
+    onClick: MouseEventHandler;
 }) {
     const sortedSlots = [...match.match_slots].sort((a, b) => a.slot_num - b.slot_num);
     const slot1 = sortedSlots.find(s => s.slot_num === 1) ?? sortedSlots[0];
@@ -161,7 +162,8 @@ function MatchNode({ match, matchIndex, isLast, showSeeds }: {
         <div className="flex-1 flex items-center relative min-h-24 w-full">
             {/* Match card */}
             <div
-                className="relative bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                onClick={onClick}
+                className="relative bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer"
                 style={{ width: CARD_WIDTH }}
             >
                 {/* Match code badge */}
@@ -275,18 +277,17 @@ export default function SingleElimBracket({
                     {/* Matches */}
                     <div className="flex flex-col flex-1">
                         {round.matches.map((match, matchIndex) => (
-                            <button key={match.code} onClick={(e) => {
-                                e.stopPropagation();
-                                handleClick(roundIndex, matchIndex)
-                            }} className='cursor-pointer' >
-                                <MatchNode
-                                    key={match.code}
-                                    match={match}
-                                    matchIndex={matchIndex}
-                                    isLast={roundIndex === rounds.length - 1}
-                                    showSeeds={showSeeds}
-                                />
-                            </button>
+                            <MatchNode
+                                key={match.code}
+                                match={match}
+                                matchIndex={matchIndex}
+                                isLast={roundIndex === rounds.length - 1}
+                                showSeeds={showSeeds}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleClick(roundIndex, matchIndex);
+                                }}
+                            />
                         ))}
                     </div>
                 </div>

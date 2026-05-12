@@ -40,14 +40,14 @@ function isPlayableHeadToHead(match: MatchResponse): boolean {
     if (match.match_slots.length !== 2) return false;
     const [slot1, slot2] = match.match_slots;
     if (!keyOfSlot(slot1) || !keyOfSlot(slot2)) return false;
-    if (!match.isComplete) return false;
+    if (!match.is_complete) return false;
     return isValidScore(slot1.score) && isValidScore(slot2.score);
 }
 
 // The lone entrant gets credit for showing up but no score is added to their for/against totals.
 function detectByeEntrant(match: MatchResponse): MatchSlot | null {
     if (match.match_slots.length !== 2) return null;
-    if (!match.isComplete) return null;
+    if (!match.is_complete) return null;
     const [slot1, slot2] = match.match_slots;
     const has1 = !!keyOfSlot(slot1);
     const has2 = !!keyOfSlot(slot2);
@@ -486,7 +486,7 @@ function ScheduleTimeline({ rounds }: { rounds: FetchBracketResponse }) {
                                     const [slot1, slot2] = match.match_slots;
 
                                     const bothScoresReported =
-                                        match.isComplete &&
+                                        match.is_complete &&
                                         isValidScore(slot1.score) &&
                                         isValidScore(slot2.score);
 

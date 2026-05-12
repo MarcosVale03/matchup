@@ -157,23 +157,26 @@ export function TournamentDetails({
                             {hasPermissions && <button
                                 onClick={handleAdminClick}
                                 className="flex items-center justify-center gap-2 p-2 px-4 lg:mt-0
-                                           rounded-md shadow-sm text-sm md:text-lg font-jersey-25
+                                           rounded-md shadow-sm text-sm md:text-lg font-jersey
                                            text-white bg-primary hover:bg-secondary cursor-pointer
                                            disabled:opacity-50 transition-colors duration-200"
                             >
                                 <Cog className="size-5" />
                                 Admin
                             </button>}
-                            <button
-                                onClick={handleRegClick}
-                                className="flex items-center justify-center gap-2 p-2 px-4 lg:mt-0
-                                           rounded-md shadow-sm text-sm md:text-lg font-jersey-25
+                            {!isUserParticipant && (
+                                <button
+                                    onClick={handleRegClick}
+                                    className="flex items-center justify-center gap-2 p-2 px-4 lg:mt-0
+                                           rounded-md shadow-sm text-sm md:text-lg font-jersey
                                            text-white bg-primary hover:bg-secondary cursor-pointer
                                            disabled:opacity-50 transition-colors duration-200"
-                            >
-                                <UserPlus className="size-5" />
-                                Register
-                            </button>
+                                >
+                                    <UserPlus className="size-5" />
+                                    Register
+                                </button>
+                            )}
+
                         </div>
                     </div>
 

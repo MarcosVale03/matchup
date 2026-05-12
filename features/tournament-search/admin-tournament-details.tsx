@@ -2,8 +2,7 @@
 import {FetchTournamentFromIdResponse, FetchTournamentParticipantsResponse} from "@/server/queries/tournaments.queries";
 import { getTimeUntilStart } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import {Mail, Pencil, Globe, Trash, AlertTriangle, Trash2, Plus} from "lucide-react";
-import {Mail, Pencil, Globe, Trash, User, CalendarPlus, ArrowUpDown, Megaphone} from "lucide-react";
+import {Mail, Pencil, Globe, Trash, User, CalendarPlus, ArrowUpDown, Megaphone, AlertTriangle, Trash2} from "lucide-react";
 import Image from "next/image";
 import React, { useState } from "react";
 import { deleteTournament } from "@/server/mutations/tournaments.mutations";
@@ -220,7 +219,7 @@ export function TournamentDetails({
                                 <button
                                     onClick={() => handleAddEventClick()}
                                     className="flex items-center justify-center gap-2 p-2 px-4 lg:mt-0
-                                           rounded-md shadow-sm text-sm md:text-lg font-jersey-25
+                                           rounded-md shadow-sm text-sm md:text-lg font-jersey
                                            text-white bg-primary hover:bg-secondary cursor-pointer
                                            disabled:opacity-50 transition-colors duration-200"
                                 >
@@ -230,7 +229,7 @@ export function TournamentDetails({
                                 <button
                                     onClick={() => handleSeedingClick()}
                                     className="flex items-center justify-center gap-2 p-2 px-4 lg:mt-0
-                                           rounded-md shadow-sm text-sm md:text-lg font-jersey-25
+                                           rounded-md shadow-sm text-sm md:text-lg font-jersey
                                            text-white bg-primary hover:bg-secondary cursor-pointer
                                            disabled:opacity-50 transition-colors duration-200"
                                 >
@@ -240,7 +239,7 @@ export function TournamentDetails({
                                 <button
                                     onClick={() => handleReportingClick()}
                                     className="flex items-center justify-center gap-2 p-2 px-4 lg:mt-0
-                                           rounded-md shadow-sm text-sm md:text-lg font-jersey-25
+                                           rounded-md shadow-sm text-sm md:text-lg font-jersey
                                            text-white bg-primary hover:bg-secondary cursor-pointer
                                            disabled:opacity-50 transition-colors duration-200"
                                 >
@@ -250,7 +249,7 @@ export function TournamentDetails({
                                 <button
                                     onClick={() => handleViewClick()}
                                     className="flex items-center justify-center gap-2 p-2 px-4 lg:mt-0
-                                           rounded-md shadow-sm text-sm md:text-lg font-jersey-25
+                                           rounded-md shadow-sm text-sm md:text-lg font-jersey
                                            text-white bg-primary hover:bg-secondary cursor-pointer
                                            disabled:opacity-50 transition-colors duration-200"
                                 >
@@ -329,7 +328,7 @@ export function TournamentDetails({
                     }}
                 />
 
-                <EventList events={events} amountRegistered={participants.length} isAdmin/>
+                <EventList events={events} amountRegistered={participants.length}/>
             </div>
 
             {/* Right side, participants list */}
