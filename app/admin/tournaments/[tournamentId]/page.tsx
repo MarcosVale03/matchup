@@ -44,12 +44,12 @@ export default async function TournamentDetailsPage({ params }: { params: { tour
 
     // Kicks user out if they don't have permission to view the page
     const user = await getUser();
-    const permissions = await hasPermissionLevel(user.id, id, PermissionLevel.Reporter)
+    const permissions = user ? await hasPermissionLevel(user.id, id, PermissionLevel.Reporter) : false
     if (!permissions) {
         notFound()
     }
 
-    const hasPermissions = await hasPermissionLevel(user.id, id, PermissionLevel.Admin)
+    const hasPermissions = user ? await hasPermissionLevel(user.id, id, PermissionLevel.Admin) : false
 
     return (
         <main className="bg-main-bg flex flex-col font-[Poppins] text-black">

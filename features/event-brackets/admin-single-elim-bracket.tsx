@@ -194,7 +194,7 @@ export default function SingleElimBracket({tournamentId, events, currEventId, br
                             with their parent match in the next round */}
                         <div className="flex flex-col justify-around flex-1 gap-4">
                             {round.matches.map((match, matchIndex) => (
-                                <button key={match.code} onClick={(e) => {
+                                <button key={match.id} onClick={(e) => {
                                     e.stopPropagation();
                                     handleClick(roundIndex, matchIndex)
                                 }} className='cursor-pointer'>
