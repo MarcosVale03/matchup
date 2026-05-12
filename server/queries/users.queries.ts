@@ -1,5 +1,6 @@
 import {cookies} from "next/headers";
 import {createClient} from "@/server/db/server";
+import {AuthSessionMissingError} from "@supabase/auth-js";
 
 export async function getUser() {
     const cookieStore = await cookies();
@@ -7,6 +8,9 @@ export async function getUser() {
     const { data, error } = await supabase.auth.getUser();
 
     if (error) {
+        if (error instanceof AuthSessionMissingError) {
+            return null
+        }
         throw error;
     }
 

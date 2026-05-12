@@ -21,7 +21,7 @@ export default async function Events({ params }: { params: Promise<{ tournamentI
 
     // Kicks user out if they don't have permission to view the page
     const user = await getUser();
-    const permissions = await hasPermissionLevel(user.id, tournamentId, PermissionLevel.Reporter)
+    const permissions = user ? await hasPermissionLevel(user.id, tournamentId, PermissionLevel.Reporter) : false
     if (!permissions) {
         notFound()
     }

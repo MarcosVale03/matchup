@@ -23,7 +23,7 @@ export default async function Page(
 
     // Kicks user out if they don't have permission to view the page
     const user = await getUser();
-    const permissions = await hasPermissionLevel(user.id, tournamentId, PermissionLevel.Moderator)
+    const permissions = user ? await hasPermissionLevel(user.id, tournamentId, PermissionLevel.Moderator) : false
     if (!permissions) {
         notFound()
     }
